@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{% static 'style/main.css' %}" rel="stylesheet" />
+        {% comment %} <script defer src="{% static 'script/header.js' %}"></script> {% endcomment %}
+        <title>BroFessional Vending Services</title>
+    </head>
+    <body>
+        {% include "landing/components/landing_header.html" %}
+        {% comment %} {% if sideBar %}{% include "components/sideBar.html" %}{% endif %} {% endcomment %}
+        {% comment %} <div class="bigHeaderSpacer"></div>  {% endcomment %}
+        <div class="insideBody">
+            <div id="layoutDataContainer">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </body>
+    {% if not noFooter %}
+    <footer style="text-align:center;">
+        <p>&copy; 2024 Brofessional Vending LLC</p>
+    </footer>
+    {% endif %}
+</html>

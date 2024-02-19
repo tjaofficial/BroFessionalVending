@@ -1,0 +1,24 @@
+{% extends "landing/components/landing_layout.html" %}{% load static %}
+{% block body %}
+<style>
+</style>
+<div style="text-align:center;">
+    <div style="font-size: 33px; font-weight: bold; padding: 95px 0 25px 0;">
+        Contact Our Team
+    </div>
+    <div>
+        <form method="POST" action="">
+            {% csrf_token %}
+            Name *<br>
+            <input type="text" name="name" required><br>
+            Email *<br>
+            <input type="text" name="email" required><br>
+            Subject *<br>
+            <input type="text" name="subject" required><br>
+            Message *<br>
+            <input type="text" name="message" required><br>
+            <input type="submit" name="send" value="submit">
+        </form>
+    </div>
+</div>
+{% endblock %}

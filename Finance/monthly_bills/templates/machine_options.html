@@ -1,0 +1,416 @@
+{% load static %}
+<link href="{% static 'style/header.css' %}" rel="stylesheet">
+<link href="{% static 'style/machine_options.css' %}" rel="stylesheet">
+<script defer src="{% static 'script/add_sold.js' %}"></script>
+<body>
+    <div>
+        <div style='width:100%; margin-bottom: 5rem;'>
+            <div class="header">
+                <a class="rightGap" href="{% url 'vendDash' %}">Back</a>
+                <a class="rightGap" href="{% url 'stock' type id_tag %}">Product Data</a>
+                <a class="rightGap" href="{% url machineURL type id_tag %}">Inventory Form</a>
+                <a href="{% url 'vmax576_rd' type id_tag %}">Restock Data</a>
+            </div>
+            {% comment %} <div>
+                <table style="margin: auto; margin-top: 75px;">
+                    <tr>
+                        <th class='priceHeader'>1</th>
+                        <th class='priceHeader'>2</th>
+                        <th class='priceHeader'>3</th>
+                        <th class='priceHeader'>4</th>
+                        <th class='priceHeader'>5</th>
+                        <th class='priceHeader'>6</th>
+                        <th class='priceHeader'>7</th>
+                        <th class='priceHeader'>8</th>
+                    </tr>
+                    <tr>
+                        <td class='priceProduct'>Product: <br>{{products.0}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.1}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.2}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.3}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.4}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.5}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.6}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.7}}</td>
+                    </tr>
+                    <tr>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.0}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.1}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.2}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.3}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.4}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.5}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.6}}</p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.7}}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='priceData'>Price: ${{prices.1|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.2|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.3|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.4|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.5|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.6|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.7|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.8|floatformat:2}}</td>
+                    </tr>
+                </table>
+            </div> {% endcomment %}
+            <form method='POST'>
+                {% csrf_token %}
+                <table style="margin: auto; margin-top: 75px;">
+                    <tr>
+                        <th class='priceHeader'>1</th>
+                        <th class='priceHeader'>2</th>
+                        <th class='priceHeader'>3</th>
+                        <th class='priceHeader'>4</th>
+                        <th class='priceHeader'>5</th>
+                        <th class='priceHeader'>6</th>
+                        <th class='priceHeader'>7</th>
+                        <th class='priceHeader'>8</th>
+                    </tr>
+                    <tr>
+                        <td class='priceProduct'>Product: <br>{{products.0}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.1}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.2}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.3}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.4}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.5}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.6}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.7}}</td>
+                    </tr>
+                    <tr>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.0}}</p>
+                            <p><div class='addProdButton' id='addButtonP1'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP1'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.1}}</p>
+                            <p><div class='addProdButton' id='addButtonP2'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP2'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.2}}</p>
+                            <p><div class='addProdButton' id='addButtonP3'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP3'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.3}}</p>
+                            <p><div class='addProdButton' id='addButtonP4'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP4'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.4}}</p>
+                            <p><div class='addProdButton' id='addButtonP5'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP5'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.5}}</p>
+                            <p><div class='addProdButton' id='addButtonP6'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP6'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.6}}</p>
+                            <p><div class='addProdButton' id='addButtonP7'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP7'>sold</div></p>
+                        </td>
+                        <td class='priceInventory'>
+                            <p>Inventory: {{canta.7}}</p>
+                            <p><div class='addProdButton' id='addButtonP8'>add</div></p>
+                            <p><div class='soldProdButton' id='soldButtonP8'>sold</div></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='priceData'>Price: ${{prices.1|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.2|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.3|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.4|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.5|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.6|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.7|floatformat:2}}</td>
+                        <td class='priceData'>Price: ${{prices.8|floatformat:2}}</td>
+                    </tr>
+                    <tr>
+                        <td class='prodInputSize' id='addP1'>Add: <input type='number' name='addP1' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP2'>Add: <input type='number' name='addP2' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP3'>Add: <input type='number' name='addP3' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP4'>Add: <input type='number' name='addP4' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP5'>Add: <input type='number' name='addP5' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP6'>Add: <input type='number' name='addP6' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP7'>Add: <input type='number' name='addP7' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='addP8'>Add: <input type='number' name='addP8' value='0' class='prodInput'/></td>
+                    </tr>
+                    <tr>
+                        <td class='prodInputSize' id='soldP1'>Sold: <input type='number' name='soldP1' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP2'>Sold: <input type='number' name='soldP2' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP3'>Sold: <input type='number' name='soldP3' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP4'>Sold: <input type='number' name='soldP4' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP5'>Sold: <input type='number' name='soldP5' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP6'>Sold: <input type='number' name='soldP6' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP7'>Sold: <input type='number' name='soldP7' value='0' class='prodInput'/></td>
+                        <td class='prodInputSize' id='soldP8'>Sold: <input type='number' name='soldP8' value='0' class='prodInput'/></td>
+                    </tr>
+                    <tr>
+                        <td>{{cantaForm.date}}<input type='submit' value='Update'/></td>
+                    </tr>
+                </table>
+            </form>
+            <div style='margin-top:4rem;text-align:center;'>
+                {% comment %} <center>
+                    <table class='machine'>
+                        <tr>
+                            <th class='colHeader'>A1</th>
+                            <th class='colHeader'>A2</th>
+                            <th class='colHeader'>A3</th>
+                            <th class='colHeader'>A4</th>
+                            <th class='colHeader'>A5</th>
+                        </tr>
+                        <tr>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.A1.name}}<br><br>
+                                Stocked: {{machineLayout.A1.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.A2.name}}<br><br>
+                                Stocked: {{machineLayout.A2.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.A3.name}}<br><br>
+                                Stocked: {{machineLayout.A3.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.A4.name}}<br><br>
+                                Stocked: {{machineLayout.A4.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.A5.name}}<br><br>
+                                Stocked: {{machineLayout.A5.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                        </tr>
+                    </table><br>
+                    <table class='machine'>
+                        <tr>
+                            <th class='colHeader'>B1</th>
+                            <th class='colHeader'>B2</th>
+                            <th class='colHeader'>B3</th>
+                            <th class='colHeader'>B4</th>
+                            <th class='colHeader'>B5</th>
+                            <th class='colHeader'>B6</th>
+                        </tr>
+                        <tr>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B1.name}}<br><br>
+                                Stocked: {{machineLayout.B1.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B2.name}}<br><br>
+                                Stocked: {{machineLayout.B2.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B3.name}}<br><br>
+                                Stocked: {{machineLayout.B3.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B4.name}}<br><br>
+                                Stocked: {{machineLayout.B4.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B5.name}}<br><br>
+                                Stocked: {{machineLayout.B5.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.B6.name}}<br><br>
+                                Stocked: {{machineLayout.B6.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                        </tr>
+                    </table><br>
+                    <table class='machine'>
+                        <tr>
+                            <th class='colHeader'>C1</th>
+                            <th class='colHeader'>C2</th>
+                            <th class='colHeader'>C3</th>
+                            <th class='colHeader'>C4</th>
+                            <th class='colHeader'>C5</th>
+                            <th class='colHeader'>C6</th>
+                            <th class='colHeader'>C7</th>
+                            <th class='colHeader'>C8</th>
+                            <th class='colHeader'>C9</th>
+                            <th class='colHeader'>C10</th>
+                        </tr>
+                        <tr>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C1.name}}<br><br>
+                                Stocked: {{machineLayout.C1.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C2.name}}<br><br>
+                                Stocked: {{machineLayout.C2.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C3.name}}<br><br>
+                                Stocked: {{machineLayout.C3.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C4.name}}<br><br>
+                                Stocked: {{machineLayout.C4.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C5.name}}<br><br>
+                                Stocked: {{machineLayout.C5.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C6.name}}<br><br>
+                                Stocked: {{machineLayout.C6.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C7.name}}<br><br>
+                                Stocked: {{machineLayout.C7.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C8.name}}<br><br>
+                                Stocked: {{machineLayout.C8.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C9.name}}<br><br>
+                                Stocked: {{machineLayout.C9.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.C10.name}}<br><br>
+                                Stocked: {{machineLayout.C10.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                        </tr>
+                    </table><br>
+                    <table class='machine'>
+                        <tr>
+                            <th class='colHeader'>D1</th>
+                            <th class='colHeader'>D2</th>
+                            <th class='colHeader'>D3</th>
+                            <th class='colHeader'>D4</th>
+                            <th class='colHeader'>D5</th>
+                            <th class='colHeader'>D6</th>
+                            <th class='colHeader'>D7</th>
+                            <th class='colHeader'>D8</th>
+                        </tr>
+                        <tr>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D1.name}}<br><br>
+                                Stocked: {{machineLayout.D1.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D2.name}}<br><br>
+                                Stocked: {{machineLayout.D2.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D3.name}}<br><br>
+                                Stocked: {{machineLayout.D3.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D4.name}}<br><br>
+                                Stocked: {{machineLayout.D4.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D5.name}}<br><br>
+                                Stocked: {{machineLayout.D5.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D6.name}}<br><br>
+                                Stocked: {{machineLayout.D6.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D7.name}}<br><br>
+                                Stocked: {{machineLayout.D7.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                            <td class='contentBox rowHeight'>
+                                {{machineLayout.D8.name}}<br><br>
+                                Stocked: {{machineLayout.D8.in_stock}}<br><br>
+                                {% include "deleteButton.html" %}
+                            </td>
+                        </tr>
+                    </table><br>
+                </center> {% endcomment %}
+                Cash Collected: ${{totalCollected}}<br><br>
+                <table id="logList" class='mainTable'>
+                    <tr>
+                        <th colspan=7 style='text-align:center;padding:5px;'>Inventory Logs</th>
+                    </tr>
+                    <tr>
+                        <th class='c1'>Date</th>
+                        <th class='c2'>Technician</th>
+                        <th class='c3'>Start Time</th>
+                        <th class='c4'>Stop Time</th>
+                        <th class='c5'>Condition</th>
+
+                        <th class='c6'>Collected</th>
+                        <th class='c7'>Notes</th>
+                    </tr>
+                    
+                    {% for log in inventoryLogs %}
+                        <tr class="logLine">
+                            <td class='c1'>{{log.date}}</td>
+                            <td class='c2'>{{log.technician}}</td>
+                            <td class='c3'>{{log.time_start}}</td>
+                            <td class='c4'>{{log.time_end}}</td>
+                            <td class='c5'>{{log.condition}}</td>
+                            
+                            <td class='c6'>${{log.collected|floatformat:2}}</td>
+                            <td class='c7'>{{log.notes}}</td>
+                        </tr>
+                    {% endfor%}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td style="text-align:right;">Cash Collected:</td>
+                        <td style="text-align:center;"></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>

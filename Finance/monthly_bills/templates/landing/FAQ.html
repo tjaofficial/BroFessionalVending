@@ -1,0 +1,31 @@
+{% extends "landing/components/landing_layout.html" %}{% load static %}
+{% block body %}
+<style>
+    .question{
+        font-size: 19px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .answer{
+        line-height: 38px;
+        margin-bottom: 62px;
+    }
+</style>
+<div style="text-align:center;">
+    <div style="font-size: 33px; font-weight: bold; padding: 95px 0 25px 0;">
+        Frequently Asked Questions
+    </div>
+    <div style="letter-spacing: 2px; margin-bottom: 73px;">
+        A Curated List for You
+    </div>
+    <div style="display: flex; justify-content:center;">
+        <div style="width: 831px; text-align: left;">
+            {% for FAQ in FAQData %}
+                <div class="question">{{FAQ.question}}</div><br>
+                <div class="answer">{{FAQ.answer}}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

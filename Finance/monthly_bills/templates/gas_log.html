@@ -1,0 +1,86 @@
+<style>
+    table{
+        border-collapse: collapse;
+    }
+    th, td {
+        border:1px solid black;
+        border-collapse: collapse;
+    }
+    .mainTable{
+        width:100%;
+        max-width: 925px;
+        margin:auto;
+        background-color: #f1eace;
+    }
+</style>
+
+<body>
+    <div>
+        <div style='width:100%; height:100%;'>
+            <a href={% url 'vendDash' %}>Back</a>
+            <div style='margin-top:10rem;'>
+                <table class='mainTable'>
+                    <tr>
+                        <th colspan=7 style='text-align:center;padding:5px;'>Gas Log</th>
+                    </tr>
+                    <tr>
+                        <th style='width: 162px;'>Name</th>
+                        <th style='width: 110px;'>Date</th>
+                        <th style='width: 55px;'>Cost</th>
+                        <th>Description</th>
+                    </tr>
+                    {% if existingG %}
+                        {% for itemDetails in gas %}
+                            <tr>
+                                <td>{{itemDetails.name}}</td>
+                                <td>{{itemDetails.date}}</td>
+                                <td>${{itemDetails.actual_cost}}</td>
+                                <td>{{itemDetails.description}}</td>
+                            </tr>
+                        {% endfor%}
+                    {% else %}
+                    <tr>
+                        <td colspan=7 style='text-align:center;padding:20px;'>No Gas Logs</td>
+                    </tr>
+                    {% endif %}
+                </table>
+                <center style='margin-top: 15px'>Total Gas: ${{totalG}}</center><br>
+                <center>Tax Deduction: ${{taxDg}}</center><br>
+            </div>
+            <br>
+            <center><a href={% url 'addGas' %}>Add Gas Log</a></center>
+            <br>
+            <div style='margin-top:10rem;'>
+                <table class='mainTable'>
+                    <tr>
+                        <th colspan=4 style='text-align:center;padding:5px;'>Mileage Log</th>
+                    </tr>
+                    <tr>
+                        <th style='width: 162px;'>Name</th>
+                        <th style='width: 110px;'>Date</th>
+                        <th style='width: 70px;'>Mileage</th>
+                        <th>Description</th>
+                    </tr>
+                    {% if existingM %}
+                        {% for itemDetails in mileage %}
+                            <tr>
+                                <td>{{itemDetails.name}}</td>
+                                <td>{{itemDetails.date}}</td>
+                                <td>{{itemDetails.mileage}}</td>
+                                <td>{{itemDetails.description}}</td>
+                            </tr>
+                        {% endfor%}
+                    {% else %}
+                    <tr>
+                        <td colspan=4 style='text-align:center;padding:20px;'>No Mileage Logs</td>
+                    </tr>
+                    {% endif %}
+                </table>
+                <center style='margin-top: 15px'>Total Mileage: {{totalM}}</center><br>
+                <center>Tax Deduction: ${{taxDm}}</center><br>
+            </div>
+            <br>
+            <center><a href={% url 'addMileage' %}>Add Mileage Log</a></center>
+        </div>
+    </div>
+</body>

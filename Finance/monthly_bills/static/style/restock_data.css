@@ -1,0 +1,15 @@
+.priceHeader{
+    padding: 8px 35px;
+    font-size: 24px;
+    width: 4rem;
+}
+.priceProduct{
+    text-align: center;
+}
+th, td {
+    border:1px solid black;
+    border-collapse: collapse;
+}
+table{
+    border-collapse: collapse;
+}

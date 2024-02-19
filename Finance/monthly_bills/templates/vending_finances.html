@@ -1,0 +1,213 @@
+{% load static %}
+<script defer="" src="{% static 'script/monthlyBills.js' %}"></script>
+<style>
+    .table_headers{
+        width: 100px;
+    }
+    .center_cell{
+        text-align: center;
+    }
+    .left_month_card{
+        
+    }
+    .right_month_card{
+        margin-left: 5rem;
+    }
+    .container{
+        display: flex;
+        width: fit-content;
+    }
+</style>
+<body>
+    <a href={% url 'dashboard' %}>Back</a>
+<center>
+    <a href={% url 'vendingFinances' prev_year prev_month%}>Previous Month</a>
+    <a href={% url 'vendingFinances' next_year next_month%}>Next Month</a>
+<div class="container">
+    <div class="left_month_card">
+        <h1>Vending Finances For {{ monthList.1 }}</h1>
+        <table style="border-collapse: collapse; border: 2px solid black;">
+            <tr>
+                <th colspan="2">
+                    <div class="table_headers">
+                        Date
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Transaction
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Withdrawal
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Depsoit
+                    </div>
+                </th>
+            </tr>
+            {% for item in monthlyTrans %}
+            {% if item.0 %}
+            <tr style='background-color:#ffa8a8;'>
+                <td colspan="2">
+                    {{ item.1.date }}
+                </td>
+                <td class="center_cell">
+                    {{ item.1.transaction }}
+                </td>
+                <td class="center_cell">
+                    ${{item.1.withdrawal}}
+                </td>
+                <td class="center_cell">
+                    -
+                </td>
+            </tr>
+            {% else %}
+            <tr style='background-color:#a1d6a1;'>
+                <td colspan="2">
+                    {{ item.1.date }}
+                </td>
+                <td class="center_cell">
+                    {{ item.1.transaction }}
+                </td>
+                <td class="center_cell">
+                    -
+                </td>
+                <td class="center_cell">
+                    ${{item.1.deposit}}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="2"></td>
+                <td class="center_cell"></td>
+                <td class="center_cell" style='background-color:#ffa8a8;'>-${{ totalW }}</td>
+                <td class="center_cell" style='background-color:#a1d6a1;'>${{ totalD }}</td>
+            </tr>
+        </table>
+        <br><br>
+        <form action="" method="POST">
+            {% csrf_token %}
+            Date: {{ vendingForm.date }} <br>
+            Transaction: {{ vendingForm.transaction }} <br>
+            Categroy: {{ vendingForm.category }} <br>
+            Type:   <select name="type" id="type">
+                        <option value="">-------</option>
+                        <option value="withdrawal">Withdrawal</option>
+                        <option value="deposit">Deposit</option>
+                    </select><br>
+            Amount: <input type="number" name="amount" style="width:50px;" step="0.01" required="" id="amount"> <br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    {% comment %} <div class="right_month_card">
+        <h1>Monthly Bills For {{ monthList.1 }}</h1>
+        <table style="border-collapse: collapse; border: 2px solid black;">
+            <tr>
+                <th class="table_headers">
+                    Paychecks
+                </th>
+                <th class="table_headers">
+                    Estimate
+                </th>
+                <th class="table_headers">
+                    Actual
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    2nd Check
+                </td>
+                <td class="center_cell">
+                    $1,300
+                </td>
+                <td class="center_cell">
+                    ${{ last_months_2nd_check }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    1st Check
+                </td>
+                <td class="center_cell">
+                    $1,300
+                </td>
+                <td class="center_cell">
+                    ${{ this_months_1st_check }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Expense Check
+                </td>
+                <td class="center_cell">
+                    $400
+                </td>
+                <td class="center_cell">
+                    ${{ expense }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Music
+                </td>
+                <td class="center_cell">
+                    $18.80
+                </td>
+                <td class="center_cell">
+                    ${{ music }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Extra
+                </td>
+                <td class="center_cell">
+                    $0.00
+                </td>
+                <td class="center_cell">
+                    ${{ extra }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total Income:
+                </td>
+                <td class="center_cell">
+                    $3,000
+                </td>
+                <td class="center_cell">
+                    ${{ total_income }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Bills:
+                </td>
+                <td class="center_cell">
+                    - ${{ totals.4 }}
+                </td>
+                <td class="center_cell">
+                    - ${{ totals.5 }}
+                </td>
+            </tr>
+        </table>
+        <div class="">
+            <a href="{% url 'add_income' %}">
+                Add Income
+            </a>
+        </div>
+    </div> {% endcomment %}
+</div>  
+</center>
+</body>

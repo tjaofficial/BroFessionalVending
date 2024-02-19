@@ -1,0 +1,57 @@
+{% load static %}
+<link href="{% static 'style/landing_header.css' %}" rel="stylesheet"/>
+<div id="header" class="header">
+    <div class="logo">
+        <a href="{% url 'landing' %}">
+            <img src="{% static 'images/logo-wo_background.png' %}">
+        </a>
+    </div>
+    <div class="navCont">
+        <ul class="main-nav">
+            {% comment %} <li id='home-button' class="wood-button-gap">
+                <a class="wood-button" href="{% url 'home' %}">
+                    Home
+                </a>
+            </li> {% endcomment %}
+            <li id='story-button' class="wood-button-gap">
+                <a href="{% url 'landing' %}">
+                    Home
+                </a>
+            </li>
+            <li class="wood-button-gap">
+                <a href="#">
+                    About
+                </a>
+            </li>
+            <li class="wood-button-gap">
+                <a href="{% url 'FAQ' %}">
+                    FAQ
+                </a>
+            </li>
+            <li class="wood-button-gap">
+                <a href="{% url 'contact' %}">
+                    Contact
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    Login
+                </a>
+            </li>
+            {% comment %} <li><a href="#">Sponsors</a></li> {% endcomment %}
+        </ul>
+        <div>
+            <div id="menu" class="menu">MENU</div>
+        </div>
+    </div>
+</div>
+<div id="dropDownMenu">
+    <ul class="main-nav">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Annuncements</a></li>
+        <li><a href="#">Whats Fresh</a></li>
+        {% comment %} <li><a href="{% url 'login' %}">TreeSpace</a></li> {% endcomment %}
+        {% comment %} <li><a href="#">Sponsors</a></li> {% endcomment %}
+    </ul>
+</div>

@@ -1,0 +1,71 @@
+{% extends "landing/components/landing_layout.html" %}{% load static %}
+{% block body %}
+<style>
+    .h1{
+        font-size: 85px;
+        font-family: sans-serif;
+        font-weight: bold;
+    }
+    .h5{
+        font-size: 22px;
+        font-family: system-ui;
+        font-weight: 300;
+        letter-spacing: 3px;
+    }
+    .titleCont{
+        position: absolute;
+        min-width: 539px;
+        background: #ffffff85;
+        padding: 90px 53px;
+        margin-top: 137px;
+    }
+    p{
+        font-family: system-ui;  
+    }
+    .split{
+        width:50%;
+    }
+</style>
+<div>
+    <div style="max-height: 836px; overflow: hidden;">
+        <div style="display:flex; justify-content: center;">
+            <img style="width: 100%;" src="{% static 'images/anotherone.webp' %}">
+            <div class="titleCont">
+                <div class="h1" style="color: #d9614f;">Meet<br>BroFessional<br>Vending</div>
+                <div class="h5" style="color: black; text-align: right; padding-top: 37px;">Lets keep it BroFessional!</div>
+            </div>
+        </div>
+    </div>
+    <div style="display:flex; width:88%; background-color: #d9614f; margin: auto; color: white;">
+        <img class="split" src="{% static 'images/theotherone.webp' %}">
+        <div class="split" style="padding: 120px 92px;">
+            <div>
+                <div style="text-align: center;
+                font-size: 37px;
+                font-weight: bold;">About BroFessional Vending</div>
+                <div style="text-align: center;
+                font-size: 17px;
+                line-height: 32px;
+                padding-top: 22px;">We opened our doors in 2023 with a simple 
+                    mission: to make the wholesale purchasing 
+                    process easy and affordable. Since then, we 
+                    have grown exponentially, cultivating 
+                    partnerships with companies, manufacturers 
+                    and expanding our inventory. This growth has 
+                    greatly benefited our customers, as they 
+                    receive the highest quality products at the 
+                    best prices around.</div>
+            </div>
+            <div style="padding: 14px;
+            border: white solid 1px;
+            width: fit-content;
+            border-radius: 31px;
+            margin: auto;
+            margin-top: 82px;
+            color: white;">
+                Get in touch
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+<center>
+    <div class="">
+        <form action="" method="POST">
+            {% csrf_token %}
+            Income Title: {{ form.title }} <br>
+            Description: {{ form.describe }} <br>
+            Income Amount: {{ form.amount }} <br>
+            Date: {{ form.date }} <br>
+            <input type="submit" value="Add">
+        </form>
+    </div>
+</center>

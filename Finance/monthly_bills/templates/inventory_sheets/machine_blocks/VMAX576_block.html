@@ -1,0 +1,92 @@
+{% extends "inventory_sheets/inventory_sheet.html" %}{% load static %}
+{% block list %}
+<link href="{% static 'style/vmax576.css' %}" rel="stylesheet">
+<script defer src="{% static 'script/vmax576.js' %}"></script>
+<div id="lane_1" data-lane="{{vmax576_oldData.0}}" style="display:none;"></div>
+<div id="lane_2" data-lane="{{vmax576_oldData.1}}" style="display:none;"></div>
+<div id="lane_3" data-lane="{{vmax576_oldData.2}}" style="display:none;"></div>
+<div id="lane_4" data-lane="{{vmax576_oldData.3}}" style="display:none;"></div>
+<div id="lane_5" data-lane="{{vmax576_oldData.4}}" style="display:none;"></div>
+<div id="lane_6" data-lane="{{vmax576_oldData.5}}" style="display:none;"></div>
+<div id="lane_7" data-lane="{{vmax576_oldData.6}}" style="display:none;"></div>
+<div id="lane_8" data-lane="{{vmax576_oldData.7}}" style="display:none;"></div>
+<table style="border:1px solid black;border-collapse: collapse;width: 565px;">
+    <tr style="text-align: center; font-weight: bolder;">
+        <td class="c1">Item Name</td>
+        <td class="c2">Stock</td>
+        <td class="c3">Sold</td>
+        <td class="c4">Added</td>
+        <td class="c6">Removed</td>
+        <td class="c5">Notes</td>
+    </tr>
+    <tr>
+        <td>
+            <input type="hidden" name="data" style="width: 154px;" maxlength="400" required="" id="id_data">
+        </td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_1" value="{{invList.item_name_1}}" maxlength="30" id="id_item_name_1"></td>
+        <td class="c2"><input oninput="autoFill(1)" type="number" name="stock_1" style="width:44px;" maxlength="200" id="id_stock_1"></td>
+        <td class="c3"><input type="number" name="sold_1" style="width:44px;" maxlength="200" id="id_sold_1"></td>
+        <td class="c4"><input type="number" name="added_1" style="width:44px;" maxlength="200" id="id_added_1"></td>
+        <td class="c6"><input type="number" name="removed_1" style="width:44px;" maxlength="200" id="removed_1"></td>
+        <td class="c5"><input type="text" name="notes_1" maxlength="600" id="id_notes_1"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_2" value="{{invList.item_name_2}}" maxlength="30" id="id_item_name_2"></td>
+        <td class="c2"><input type="number" oninput="autoFill(2)" name="stock_2" style="width:44px;" maxlength="200" id="id_stock_2"></td>
+        <td class="c3"><input type="number" name="sold_2" style="width:44px;" maxlength="200" id="id_sold_2"></td>
+        <td class="c4"><input type="number" name="added_2" style="width:44px;" maxlength="200" id="id_added_2"></td>
+        <td class="c6"><input type="number" name="removed_2" style="width:44px;" maxlength="200" id="removed_2"></td>
+        <td class="c5"><input type="text" name="notes_2" maxlength="600" id="id_notes_2"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_3" value="{{invList.item_name_3}}" maxlength="30" id="id_item_name_3"></td>
+        <td class="c2"><input type="number" oninput="autoFill(3)" name="stock_3" style="width:44px;" maxlength="200" id="id_stock_3"></td>
+        <td class="c3"><input type="number" name="sold_3" style="width:44px;" maxlength="200" id="id_sold_3"></td>
+        <td class="c4"><input type="number" name="added_3" style="width:44px;" maxlength="200" id="id_added_3"></td>
+        <td class="c6"><input type="number" name="removed_3" style="width:44px;" maxlength="200" id="removed_3"></td>
+        <td class="c5"><input type="text" name="notes_3" maxlength="600" id="id_notes_3"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_4" value="{{invList.item_name_4}}" maxlength="30" id="id_item_name_4"></td>
+        <td class="c2"><input type="number" oninput="autoFill(4)" name="stock_4" style="width:44px;" maxlength="200" id="id_stock_4"></td>
+        <td class="c3"><input type="number" name="sold_4" style="width:44px;" maxlength="200" id="id_sold_4"></td>
+        <td class="c4"><input type="number" name="added_4" style="width:44px;" maxlength="200" id="id_added_4"></td>
+        <td class="c6"><input type="number" name="removed_4" style="width:44px;" maxlength="200" id="removed_4"></td>
+        <td class="c5"><input type="text" name="notes_4" maxlength="600" id="id_notes_4"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_5" value="{{invList.item_name_5}}" maxlength="30" id="id_item_name_5"></td>
+        <td class="c2"><input type="number" oninput="autoFill(5)" name="stock_5" style="width:44px;" maxlength="200" id="id_stock_5"></td>
+        <td class="c3"><input type="number" name="sold_5" style="width:44px;" maxlength="200" id="id_sold_5"></td>
+        <td class="c4"><input type="number" name="added_5" style="width:44px;" maxlength="200" id="id_added_5"></td>
+        <td class="c6"><input type="number" name="removed_5" style="width:44px;" maxlength="200" id="removed_5"></td>
+        <td class="c5"><input type="text" name="notes_5" maxlength="600" id="id_notes_5"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_6" value="{{invList.item_name_6}}" maxlength="30" id="id_item_name_6"></td>
+        <td class="c2"><input type="number" oninput="autoFill(6)" name="stock_6" style="width:44px;" maxlength="200" id="id_stock_6"></td>
+        <td class="c3"><input type="number" name="sold_6" style="width:44px;" maxlength="200" id="id_sold_6"></td>
+        <td class="c4"><input type="number" name="added_6" style="width:44px;" maxlength="200" id="id_added_6"></td>
+        <td class="c6"><input type="number" name="removed_6" style="width:44px;" maxlength="200" id="removed_6"></td>
+        <td class="c5"><input type="text" name="notes_6" maxlength="600" id="id_notes_6"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_7" value="{{invList.item_name_7}}" maxlength="30" id="id_item_name_7"></td>
+        <td class="c2"><input type="number" oninput="autoFill(7)" name="stock_7" style="width:44px;" maxlength="200" id="id_stock_7"></td>
+        <td class="c3"><input type="number" name="sold_7" style="width:44px;" maxlength="200" id="id_sold_7"></td>
+        <td class="c4"><input type="number" name="added_7" style="width:44px;" maxlength="200" id="id_added_7"></td>
+        <td class="c6"><input type="number" name="removed_7" style="width:44px;" maxlength="200" id="removed_7"></td>
+        <td class="c5"><input type="text" name="notes_7" maxlength="600" id="id_notes_7"></td>
+    </tr>
+    <tr>
+        <td class="c1"><input type="text" class="line_name" readonly name="item_name_8" value="{{invList.item_name_8}}" maxlength="30" id="id_item_name_8"></td>
+        <td class="c2"><input type="number" oninput="autoFill(8)" name="stock_8" style="width:44px;" maxlength="200" id="id_stock_8"></td>
+        <td class="c3"><input type="number" name="sold_8" style="width:44px;" maxlength="200" id="id_sold_8"></td>
+        <td class="c4"><input type="number" name="added_8" style="width:44px;" maxlength="200" id="id_added_8"></td>
+        <td class="c6"><input type="number" name="removed_8" style="width:44px;" maxlength="200" id="removed_8"></td>
+        <td class="c5"><input type="text" name="notes_8" maxlength="600" id="id_notes_8"></td>
+    </tr>
+</table>
+{% endblock %}

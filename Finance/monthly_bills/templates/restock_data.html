@@ -1,0 +1,94 @@
+{% load static %}
+<link href="{% static 'style/header.css' %}" rel="stylesheet">
+<link href="{% static 'style/restock_data.css' %}" rel="stylesheet">
+<script defer src="{% static 'script/restock_data.js' %}"></script>
+<body>
+    <div>
+        <div style='width:100%; margin-bottom: 5rem;'>
+            <div class="header">
+                <a class="rightGap" href="{% url 'vendDash' %}">Back</a>
+                <a class="rightGap" href="{% url 'stock' type id_tag %}">Product Data</a>
+                <a class="rightGap" href="{% url 'vmax576_is' type id_tag %}">Inventory Form</a>
+                <a href="{% url 'vmax576_rd' type id_tag %}">Restock Data</a>
+            </div>
+            <div class="contentCont">
+                <table style="margin: auto; margin-top: 75px;">
+                    <tr>
+                        <th>Annual</th>
+                    </tr>
+                    <tr>
+                        <th class='priceHeader'></th>
+                        <td class='priceProduct'>Product: <br>{{products.0}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.1}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.2}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.3}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.4}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.5}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.6}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.7}}</td>
+                    </tr>
+                    <tr>
+                        <th class='priceHeader'>Year</th>
+                        <th class='priceHeader'>1</th>
+                        <th class='priceHeader'>2</th>
+                        <th class='priceHeader'>3</th>
+                        <th class='priceHeader'>4</th>
+                        <th class='priceHeader'>5</th>
+                        <th class='priceHeader'>6</th>
+                        <th class='priceHeader'>7</th>
+                        <th class='priceHeader'>8</th>
+                    </tr>
+                    {% for key, year in annualTotals.items %}
+                    <tr>
+                        <th class='priceHeader'>{{key}}</th>
+                        {% for data in year %}
+                            <td class='priceProduct'>{{data}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <table style="margin: auto; margin-top: 75px;">
+                    <tr>
+                        <th>Monthy</th>
+                    </tr>
+                    <tr>
+                        <th class='priceHeader'></th>
+                        <td class='priceProduct'>Product: <br>{{products.0}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.1}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.2}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.3}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.4}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.5}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.6}}</td>
+                        <td class='priceProduct'>Product: <br>{{products.7}}</td>
+                    </tr>
+                    <tr>
+                        <th class='priceHeader'>Month</th>
+                        <th class='priceHeader'>1</th>
+                        <th class='priceHeader'>2</th>
+                        <th class='priceHeader'>3</th>
+                        <th class='priceHeader'>4</th>
+                        <th class='priceHeader'>5</th>
+                        <th class='priceHeader'>6</th>
+                        <th class='priceHeader'>7</th>
+                        <th class='priceHeader'>8</th>
+                    </tr>
+                    {% for key, year in monthlyTotals.items %}
+                    <tr>
+                        <th class='priceHeader'>{{key}}</th>
+                    </tr>
+                    {% for key2, data in year.items %}
+                    <tr>
+                        <th class='priceHeader'>{{key2}}</th>
+                        {% for dataDeep in data %}
+                            <td class='priceProduct'>{{dataDeep}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</body>

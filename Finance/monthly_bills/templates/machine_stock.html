@@ -1,0 +1,58 @@
+<style>
+    table{
+        border-collapse: collapse;
+    }
+    th, td {
+        border:1px solid black;
+        border-collapse: collapse;
+    }
+    .mainTable{
+        width:100%;
+        max-width: 600px;
+        margin:auto;
+        background-color: #f1eace;
+    }
+</style>
+
+<body>
+    <div>
+        <div style='width:100%; height:100%;'>
+            <a href={% url 'machineDash' type id_tag%}>Back</a>
+            <div style='margin-top:10rem;'>
+                <table class='mainTable'>
+                    <tr>
+                        <th colspan=7>{{id_tag}}</th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Vendor</th>
+                        <th>Qty/Unit</th>
+                        <th>Cost/Unit</th>
+                        <th>Sell Price</th>
+                        <th>Stock</th>
+                    </tr>
+                    {% for itemDetails in stock %}
+                        <tr>
+                            <td>{{itemDetails.name}}</td>
+                            <td>{{itemDetails.size}}</td>
+                            <td>{{itemDetails.vendor}}</td>
+                            <td>{{itemDetails.qty_per_unit}}</td>
+                            <td>${{itemDetails.cost_per_unit}}</td>
+                            <td>${{itemDetails.sell_price}}</td>
+                            <td>{{itemDetails.in_stock}}</td>
+                        </tr>
+                    {% endfor%}
+                </table>
+            </div>
+            <br>
+            <a href={% url 'addItem' type id_tag 'item' %}>Add Item</a>
+            <a href={% url 'addItem' type id_tag 'stock' %}>Add Stock</a>
+            {% comment %} <form action="" method="POST" class='form'>
+                {% csrf_token %}
+                
+                <input type='submit' value='select'/>
+            </form> {% endcomment %}
+        </div>
+    </div>
+</body>

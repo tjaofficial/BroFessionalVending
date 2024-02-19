@@ -1,0 +1,32 @@
+<style>
+    .group{
+        width: 200px;
+        margin: auto;
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: sans-serif;
+        margin-top: 23rem;
+    }
+</style>
+
+<body>
+    <div>
+        <div style='width:100%; height:100%;'>
+            <a href={% url 'vendDash' %}>Back</a>
+            <div class='group'>
+                <form action="" method="POST" class='form'>
+                    {% csrf_token %}
+                    <select name="id_tags" id="machines">
+                        <option value="">----------</option>
+                        {% for item in fleet %}
+                            {% if item.active %}
+                                <option value="{{item.id_tag}}">{{item.id_tag}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input type='submit' value='select'/>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>

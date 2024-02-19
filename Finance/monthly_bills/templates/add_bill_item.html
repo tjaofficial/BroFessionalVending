@@ -1,0 +1,17 @@
+<center>
+    <div class="">
+        <form action="" method="POST">
+            {% csrf_token %}
+            Category: {{ form.category }} <br>
+            Title: {{ form.title }} <br>
+            Budget: {{ form.budget_amt }} <br>
+            Charge Source: {{ form.source }} <br>
+            Estimated Charge Day: {{ form.charge_day_1 }} <br>
+            Monthly Frquency: {{ form.billing_period }} <br>
+            Second Charge Date: {{ form.charge_day_2 }} <br>
+            Start Date: {{ form.start_date }} <br>
+            Stop Date: {{ form.stop_date }} (leave blank if continuous)<br>
+            <input type="submit" value="Add">
+        </form>
+    </div>
+</center>

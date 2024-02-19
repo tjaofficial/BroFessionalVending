@@ -1,0 +1,27 @@
+<style>
+    .group{
+        width: 200px;
+        margin: auto;
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: sans-serif;
+        margin-top: 23rem;
+    }
+    a{
+        text-decoration: none;
+        padding: 8px;
+        background-color: #a52a2a63;
+        border-radius: 12px;
+        color: black;
+    }
+</style>
+
+<body>
+    <a href="{% url 'dashboard' %}">Back</a>
+    <div class='group'>
+       <a href="{% url 'fleet' %}">Fleet</a><br><br>
+       <a href="{% url 'gasLog' %}">Gas Log</a><br><br>
+       <a href="{% url 'inventory' %}">Inventory</a><br><br>
+       <a href=#>Inventory</a><br><br>
+    </div>
+</body>

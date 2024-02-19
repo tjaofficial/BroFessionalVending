@@ -1,0 +1,20 @@
+.header{
+    font-family: sans-serif;
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+}
+body{
+    margin: 0px;
+}
+.rightGap{
+    margin-right: 1rem;
+}
+.header a{
+    text-decoration: none;
+    padding: 8px;
+    background-color: #a52a2a63;
+    border-radius: 12px;
+    color: black;
+}

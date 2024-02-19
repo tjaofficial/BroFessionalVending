@@ -1,0 +1,71 @@
+{% load static %}
+<script defer src="{% static 'script/inventory_sheet.js' %}"></script>
+<style>
+    table{
+        width: 650px;
+        margin: auto;
+        border-collapse: collapse;
+    }
+    .c1{
+        width: 154px;
+    }
+    .c2{
+        width: 44px;
+    }
+    .c3{
+        width: 44px;
+    }
+    .c4{
+        width: 44px;
+    }
+    .c5{
+        
+    }
+</style>
+<script>
+
+    
+</script>
+<body>
+    <div>
+        <div style='width:100%; height:100%;'>
+            <a href="{% url 'machineDash' type id_tag%}">Back</a>
+            <form action="" method="POST" class='form'>
+                {% csrf_token %}
+                <table style='margin-top: 7rem;'>
+                    <tr>
+                        <th>{{invForm.business.label}}:{{invForm.business}}</th>
+                        <th>{{invForm.id_tag.label}}:{{invForm.id_tag}}</th>
+                        <th>{{invForm.date.label}}:{{invForm.date}}</th>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>{{invForm.technician.label}}:{{invForm.technician}}</th>
+                        <th>{{invForm.condition.label}}:{{invForm.condition}}</th>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>{{invForm.time_start.label}}:{{invForm.time_start}}</th>
+                        <th>{{invForm.time_end.label}}:{{invForm.time_end}}</th>
+                    </tr>
+                </table>
+                <table style='margin-bottom: 4rem;'>
+                    <tr>
+                        <th>{{invForm.collected.label}}:{{invForm.collected}}</th>
+                    </tr>
+                </table>
+                
+                    {% block content %}
+                    {% endblock %}
+                
+                    {% block list %}
+                    {% endblock %}
+                
+                {% comment %} {% include includeStr %} {% endcomment %}
+                <input type='submit' value='select'/>
+            </form>
+        </div>
+    </div>
+</body>

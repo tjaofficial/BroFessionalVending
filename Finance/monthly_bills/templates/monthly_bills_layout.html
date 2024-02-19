@@ -1,0 +1,296 @@
+{% load static %}
+<script defer="" src="{% static 'script/monthlyBills.js' %}"></script>
+<style>
+    .table_headers{
+        width: 100px;
+    }
+    .center_cell{
+        text-align: center;
+    }
+    .left_month_card{
+        
+    }
+    .right_month_card{
+        margin-left: 5rem;
+    }
+    .container{
+        display: flex;
+        width: fit-content;
+    }
+</style>
+<body>
+    <a href={% url 'dashboard' %}>Back</a>
+<center>
+    <a href={% url 'monthly_bills' prev_year prev_month%}>Previous Month</a>
+    <a href={% url 'monthly_bills' next_year next_month%}>Next Month</a>
+<div class="container">
+    <div class="left_month_card">
+        <h1>Monthly Bills For {{ monthList.1 }}</h1>
+        <table style="border-collapse: collapse; border: 2px solid black;">
+            <tr>
+                <th colspan="2">
+                    <div class="table_headers">
+                        Monthly Bills
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Budget
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Spent
+                    </div>
+                </th>
+                <th>
+                    <div class="table_headers">
+                        Charge Date
+                    </div>
+                </th>
+            </tr>
+            {% for item in first_half_bills %}
+            <tr>
+                <td colspan="2">
+                    {{ item.title }}
+                </td>
+                <td class="center_cell">
+                    ${{ item.budget_amt }}
+                </td>
+                <td class="center_cell">
+                    {% for paid in payment_model %}
+                        {% if paid.date.year == monthList.2 and paid.date.month == monthList.0 %}
+                            {% if paid.date.day < 15 %}
+                                {% if paid.bill|lower == item.title|lower %}
+                                    ${{ paid.payment }}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="center_cell">
+                    {{monthList.3}}. {{item.charge_day_1}}, {{monthList.2}}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+            {% for item in purchase_data_1 %}
+            <tr>
+                <td colspan="2">
+                    {{ item.title }}
+                </td>
+                <td class="center_cell">
+                    -
+                </td>
+                <td class="center_cell">
+                    ${{ item.amount }}
+                </td>
+                <td class="center_cell">
+                    {{ today.month }}/{{ item.date.day }}/{{ today.year }}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2" style="height: 25px;text-align:right;">
+                    Totals:
+                </td>
+                <td class="center_cell">
+                    -${{ totals.0 }}
+                </td>
+                <td class="center_cell">
+                    ${{ totals.2 }}
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+            {% for item in second_half_bills %}
+            <tr>
+                <td colspan="2">
+                    {{ item.title }}
+                </td>
+                <td class="center_cell">
+                    ${{ item.budget_amt }}
+                </td>
+                <td class="center_cell">
+                    {% for paid in payment_model %}
+                        {% if paid.date.year == monthList.2 and paid.date.month == monthList.0 %}
+                            {% if paid.date.day >= 15 %}
+                                {% if paid.bill|lower == item.title|lower %}
+                                    ${{ paid.payment }}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="center_cell">
+                    {{monthList.3}}. {{item.charge_day_1}}, {{monthList.2}}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+            {% for item in purchase_data_2 %}
+            <tr>
+                <td colspan="2">
+                    {{ item.title }}
+                </td>
+                <td class="center_cell">
+                    -
+                </td>
+                <td class="center_cell">
+                    ${{ item.amount }}
+                </td>
+                <td class="center_cell">
+                    {{ today.month }}/{{ item.date.day }}/{{ today.year }}
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2" style="height: 25px;text-align:right;">
+                    Totals:
+                </td>
+                <td class="center_cell">
+                    -${{ totals.1 }}
+                </td>
+                <td class="center_cell">
+                    ${{ totals.3 }}
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+            
+            <tr>
+                <td style="height: 25px;">
+                </td>
+            </tr>
+        </table>
+        <br>
+        <input id='billData' hidden='true' data-bills={{ monthlyBillsDataList }}/>
+        <br>
+        <form action="" method="POST">
+            {% csrf_token %}
+            Select Bill: {{ payments.bill }} <br>
+            Date: {{ payments.date }} <br>
+            Payment: {{ payments.payment }} <br>
+            <input type="submit" value="Pay">
+        </form>
+        <div class="">
+            <a href="{% url 'add_bills' %}">
+                Add Bill
+            </a>
+            <br>
+            <a href="{% url 'add_purchase' %}">
+                Add Purchase
+            </a>
+        </div>
+    </div>
+    <div class="right_month_card">
+        <h1>Monthly Bills For {{ monthList.1 }}</h1>
+        <table style="border-collapse: collapse; border: 2px solid black;">
+            <tr>
+                <th class="table_headers">
+                    Paychecks
+                </th>
+                <th class="table_headers">
+                    Estimate
+                </th>
+                <th class="table_headers">
+                    Actual
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    2nd Check
+                </td>
+                <td class="center_cell">
+                    $1,300
+                </td>
+                <td class="center_cell">
+                    ${{ last_months_2nd_check }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    1st Check
+                </td>
+                <td class="center_cell">
+                    $1,300
+                </td>
+                <td class="center_cell">
+                    ${{ this_months_1st_check }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Expense Check
+                </td>
+                <td class="center_cell">
+                    $400
+                </td>
+                <td class="center_cell">
+                    ${{ expense }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Music
+                </td>
+                <td class="center_cell">
+                    $18.80
+                </td>
+                <td class="center_cell">
+                    ${{ music }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Extra
+                </td>
+                <td class="center_cell">
+                    $0.00
+                </td>
+                <td class="center_cell">
+                    ${{ extra }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total Income:
+                </td>
+                <td class="center_cell">
+                    $3,000
+                </td>
+                <td class="center_cell">
+                    ${{ total_income }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Bills:
+                </td>
+                <td class="center_cell">
+                    - ${{ totals.4 }}
+                </td>
+                <td class="center_cell">
+                    - ${{ totals.5 }}
+                </td>
+            </tr>
+        </table>
+        <div class="">
+            <a href="{% url 'add_income' %}">
+                Add Income
+            </a>
+        </div>
+    </div>
+</div>  
+</center>
+</body>

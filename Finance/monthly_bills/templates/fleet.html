@@ -1,0 +1,230 @@
+<style>
+    body{
+        background-color: #cbcbff;
+    }
+    table{
+        border-collapse: collapse;
+    }
+    th, td {
+        border:1px solid black;
+        border-collapse: collapse;
+    }
+    th{
+        font-size:13px;
+    }
+    .page_cont{
+        margin:auto;
+        width:100%;
+        height: 100%;
+    }
+    .mainTable{
+        width:100%;
+        margin:auto;
+        background-color: #f1eace;
+        max-width: 1800px;
+    }
+    .cID{
+        width:15px; 
+        text-align:center;
+    }
+    .c1{
+        width:65px; 
+        text-align:center;
+    }
+    .c2{
+        width:106px; 
+        text-align:center;
+    }
+    .c3{
+        width:60px; 
+        text-align:center;
+    }
+    .c4{
+        width:60px; 
+        text-align:center;
+    }
+    .c5{
+        width:103px; 
+        text-align:center;
+    }
+    .c6{
+        width:70px; 
+        text-align:center;
+    }
+    .c7{
+        width:79px; 
+        text-align:center;
+    }
+    .c8{
+        width:150px; 
+        text-align:center;
+    }
+    .c9{
+        width:170px; 
+        text-align:center;
+    }
+    .c10{
+        width:130px; 
+        text-align:center;
+    }
+    .c11{
+        width:100px; 
+        text-align:center;
+    }
+    .c12{
+        width:103px; 
+        text-align:center;
+    }
+    .c13{
+        width:103px; 
+        text-align:center;
+    }
+    .c14{
+        width:103px; 
+        text-align:center;
+    }
+    .c15{
+        text-align:left;
+        padding-left: 10px;
+    }
+    .fleetHeader{
+        text-align: center;
+        width: 100%;
+        font-size: 2rem;
+        padding: 27px 0px;
+        margin-top: 25px;
+    }
+    .actionDiv{
+        width:100%;
+        margin:auto;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .hover:hover{
+        border:1px solid black;
+        border-collapse: collapse;
+        background-color: #97927e;
+    }
+</style>
+<body>
+    <div class='page_cont'>
+        <a href={% url 'vendDash' %}>Back</a>
+        <div class='fleetHeader'>Fleet of Vending Machines</div>
+        <div class='actionDiv'>
+            <a href={% url 'addFleet' 'add' %}>Add Machine</a>
+            <a href=#></a>
+        </div>
+        <table class='mainTable'>
+            <tr>
+                <th colspan=16>Active Machines</th>
+            </tr>
+            <tr>
+                <th class="cID"></th>
+                <th class="c1">ID</th>
+                <th class="c2">Type</th>
+                <th class="c3">Model</th>
+                <th class="c4">Key ID</th>
+                <th class="c5">Serial No.</th>
+                <th class="c6">Buy Price</th>
+                <th class="c7">Date Bought</th>
+                <th class="c8">Location</th>
+                <th class="c9">Address</th>
+                <th class="c10">Contact</th>
+                <th class="c11">Phone</th>
+                <th class="c12">In-Service</th>
+                <th class="c13">Last-Serviced</th>
+                <th class="c14">Next-Servicing</th>
+                <th class="c15">Notes</th>
+            </tr>
+            {% if nonActive %}
+                <tr>
+                    <th colspan=16 style='font-size: 18px;padding: 20px;'>No Active Vending Machines</th>
+                </tr>
+            {% else %}
+                {% for machine in fleet %}
+                    {% if machine.active %}
+                        <tr class='hover'>
+                            <td class="cID">{{machine.id}}</td>
+                            <td class="c1">
+                                <a href={% url 'machineDash' machine.model machine.id_tag %}>
+                                    {{machine.id_tag}}
+                                </a>
+                            </td>
+                            <td class="c2">{{machine.machine_type}}</td>
+                            <td class="c3">{{machine.model}}</td>
+                            <td class="c4">{{machine.key_id}}</td>
+                            <td class="c5">{{machine.serial_num}}</td>
+                            <td class="c6">${{machine.buy_price}}</td>
+                            <td class="c7">{{machine.date_bought}}</td>
+                            <td class="c8">{{machine.location_name}}</td>
+                            <td class="c9">{{machine.address}}</td>
+                            <td class="c10">{{machine.contact_name}}</td>
+                            <td class="c11">{{machine.phone}}</td>
+                            <td class="c12">{{machine.in_service}}</td>
+                            <td class="c13">{{machine.last_service}}</td>
+                            <td class="c14">{{machine.next_servicing}}</td>
+                            <td class="c15">{{machine.notes}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <tr>
+                <td colspan=16 style='height:25px; border:none;background-color: #cbcbff'></td>
+            </tr>
+            <tr>
+                <th colspan=16>Inactive Machines</th>
+            </tr>
+            <tr>
+                <th class="cID"></th>
+                <th class="c1">ID</th>
+                <th class="c2">Type</th>
+                <th class="c3">Model</th>
+                <th class="c4">Key ID</th>
+                <th class="c5">Serial No.</th>
+                <th class="c6">Buy Price</th>
+                <th class="c7">Date Bought</th>
+                <th class="c8">Location</th>
+                <th class="c9">Address</th>
+                <th class="c10">Contact</th>
+                <th class="c11">Phone</th>
+                <th class="c12">In-Service</th>
+                <th class="c13">Last-Serviced</th>
+                <th class="c14">Next-Servicing</th>
+                <th class="c15">Notes</th>
+            </tr>
+            {% if availability %}
+                {% for machine in fleet %}
+                    {% if not machine.active %}
+                    
+                        <tr class='hover'>
+                                <td class="cID">{{machine.id}}</td>
+                                <td class="c1">
+                                    <a href={% url 'addFleet' machine.id_tag %}>
+                                        {{machine.id_tag}}
+                                    </a>
+                                </td>
+                                <td class="c2">{{machine.machine_type}}</td>
+                                <td class="c3">{{machine.model}}</td>
+                                <td class="c4">{{machine.key_id}}</td>
+                                <td class="c5">{{machine.serial_num}}</td>
+                                <td class="c6">${{machine.buy_price}}</td>
+                                <td class="c7">{{machine.date_bought}}</td>
+                                <td class="c8">{{machine.location_name}}</td>
+                                <td class="c9">{{machine.address}}</td>
+                                <td class="c10">{{machine.contact_name}}</td>
+                                <td class="c11">{{machine.phone}}</td>
+                                <td class="c12">{{machine.in_service}}</td>
+                                <td class="c13">{{machine.last_service}}</td>
+                                <td class="c14">{{machine.next_servicing}}</td>
+                                <td class="c15">{{machine.notes}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <th colspan=16 style='font-size: 18px;padding: 20px;'>No Vending Machines Available</th>
+                </tr>
+            {% endif %}
+          </table>
+    </div>
+</body>
