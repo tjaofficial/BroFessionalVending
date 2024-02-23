@@ -39,6 +39,7 @@ def machine_options(request, type, id_tag):
     priceModel = price_model.objects.filter(machine_id=id_tag)
     cantaLogs = cantaLogs_model.objects.filter(id_tag__id_tag__exact=id_tag).order_by('-date')
     showForm = False
+    
     if type == 'vmax576':
         showForm = True
     if machine.exists():
@@ -49,7 +50,7 @@ def machine_options(request, type, id_tag):
     if vmax576_model.objects.filter(id_tag__id=machine.id).exists():
         inventoryLogs = vmax576_model.objects.filter(id_tag__id=machine.id).order_by('-date')
     else:
-        inventoryLogs = False
+        inventoryLogs = []
 
     totalCollected = 0.00
     for log in inventoryLogs:
