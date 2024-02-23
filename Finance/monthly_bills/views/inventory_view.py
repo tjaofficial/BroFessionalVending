@@ -46,7 +46,10 @@ def machine_options(request, type, id_tag):
         machineModel = machine.model.replace('-', '_')
         machineURL = machineModel + '_is'
     
-    inventoryLogs = vmax576_model.objects.filter(id_tag__id=machine.id).order_by('-date')
+    if vmax576_model.objects.filter(id_tag__id=machine.id).exists():
+        inventoryLogs = vmax576_model.objects.filter(id_tag__id=machine.id).order_by('-date')
+    else:
+        inventoryLogs = False
 
     totalCollected = 0.00
     if inventoryLogs.exists():
