@@ -71,6 +71,7 @@
                     </tr>
                 </table>
             </div> {% endcomment %}
+            {% if showForm%}
             <form method='POST'>
                 {% csrf_token %}
                 <table style="margin: auto; margin-top: 75px;">
@@ -171,6 +172,7 @@
                     </tr>
                 </table>
             </form>
+            {% endif %}
             <div style='margin-top:4rem;text-align:center;'>
                 {% comment %} <center>
                     <table class='machine'>

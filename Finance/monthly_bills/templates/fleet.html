@@ -108,10 +108,10 @@
 </style>
 <body>
     <div class='page_cont'>
-        <a href={% url 'vendDash' %}>Back</a>
+        <a href="{% url 'vendDash' %}">Back</a>
         <div class='fleetHeader'>Fleet of Vending Machines</div>
         <div class='actionDiv'>
-            <a href={% url 'addFleet' 'add' %}>Add Machine</a>
+            <a href="{% url 'addFleet' 'add' %}">Add Machine</a>
             <a href=#></a>
         </div>
         <table class='mainTable'>
@@ -143,28 +143,32 @@
             {% else %}
                 {% for machine in fleet %}
                     {% if machine.active %}
-                        <tr class='hover'>
-                            <td class="cID">{{machine.id}}</td>
-                            <td class="c1">
-                                <a href={% url 'machineDash' machine.model machine.id_tag %}>
-                                    {{machine.id_tag}}
-                                </a>
-                            </td>
-                            <td class="c2">{{machine.machine_type}}</td>
-                            <td class="c3">{{machine.model}}</td>
-                            <td class="c4">{{machine.key_id}}</td>
-                            <td class="c5">{{machine.serial_num}}</td>
-                            <td class="c6">${{machine.buy_price}}</td>
-                            <td class="c7">{{machine.date_bought}}</td>
-                            <td class="c8">{{machine.location_name}}</td>
-                            <td class="c9">{{machine.address}}</td>
-                            <td class="c10">{{machine.contact_name}}</td>
-                            <td class="c11">{{machine.phone}}</td>
-                            <td class="c12">{{machine.in_service}}</td>
-                            <td class="c13">{{machine.last_service}}</td>
-                            <td class="c14">{{machine.next_servicing}}</td>
-                            <td class="c15">{{machine.notes}}</td>
-                        </tr>
+                        {% for key, value in modelParseDict.items %}
+                            {% if machine.model == key %}
+                                <tr class='hover'>
+                                    <td class="cID">{{machine.id}}</td>
+                                    <td class="c1">
+                                        <a href="{% url 'machineDash' value machine.id_tag %}">
+                                            {{machine.id_tag}}
+                                        </a>
+                                    </td>
+                                    <td class="c2">{{machine.machine_type}}</td>
+                                    <td class="c3">{{machine.model}}</td>
+                                    <td class="c4">{{machine.key_id}}</td>
+                                    <td class="c5">{{machine.serial_num}}</td>
+                                    <td class="c6">${{machine.buy_price}}</td>
+                                    <td class="c7">{{machine.date_bought}}</td>
+                                    <td class="c8">{{machine.location_name}}</td>
+                                    <td class="c9">{{machine.address}}</td>
+                                    <td class="c10">{{machine.contact_name}}</td>
+                                    <td class="c11">{{machine.phone}}</td>
+                                    <td class="c12">{{machine.in_service}}</td>
+                                    <td class="c13">{{machine.last_service}}</td>
+                                    <td class="c14">{{machine.next_servicing}}</td>
+                                    <td class="c15">{{machine.notes}}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
                 {% endfor %}
             {% endif %}

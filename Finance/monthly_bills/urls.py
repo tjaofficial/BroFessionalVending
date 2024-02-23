@@ -25,6 +25,7 @@ urlpatterns = [
     path("<str:type>/<str:id_tag>/vmax576", views.vmax576_is, name="vmax576_is"),
     path("<str:type>/<str:id_tag>/vmax576/restock-data", views.vmax576_rd, name="vmax576_rd"),
     path("<str:type>/<str:id_tag>/RS900", views.RS900_is, name="RS900_is"),
+    path("<str:type>/<str:id_tag>/GF12_3506_3506A", views.GF12_3506_3506A_is, name="GF12_3506_3506A_is"),
     path("<str:type>/<str:id_tag>/stock", views.stock, name="stock"),
     path("<str:type>/<str:id_tag>/stock/<str:selector>", views.add_item, name="addItem"),
     path("add_gas_log", views.add_gas_log, name="addGas"),

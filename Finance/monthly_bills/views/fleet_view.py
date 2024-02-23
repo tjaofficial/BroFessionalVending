@@ -7,16 +7,20 @@ def fleet(request):
     nonActive = True
     availability = False
     
+    modelParseDict = {}
     for x in fleet:
         if x.active:
             nonActive=False
         else:
             availability = True
         
-    
-    
+        modelParseDict[x.model] = x.model.replace('-', '_')
+
     return render (request,'fleet.html',{
-        'fleet': fleet, 'nonActive': nonActive, 'availability': availability
+        'fleet': fleet, 
+        'nonActive': nonActive, 
+        'availability': availability,
+        'modelParseDict': modelParseDict
     })
     
 def add_fleet(request, selector):
