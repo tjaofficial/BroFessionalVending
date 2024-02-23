@@ -269,7 +269,7 @@ class machine_stock_model(models.Model):
     
     def __str__(self):
         return str(self.id_tag.id_tag) + ' - ' + str(self.name)
-
+    
 class vmax576_model(models.Model):
     business = models.CharField(
         max_length=30
@@ -598,3 +598,56 @@ class FAQ_model(models.Model):
     )
     def __str__(self):
         return str(self.question)
+    
+class item_data_model(models.Model):
+    typeChoices = (
+        ('candy','candy'),
+        ('chips','chips'),
+        ('health bars','health bars'),
+        ('meat sticks','meat sticks'),
+        ('energy drinks','energy drinks'),
+        ('soda pops','soda pops'),
+        ('juices','juices'),
+        ('crackers','crackers'),
+        ('water','water'),
+    )
+    name = models.CharField(
+        max_length=30
+    )
+    itemType =  models.CharField(
+        max_length=60,
+        choices=typeChoices
+    )
+    container_description = models.CharField(
+        max_length=60
+    )
+    vendor = models.CharField(
+        max_length=30
+    )
+    qty_per_unit = models.IntegerField()
+    discontinued = models.BooleanField(
+        default=False,
+        null=True
+    )
+    itemID = models.CharField(
+        max_length=15
+    )
+    def __str__(self):
+        return str(self.itemID) + ' - ' + str(self.name)
+    
+class item_stock_model(models.Model):
+    itemChoice = models.ForeignKey(to=item_data_model, on_delete=models.CASCADE)
+    date_updated = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
+    exp_date = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
+    sell_price = models.FloatField()
+    cost_per_unit = models.FloatField()
+    personal_stock = models.IntegerField()
+    
+    def __str__(self):
+        return str(self.itemChoice.itemID) + ' - ' + str(self.date_updated)

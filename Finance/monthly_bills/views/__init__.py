@@ -5,3 +5,4 @@ from .fleet_view import *
 from .inventory_view import *
 from .gas_view import *
 from .landing_view import *
+from .snacks_view import *

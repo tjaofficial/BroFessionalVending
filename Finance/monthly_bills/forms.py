@@ -229,3 +229,34 @@ class cantaLogs_form(ModelForm):
             'adding' : forms.TextInput(attrs={}),
             'sold' : forms.TextInput(attrs={}),
         }
+        
+class item_data_form(ModelForm):
+    discontinued = forms.BooleanField(required=False)
+    class Meta:
+        model = item_data_model
+        fields = ('__all__')
+        widgets = {
+            'itemID': forms.TextInput(attrs={'type':'text'}),
+            'name' : forms.TextInput(attrs={'type':'text'}),
+            'itemType': forms.Select(),
+            'container_description' : forms.TextInput(attrs={'type':'text'}),
+            'vendor' : forms.TextInput(attrs={'type':'text'}),
+            'qty_per_unit' : forms.NumberInput(attrs={'type':'number'}),
+            'discontinued' : forms.BooleanField(),
+        }
+        
+class item_stock_form(ModelForm):
+    class Meta:
+        model = item_stock_model
+        fields = ('__all__')
+        widgets = {
+            'itemChoice': forms.Select(),
+            'date_updated': forms.DateInput(attrs={'type':'date'}),
+            'exp_date': forms.DateInput(attrs={'type':'date'}),
+            'cost_per_unit' : forms.NumberInput(attrs={'type':'number'}),
+            'sell_price' : forms.NumberInput(attrs={'type':'number'}),
+            'personal_stock' : forms.NumberInput(attrs={'type':'number'}),
+        }
+        
+        
+        

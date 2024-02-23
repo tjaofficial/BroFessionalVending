@@ -13,15 +13,11 @@
             <a href="{% url 'fleet' %}">Back</a>
             <form action="" method="POST" class='form'>
                 {% csrf_token %}
-                {% for item in stockForm %}
+                {% for item in snackDataForm %}
                     {{item.label}}: {{item}}<br>
                 {% endfor %}
                 <br>
-                {% if selector == 'item' %}
-                    <input type='submit' value='Add Item'/>
-                {% else %}
-                    <input type='submit' value='Update Stock'/>
-                {% endif %}
+                <input type='submit' value='Add Stock'/>
             </form>
         </div>
     </div>

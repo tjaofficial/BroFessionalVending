@@ -16,6 +16,9 @@ urlpatterns = [
     path("add_bills", views.add_bills, name="add_bills"),
     path("add_income", views.add_income, name="add_income"),
     path("add_purchase", views.add_purchase, name="add_purchase"),
+    path("add_snack", views.add_snack_view, name="add_snack"),
+    path("view_snacks", views.view_snacks_view, name="view_snacks"),
+    path("add_stock/<str:itemID>", views.add_stock_view, name="add_stock"),
     
     path("vending", views.vending_dashboard, name="vendDash"),
     path("fleet", views.fleet, name="fleet"),
