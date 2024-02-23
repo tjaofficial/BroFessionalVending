@@ -12,8 +12,8 @@ def view_snacks_view(request):
 
     snackStockList = []
     for snack in itemDatabase:
+        match = False
         for stock in stockDatabase:
-            match = False
             if stock.itemChoice == snack:
                 match = True
                 snackStockList.append((snack, stock))
