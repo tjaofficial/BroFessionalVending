@@ -32,11 +32,11 @@
         text-align:center;
     }
     .c2{
-        width:106px; 
+        width:50px; 
         text-align:center;
     }
     .c3{
-        width:60px; 
+        width:50px; 
         text-align:center;
     }
     .c4{
@@ -121,7 +121,7 @@
             <tr>
                 <th class="cID"></th>
                 <th class="c1">ID</th>
-                <th class="c2">Type</th>
+                <th class="c2">Build</th>
                 <th class="c3">Model</th>
                 <th class="c4">Key ID</th>
                 <th class="c5">Serial No.</th>
@@ -152,8 +152,8 @@
                                             {{machine.id_tag}}
                                         </a>
                                     </td>
-                                    <td class="c2">{{machine.machine_type}}</td>
-                                    <td class="c3">{{machine.model}}</td>
+                                    <td class="c2"><a href="{% url 'machine_build' machine.id_tag %}">view</a></td>
+                                    <td class="c3"><a href=#>view</a></td>
                                     <td class="c4">{{machine.key_id}}</td>
                                     <td class="c5">{{machine.serial_num}}</td>
                                     <td class="c6">${{machine.buy_price}}</td>
@@ -181,7 +181,7 @@
             <tr>
                 <th class="cID"></th>
                 <th class="c1">ID</th>
-                <th class="c2">Type</th>
+                <th class="c2">Build</th>
                 <th class="c3">Model</th>
                 <th class="c4">Key ID</th>
                 <th class="c5">Serial No.</th>
@@ -203,12 +203,12 @@
                         <tr class='hover'>
                                 <td class="cID">{{machine.id}}</td>
                                 <td class="c1">
-                                    <a href={% url 'addFleet' machine.id_tag %}>
+                                    <a href="{% url 'addFleet' machine.id_tag %}">
                                         {{machine.id_tag}}
                                     </a>
                                 </td>
-                                <td class="c2">{{machine.machine_type}}</td>
-                                <td class="c3">{{machine.model}}</td>
+                                <td class="c2"><a href=#>view</a></td>
+                                <td class="c3"><a href=#>view</a></td>
                                 <td class="c4">{{machine.key_id}}</td>
                                 <td class="c5">{{machine.serial_num}}</td>
                                 <td class="c6">${{machine.buy_price}}</td>

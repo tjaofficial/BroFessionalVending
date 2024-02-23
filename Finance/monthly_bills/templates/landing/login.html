@@ -1,0 +1,19 @@
+{% extends "landing/components/landing_layout.html" %}{% load static %}
+{% block body %}
+<div style="margin:auto; width: 350px; text-align:center;">
+    <form method='POST' action=''>
+        {% csrf_token %}
+        <div class='regHeader'>
+            <h2 class='' style='margin:auto; text-align: center; font-size: 47px;'>Login</h2>
+        </div>
+        <hr>
+        <div class='regBody'>
+            <input id="username" type="text" name="username" placeholder='Username'><br>
+            <input  id="password" type="password" name="password" placeholder='Password'><br>
+            
+            <input type='submit' value="login">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

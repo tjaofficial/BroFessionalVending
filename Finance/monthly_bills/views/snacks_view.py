@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from ..models import item_data_model, item_stock_model
 from ..forms import item_data_form, item_stock_form
 import datetime
+from django.contrib.auth.decorators import login_required
+lock = login_required(login_url='login')
 
+@lock
 def view_snacks_view(request):
     itemDatabase = item_data_model.objects.all()
     stockDatabase = item_stock_model.objects.all().order_by('-date_updated')
@@ -26,7 +29,9 @@ def view_snacks_view(request):
         'stockDatabase': stockDatabase,
         'snackStockList': snackStockList
     })
+    
 
+@lock
 def add_snack_view(request):
     
     if request.method == "POST":
@@ -39,7 +44,8 @@ def add_snack_view(request):
         "snackForm": item_data_form,
         'snackDataForm': item_stock_form
     })
-    
+   
+@lock 
 def add_stock_view(request, itemID):
     today = datetime.datetime.today().date()
     snackData = item_data_model.objects.get(itemID=itemID)

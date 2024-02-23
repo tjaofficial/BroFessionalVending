@@ -1,0 +1,83 @@
+{% load static %}
+<script defer src="{% static 'script/machine_builds.js' %}"></script>
+<style>
+    body{
+        background-color: #cbcbff;
+    }
+</style>
+<body>
+    <div class='page_cont'>
+        <a href="{% url 'vendDash' %}">Back</a>
+        <div class='fleetHeader'>{{machineID}} Build</div>
+        <div id="allLanes">
+            <form method="POST" action=''>
+                {% csrf_token %}
+                <div id="snackLanes">
+                    <div>How many snack lanes? <input oninput="displaySnackLanes(this)" type="number" name="snack_lane_qty" style="width:80px;"></div><br>
+                    <div id="snackCont"></div>
+                    <div id="laneSnackGrab" style="display:none;">
+                        <div class="singleSnackLane">
+                            <div>
+                                Is the lane large/small?
+                                <select name="size">
+                                    <option value="large">Large</option>
+                                    <option value="small">Small</option>
+                                </select>
+                            </div>
+                            <div>
+                                How many slots for snacks?
+                                <input type="number" name="slots" style="width:80px;">
+                            </div>
+                            <div>
+                                What is the selection ID?
+                                <input type="number" name="selectID" style="width:80px;">
+                            </div>
+                            <div>
+                                What snack is being sold in this lane?
+                                <select name="itemID">
+                                    <option value="">-------</option>
+                                    {% for snack in snackData %}
+                                        {% if snack.itemPrimaryType == 'snacks' %}
+                                            <option value="{{snack.itemID}}">{{snack.name}}  - {{snack.vendor}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+                <div id="drinkLanes">
+                    <div>How many drink lanes? <input oninput="displayDrinkLanes(this)" type="number" name="drink_lane_qty" style="width:80px;"></div><br>
+                    <div id='drinkCont'></div>
+                    <div id="laneDrinkGrab" style="display:none;">
+                        <div class="singleDrinkLane">
+                            <input type="hidden" name="size" value="regular">
+                            <div>
+                                How many slots for drinks?
+                                <input type="number" name="slots" style="width:80px;">
+                            </div>
+                            <div>
+                                What is the selection ID?
+                                <input type="number" name="selectID" style="width:80px;">
+                            </div>
+                            <div>
+                                What drink is being sold in this lane?
+                                <select name="itemID">
+                                    <option value="">-------</option>
+                                    {% for drink in snackData %}
+                                        {% if drink.itemPrimaryType == 'drinks' %}
+                                            <option value="{{drink.itemID}}">{{drink.name}} - {{drink.vendor}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+                <input type="submit" value="submit">
+            </form>
+        </div>
+    </div>
+</body>

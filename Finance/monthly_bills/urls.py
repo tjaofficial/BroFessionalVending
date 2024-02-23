@@ -10,6 +10,8 @@ urlpatterns = [
     path("", views.landing_page, name="landing"),
     path("FAQ", views.FAQ_page, name="FAQ"),
     path("contact", views.contact_page, name="contact"),
+    path("login", views.login_view, name="login"),
+    path("logut", views.logout_view, name="logout"),
     path("dashboard", views.dashboard, name="dashboard"),
     path("monthly_bills/<str:year>/<str:month>", views.monthly_bills, name="monthly_bills"),
     path("vending/<str:year>/<str:month>", views.vending_finances, name="vendingFinances"),
@@ -19,6 +21,7 @@ urlpatterns = [
     path("add_snack", views.add_snack_view, name="add_snack"),
     path("view_snacks", views.view_snacks_view, name="view_snacks"),
     path("add_stock/<str:itemID>", views.add_stock_view, name="add_stock"),
+    path("<str:machineID>/build", views.machine_build_view, name="machine_build"),
     
     path("vending", views.vending_dashboard, name="vendDash"),
     path("fleet", views.fleet, name="fleet"),

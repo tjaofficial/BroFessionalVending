@@ -6,3 +6,4 @@ from .inventory_view import *
 from .gas_view import *
 from .landing_view import *
 from .snacks_view import *
+from .auth_view import *

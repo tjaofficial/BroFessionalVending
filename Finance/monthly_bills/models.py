@@ -180,6 +180,14 @@ class purchase_model(models.Model):
     def __str__(self):
         return str(self.date) + ' - ' + self.title
     
+class machine_model_model(models.Model):
+    model_number = models.CharField(max_length=70)
+    type = models.CharField(max_length=40)
+    glass_front = models.BooleanField()
+    satallite = models.BooleanField()
+    def __str__(self):
+        return str(self.model_number)
+    
 class fleet_model(models.Model):
     id_tag = models.CharField(
         max_length=7,
@@ -219,7 +227,6 @@ class fleet_model(models.Model):
         auto_now_add=False,
         null=True,
         blank=True
-        
     )
     last_service = models.DateField(
         auto_now=False,
@@ -239,6 +246,12 @@ class fleet_model(models.Model):
     active = models.BooleanField(
         default=False,
         null=True
+    )
+    modelChoice = models.ForeignKey(
+        to=machine_model_model, 
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     
     def __str__(self):
@@ -533,6 +546,7 @@ class inventory_sheets_model(models.Model):
     data = models.CharField(
         max_length=10000,
     )
+    general_notes = models.CharField(max_length=10000, default='none')
     def __str__(self):
         return str(self.date) + ' - ' + str(self.id_tag.id_tag)
     
@@ -600,6 +614,10 @@ class FAQ_model(models.Model):
         return str(self.question)
     
 class item_data_model(models.Model):
+    typePrimeChoices = (
+        ('drinks','drinks'),
+        ('snacks','snacks'),
+    )
     typeChoices = (
         ('candy','candy'),
         ('chips','chips'),
@@ -614,7 +632,11 @@ class item_data_model(models.Model):
     name = models.CharField(
         max_length=30
     )
-    itemType =  models.CharField(
+    itemPrimaryType =  models.CharField(
+        max_length=60,
+        choices=typePrimeChoices
+    )
+    itemSecondaryType =  models.CharField(
         max_length=60,
         choices=typeChoices
     )
@@ -651,3 +673,17 @@ class item_stock_model(models.Model):
     
     def __str__(self):
         return str(self.itemChoice.itemID) + ' - ' + str(self.date_updated)
+    
+class machine_build_model(models.Model):
+    machineChoice = models.ForeignKey(
+        to=fleet_model, 
+        on_delete=models.CASCADE,
+    )
+    slot_dictionary = models.JSONField()
+    def __str__(self):
+        return str(self.machineChoice)
+    
+
+    
+    
+    

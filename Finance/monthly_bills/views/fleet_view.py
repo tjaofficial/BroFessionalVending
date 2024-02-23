@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
-from ..models import fleet_model
-from ..forms import fleet_form
+from ..models import fleet_model, item_data_model
+from ..forms import fleet_form, machine_build_form
+from django.contrib.auth.decorators import login_required
+import json
+lock = login_required(login_url='login')
 
+@lock
 def fleet(request):
     fleet = fleet_model.objects.all()
     nonActive = True
@@ -22,7 +26,8 @@ def fleet(request):
         'availability': availability,
         'modelParseDict': modelParseDict
     })
-    
+
+@lock
 def add_fleet(request, selector):
     if selector != 'add':
         selMachine = fleet_model.objects.all().filter(id_tag__exact=selector)[0]
@@ -61,4 +66,35 @@ def add_fleet(request, selector):
     
     return render (request,'add_fleet.html',{
         'fleet': data, 'selector': selector
+    })
+    
+@lock
+def machine_build_view(request, machineID):
+    snackData = item_data_model.objects.all()
+    machineData = fleet_model.objects.get(id_tag=machineID)
+    
+    if request.method == 'POST':
+        data = request.POST
+        snackLanes = int(data['snack_lane_qty'])
+        drinkLanes = int(data['drink_lane_qty'])
+        laneDict = {}
+        for lane in range(1, snackLanes+1):
+            laneID = "S"+str(lane)
+            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID]}
+            laneDict[data['selectID_'+laneID]] = buildlane
+        for lane in range(1, drinkLanes+1):
+            laneID = "D"+str(lane)
+            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID]}
+            laneDict[data['selectID_'+laneID]] = buildlane
+        print(laneDict)         
+        dataCopy = request.POST.copy()
+        dataCopy['machineChoice'] = machineData
+        dataCopy['slot_dictionary'] = json.dumps(laneDict)
+        dataForm = machine_build_form(dataCopy)
+        if dataForm.is_valid():
+            dataForm.save()
+            return redirect('fleet')
+    return render(request, 'machines/machine_builds.html', {
+        'machineID': machineID,
+        'snackData': snackData
     })

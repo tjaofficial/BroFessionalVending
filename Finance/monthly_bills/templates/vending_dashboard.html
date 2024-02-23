@@ -5,7 +5,7 @@
         font-size: 2rem;
         font-weight: bold;
         font-family: sans-serif;
-        margin-top: 23rem;
+        {% comment %} margin-top: 23rem; {% endcomment %}
     }
     a{
         text-decoration: none;
@@ -14,14 +14,25 @@
         border-radius: 12px;
         color: black;
     }
+    .center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+      }
 </style>
 
 <body>
-    <a href="{% url 'dashboard' %}">Back</a>
-    <div class='group'>
-       <a href="{% url 'fleet' %}">Fleet</a><br><br>
-       <a href="{% url 'gasLog' %}">Gas Log</a><br><br>
-       <a href="{% url 'inventory' %}">Inventory</a><br><br>
-       <a href="{% url 'view_snacks' %}">Snack Data</a><br><br>
+    {% comment %} <a href="{% url 'dashboard' %}">Back</a> {% endcomment %}
+    <div style="">    
+        <div class='group center'>
+            <a href="{% url 'fleet' %}">Fleet</a><br><br>
+            <a href="{% url 'gasLog' %}">Gas Log</a><br><br>
+            <a href="{% url 'inventory' %}">Inventory</a><br><br>
+            <a href="{% url 'view_snacks' %}">Snack Data</a><br><br>
+            <a href="{% url 'logout' %}">Logout</a><br><br>
+        </div>
     </div>
 </body>

@@ -390,7 +390,7 @@
                         <th class='c7'>Notes</th>
                     </tr>
                     
-                    {% for log in inventoryLogs %}
+                    {% for log in dataAll %}
                         <tr class="logLine">
                             <td class='c1'>{{log.date}}</td>
                             <td class='c2'>{{log.technician}}</td>
@@ -399,7 +399,7 @@
                             <td class='c5'>{{log.condition}}</td>
                             
                             <td class='c6'>${{log.collected|floatformat:2}}</td>
-                            <td class='c7'>{{log.notes}}</td>
+                            <td class='c7'>{{log.general_notes}}</td>
                         </tr>
                     {% endfor%}
                     <tr>

@@ -258,5 +258,13 @@ class item_stock_form(ModelForm):
             'personal_stock' : forms.NumberInput(attrs={'type':'number'}),
         }
         
+class machine_build_form(ModelForm):
+    class Meta:
+        model = machine_build_model
+        fields = ('__all__')
+        widgets = {
+            'machineChoice': forms.Select(),
+        }
+        
         
         
