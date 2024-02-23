@@ -52,11 +52,8 @@ def machine_options(request, type, id_tag):
         inventoryLogs = False
 
     totalCollected = 0.00
-    if inventoryLogs.exists():
-        for log in inventoryLogs:
-            totalCollected += float(log.collected)
-    else:
-        totalCollected = False
+    for log in inventoryLogs:
+        totalCollected += float(log.collected)
         
     if cantaLogs.exists():
         initial_data = {
