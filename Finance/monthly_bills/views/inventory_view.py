@@ -49,9 +49,11 @@ def machine_options(request, type, id_tag):
     inventoryLogs = vmax576_model.objects.filter(id_tag__id=machine.id).order_by('-date')
 
     totalCollected = 0.00
-    for log in inventoryLogs:
-        totalCollected += float(log.collected)
-        
+    if inventoryLogs.exists():
+        for log in inventoryLogs:
+            totalCollected += float(log.collected)
+    else:
+        totalCollected = False
         
     if cantaLogs.exists():
         initial_data = {
