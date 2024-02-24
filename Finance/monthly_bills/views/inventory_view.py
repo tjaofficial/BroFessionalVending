@@ -44,11 +44,9 @@ def machine_options(request, type, id_tag):
     cantaLogs = cantaLogs_model.objects.filter(id_tag__id_tag__exact=id_tag).order_by('-date')
     showForm = False
     
-    
-    
-    
-    
-    
+    totalCollected = 0.00
+    for collectedCash in dataAll:
+        totalCollected += float(collectedCash.collected)
     
     if type == 'vmax576':
         showForm = True
@@ -62,9 +60,9 @@ def machine_options(request, type, id_tag):
     else:
         inventoryLogs = []
 
-    totalCollected = 0.00
-    for log in inventoryLogs:
-        totalCollected += float(log.collected)
+    # totalCollected = 0.00
+    # for log in inventoryLogs:
+    #     totalCollected += float(log.collected)
         
     if cantaLogs.exists():
         initial_data = {
@@ -848,15 +846,137 @@ def vmax576_rd(request, type, id_tag):
         'monthlyTotals': monthlyTotals
     })
 
-@lock 
-def GF12_3506_3506A_is(request, type, id_tag):
+# @lock 
+# def GF12_3506_3506A_is(request, type, id_tag):
+#     today = datetime.date.today()
+#     machine = fleet_model.objects.get(id_tag__exact=id_tag)
+#     machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag)
+#     initial_data = {
+#         'id_tag': machine,
+#         'business': machine.location_name,
+#         'technician': request.user.get_full_name(),
+#         'date': today,
+#     }
+#     pastInventory = inventory_sheets_model.objects.filter(id_tag=machine).order_by('-date')
+#     if pastInventory.exists():
+#         pastInventory = sorted(json.loads(pastInventory[0].data).items())
+#     else:
+#         pastInventory = False
+#     allItems = item_data_model.objects.all()
+#     organizedBuildData = sorted(machineData.slot_dictionary.items())
+#     rebuildData = []
+#     for buildLane in organizedBuildData:
+#         for sItems in allItems:
+#                 if buildLane[1]['itemID'] == sItems.itemID:
+#                     rebuildData.append((buildLane[0], sItems.name))
+#     if pastInventory:
+#         newReBuild = []
+#         for rebu in rebuildData:
+#             for pastInven in pastInventory:
+#                 if rebu[0] == pastInven[0]:
+#                     newReBuild.append((rebu[0], rebu[1], pastInven[1]))
+#         rebuildData = newReBuild
+#     print(rebuildData)
+#     invForm = inventory_sheets_form(initial=initial_data)
+               
+#     if request.method == 'POST':
+#         gatheredData = {}
+#         for buildLane in rebuildData:
+#             gatheredData[buildLane[0]] = [
+#                 {'item_name': request.POST['item_'+str(buildLane[0])]},
+#                 {'stock': request.POST['stock_'+str(buildLane[0])]},
+#                 {'removed': request.POST['removed_'+str(buildLane[0])]},
+#                 {'sold': request.POST['sold_'+str(buildLane[0])]},
+#                 {'added': request.POST['added_'+str(buildLane[0])]},
+#                 {'notes': request.POST['notes_'+str(buildLane[0])]},
+#             ]
+#         gatheredJSON = json.dumps(gatheredData)
+#         copyData = request.POST.copy()
+#         copyData['data'] = gatheredJSON
+#         data = inventory_sheets_form(copyData)
+
+#         if data.is_valid():
+#             data.save()
+#             print('save')
+    
+#     return render (request,'inventory_sheets/machine_blocks/GF12-3506_block.html',{
+#         'invForm': invForm, 
+#         'type': type, 
+#         'id_tag': id_tag, 
+#         'organizedBuildData': rebuildData,
+#         'pastInventory': pastInventory
+#     })
+    
+# @lock
+# def VENDNET_3505_3505A_is(request, type, id_tag):
+#     today = datetime.date.today()
+#     machine = fleet_model.objects.get(id_tag__exact=id_tag)
+#     machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag)
+#     initial_data = {
+#         'id_tag': machine,
+#         'business': machine.location_name,
+#         'technician': request.user.get_full_name(),
+#         'date': today,
+#     }
+#     pastInventory = inventory_sheets_model.objects.filter(id_tag=machine).order_by('-date')
+#     if pastInventory.exists():
+#         pastInventory = sorted(json.loads(pastInventory[0].data).items())
+#     else:
+#         pastInventory = False
+#     allItems = item_data_model.objects.all()
+#     organizedBuildData = sorted(machineData.slot_dictionary.items())
+#     rebuildData = []
+#     for buildLane in organizedBuildData:
+#         for sItems in allItems:
+#                 if buildLane[1]['itemID'] == sItems.itemID:
+#                     rebuildData.append((buildLane[0], sItems.name))
+#     if pastInventory:
+#         newReBuild = []
+#         for rebu in rebuildData:
+#             for pastInven in pastInventory:
+#                 if rebu[0] == pastInven[0]:
+#                     newReBuild.append((rebu[0], rebu[1], pastInven[1]))
+#         rebuildData = newReBuild
+#     print(rebuildData)
+#     invForm = inventory_sheets_form(initial=initial_data)
+               
+#     if request.method == 'POST':
+#         gatheredData = {}
+#         for buildLane in rebuildData:
+#             gatheredData[buildLane[0]] = [
+#                 {'item_name': request.POST['item_'+str(buildLane[0])]},
+#                 {'stock': request.POST['stock_'+str(buildLane[0])]},
+#                 {'removed': str(-int(request.POST['removed_'+str(buildLane[0])]))},
+#                 {'sold': request.POST['sold_'+str(buildLane[0])]},
+#                 {'added': request.POST['added_'+str(buildLane[0])]},
+#                 {'notes': request.POST['notes_'+str(buildLane[0])]},
+#             ]
+#         gatheredJSON = json.dumps(gatheredData)
+#         copyData = request.POST.copy()
+#         copyData['data'] = gatheredJSON
+#         data = inventory_sheets_form(copyData)
+
+#         if data.is_valid():
+#             data.save()
+#             print('save')
+    
+#     return render (request,'inventory_sheets/machine_blocks/VENDNET-3505-3505A_block.html',{
+#         'invForm': invForm, 
+#         'type': type, 
+#         'id_tag': id_tag, 
+#         'organizedBuildData': rebuildData,
+#         'pastInventory': pastInventory
+#     })
+    
+@lock
+def universal_is(request, type, id_tag):
     today = datetime.date.today()
     machine = fleet_model.objects.get(id_tag__exact=id_tag)
     machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag)
     initial_data = {
         'id_tag': machine,
         'business': machine.location_name,
-        'technician': 'Anthony Ackerman',
+        'technician': request.user.get_full_name(),
         'date': today,
     }
     pastInventory = inventory_sheets_model.objects.filter(id_tag=machine).order_by('-date')
@@ -887,7 +1007,7 @@ def GF12_3506_3506A_is(request, type, id_tag):
             gatheredData[buildLane[0]] = [
                 {'item_name': request.POST['item_'+str(buildLane[0])]},
                 {'stock': request.POST['stock_'+str(buildLane[0])]},
-                {'removed': request.POST['removed_'+str(buildLane[0])]},
+                {'removed': str(-int(request.POST['removed_'+str(buildLane[0])]))},
                 {'sold': request.POST['sold_'+str(buildLane[0])]},
                 {'added': request.POST['added_'+str(buildLane[0])]},
                 {'notes': request.POST['notes_'+str(buildLane[0])]},
@@ -901,7 +1021,7 @@ def GF12_3506_3506A_is(request, type, id_tag):
             data.save()
             print('save')
     
-    return render (request,'inventory_sheets/machine_blocks/GF12-3506_block.html',{
+    return render (request,'inventory_sheets/machine_blocks/universal_is.html',{
         'invForm': invForm, 
         'type': type, 
         'id_tag': id_tag, 

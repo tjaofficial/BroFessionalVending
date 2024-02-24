@@ -1,0 +1,43 @@
+{% extends "inventory_sheets/inventory_sheet_layout.html" %}
+{% block content %}{% load static %}
+<script defer src="{% static 'script/machine_options.js' %}"></script>
+<script defer src="{% static 'script/inventory_fills.js' %}"></script>
+<input type="hidden" id="prevInventory" data-prev="{{pastInventory}}">
+<table style='border:1px solid black;border-collapse: collapse;width: 673px;'>
+    <tr style='text-align: center; font-weight: bolder;'>
+        <td>ID</td>
+        <td class="c1">Item Name</td>
+        <td style='display:none;'>Prev</td>
+        <td class="c2">Qty</td>
+        <td class="c3">Sold</td>
+        <td class="c6">Removed</td>
+        <td class="c4">Added</td>
+        <td class="c5">New Dates</td>
+        <td class="c5">Notes</td>
+    </tr>
+    <tr>
+        <td>
+            <input type="hidden" name="data" style="width: 154px;" maxlength="400" required="" id="id_data">
+        </td>
+    </tr>
+    {% for lane in organizedBuildData%}
+        <tr>
+            <td>{{lane.0}}</td>
+            <td class="c1">{{lane.1}}<input readonly type="hidden" name="item_{{lane.0}}" value="{{lane.1}}" style="width: 154px;" maxlength="30" required="" id="id_item_name_{{lane.0}}"></td>
+            <td style='display:none;'><input id="prev{{lane.0}}" type="number" style="width:44px;text-align:center;" value="{% if pastInventory %}{{ lane.2.1.stock|add:lane.2.4.added|add:lane.2.2.removed }}{% endif %}"></td>
+            <td class="c2"><input oninput="autoAddSold(this)" type="number" name="stock_{{lane.0}}" style="width:44px;" maxlength="200" required="" id="id_stock_{{lane.0}}"></td>
+            <td class="c3"><input readonly type="number" name="sold_{{lane.0}}" style="width:44px; background:#8080805c;" maxlength="200" required="" id="id_sold_{{lane.0}}"></td>
+            <td class="c6"><input type="number" name="removed_{{lane.0}}" style="width:44px;" maxlength="200" required="" id="removed_{{lane.0}}"></td>
+            <td class="c4"><input oninput="requireDate(this)" type="number" name="added_{{lane.0}}" style="width:44px;" maxlength="200" required="" id="id_added_{{lane.0}}"></td>
+            <td class="c5"><input disabled type="date" name="new_dates_{{lane.0}}" required="" id="id_new_dates_{{lane.0}}"></td>
+            <td class="c5"><input type="text" name="notes_{{lane.0}}" maxlength="600" required="" id="id_notes_{{lane.0}}"></td>
+        </tr>
+    {% endfor %}
+</table>
+<br>
+<div style="width:600px; margin:auto;">
+    General Notes:<br>
+    <textarea name="general_notes" rows="7" cols="70"></textarea>
+</div>
+<br>
+{% endblock %}

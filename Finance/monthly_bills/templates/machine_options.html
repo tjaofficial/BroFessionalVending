@@ -8,7 +8,7 @@
             <div class="header">
                 <a class="rightGap" href="{% url 'vendDash' %}">Back</a>
                 <a class="rightGap" href="{% url 'stock' type id_tag %}">Product Data</a>
-                <a class="rightGap" href="{% url machineURL type id_tag %}">Inventory Form</a>
+                <a class="rightGap" href="{% url 'inventorySheet' type id_tag %}">Inventory Form</a>
                 <a href="{% url 'vmax576_rd' type id_tag %}">Restock Data</a>
             </div>
             {% comment %} <div>
@@ -374,7 +374,7 @@
                         </tr>
                     </table><br>
                 </center> {% endcomment %}
-                Cash Collected: ${{totalCollected}}<br><br>
+                Cash Collected: ${{totalCollected|floatformat:2}}<br><br>
                 <table id="logList" class='mainTable'>
                     <tr>
                         <th colspan=7 style='text-align:center;padding:5px;'>Inventory Logs</th>
