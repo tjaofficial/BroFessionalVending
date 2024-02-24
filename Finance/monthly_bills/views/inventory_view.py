@@ -1021,7 +1021,7 @@ def universal_is(request, type, id_tag):
             data.save()
             print('save')
     
-    return render (request,'inventory_sheets/machine_blocks/universal_is.html',{
+    return render (request,'inventory_sheets/universal_is.html',{
         'invForm': invForm, 
         'type': type, 
         'id_tag': id_tag, 
