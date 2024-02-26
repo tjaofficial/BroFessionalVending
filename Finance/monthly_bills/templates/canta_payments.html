@@ -1,0 +1,16 @@
+{% extends "components/admin_layout.html" %}{% load static %}
+{% block content %}
+<style>
+
+</style>
+<div style="width: 17rem; margin: auto; margin-top:4rem;">
+    <form method="POST" actioon="">
+        {% csrf_token %}
+        {% for input in form %}
+            {{input.label}}: {{input}}<br>
+        {% endfor %}
+        <br>
+        <input type='submit' value='select'/>
+    </form>
+</div>
+{% endblock %}

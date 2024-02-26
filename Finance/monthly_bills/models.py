@@ -683,7 +683,19 @@ class machine_build_model(models.Model):
     def __str__(self):
         return str(self.machineChoice)
     
-
+class canta_payments_model(models.Model):
+    machineChoice = models.ForeignKey(
+        to=fleet_model, 
+        on_delete=models.CASCADE,
+    )
+    gross_revenue = models.FloatField()
+    date = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
+    def __str__(self):
+        return str(self.date) + " - " + str(self.machineChoice)
+    
     
     
     

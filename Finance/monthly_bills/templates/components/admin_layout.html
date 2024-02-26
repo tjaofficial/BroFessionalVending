@@ -1,0 +1,19 @@
+{% load static %}
+<link href="{% static 'style/header.css' %}" rel="stylesheet">
+<body>
+    <div>
+        <div style='width:100%; margin-bottom: 5rem;'>
+            <div class="header">
+                {% include "components/back_button.html" with destination=goBack %}
+                <a class="rightGap" href="{% url 'stock' type id_tag %}">Product Data</a>
+                <a class="rightGap" href="{% url 'inventorySheet' type id_tag %}">Inventory Form</a>
+                <a class="rightGap" href="{% url 'cantaPayments' type id_tag %}">Cantalope Payment</a>
+                <a href="{% url 'vmax576_rd' type id_tag %}">Restock Data</a>
+            </div>
+            <div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>

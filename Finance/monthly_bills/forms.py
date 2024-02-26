@@ -266,5 +266,15 @@ class machine_build_form(ModelForm):
             'machineChoice': forms.Select(),
         }
         
+class canta_payments_form(ModelForm):
+    class Meta:
+        model = canta_payments_model
+        fields = ('__all__')
+        widgets = {
+            'machineChoice': forms.Select(),
+            'gross_revenue': forms.NumberInput(attrs={'type':'float'}),
+            'date': forms.DateInput(attrs={'type':'date'}),
+        }
+        
         
         

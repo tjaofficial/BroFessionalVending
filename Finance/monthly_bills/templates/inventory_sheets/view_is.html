@@ -1,0 +1,96 @@
+{% extends "components/admin_layout.html" %}{% load static %}
+{% block content %}
+<style>
+    th{
+        text-align: left;
+    }
+    .centerTableColumn{
+        text-align: center;
+    }
+    .itemPadding{
+        padding: 0px 10px;
+    }
+    .h1{
+        width: 15rem;
+    }
+    .h2{
+        width: 4rem;
+    }
+    .h3{
+        padding: 0 3px;
+    }
+    .h5{
+        width: 8rem;
+    }
+</style>
+<table style='margin-top: 7rem; width: 25rem;'>
+    <tr>
+        <th style="width: 10rem;">Location:</th>
+        <td>{{currentInventoryData.business}}</td>
+    </tr>
+    <tr>
+        <th>Machine ID:</th>
+        <td>{{currentInventoryData.id_tag}}</td>
+    </tr>
+    <tr>
+        <th>Date:</th>
+        <td>{{currentInventoryData.date}}</td>
+    </tr>
+</table>
+<table style="width: 25rem;">
+    <tr>
+        <th style="width: 10rem;">Technician Name:</th>
+        <td>{{currentInventoryData.technician}}</td>
+    </tr>
+    <tr>
+        <th>Condition:</th>
+        <td>{{currentInventoryData.condition}}</td>
+    </tr>
+</table>
+<table style="width: 25rem;">
+    <tr>
+        <th style="width: 10rem;">Start Time:</th>
+        <td>{{currentInventoryData.time_start}}</td>
+    </tr>
+    <tr>
+        <th style="width: 10rem;">End Time:</th>
+        <td>{{currentInventoryData.time_end}}</td>
+    </tr>
+</table>
+<table style='margin-bottom: 4rem; width: 25rem;'>
+    <tr>
+        <th style="width: 10rem;">Collected: </th>
+        <td>${{currentInventoryData.collected|floatformat:2}}</td>
+    </tr>
+</table>
+<table style='border:1px solid black;border-collapse: collapse;width: 65rem;'>
+    <tr style='text-align: center; font-weight: bolder;'>
+        <td class="h3">ID</td>
+        <td class="h1">Item Name</td>
+        <td class="h2">Qty</td>
+        <td class="h2">Sold</td>
+        <td class="h2">Rmvd</td>
+        <td class="h2">Added</td>
+        <td class="h5">New Dates</td>
+        <td class="h6">Notes</td>
+    </tr>
+    {% for lane in organizedBuildData%}
+        <tr>
+            <td class="centerTableColumn">{{lane.0}}</td>
+            <td class="c1 itemPadding">{{lane.1}}</td>
+            <td class="c2 centerTableColumn">{{lane.2.1.stock}}</td>
+            <td class="c3 centerTableColumn">{{lane.2.3.sold}}</td>
+            <td class="c6 centerTableColumn">{{lane.2.2.removed}}</td>
+            <td class="c4 centerTableColumn">{{lane.2.4.added}}</td>
+            <td class="c5 centerTableColumn">{{lane.2.6.new_dates}}</td>
+            <td class="c5">{{lane.2.5.notes}}</td>
+        </tr>
+    {% endfor %}
+</table>
+<br>
+<div style="width:600px;">
+    <p style="font-weight: bold;">General Notes:</p>
+    {{currentInventoryData.general_notes}}
+</div>
+<br>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% load static %}
+{% if destination == 'vendDash' %}
+<a class="rightGap" href="{% url 'vendDash' %}">Back</a>
+{% elif destination == 'options' %}
+<a class="rightGap" href="{% url 'machineDash' type id_tag %}">Back</a>
+{% else %}
+{{destination}}
+{% endif %}
