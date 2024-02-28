@@ -1,5 +1,6 @@
 {% load static %}
 <link href="{% static 'style/landing_header.css' %}" rel="stylesheet"/>
+<script defer src="{% static 'script/landing_header.js' %}"></script>
 <div id="header" class="header">
     <div class="logo">
         <a href="{% url 'landing' %}">
@@ -41,16 +42,21 @@
             {% comment %} <li><a href="#">Sponsors</a></li> {% endcomment %}
         </ul>
         <div>
-            <div id="menu" class="menu">MENU</div>
+            <div id="menu" class="menu" onclick="toggleDropDown()">MENU</div>
         </div>
     </div>
 </div>
-<div id="dropDownMenu">
-    <ul class="main-nav">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Annuncements</a></li>
-        <li><a href="#">Whats Fresh</a></li>
+<div id="dropDownMenu" style="margin-top: 0px;
+position: fixed;
+width: 100%;
+background: #fbb2a7;
+z-index: 5;">
+    <ul class="main-nav" style="display: none;">
+        <li class='listGap'><a href="#">Home</a></li>
+        <li class='listGap'><a href="#">About</a></li>
+        <li class='listGap'><a href="#">Annuncements</a></li>
+        <li class='listGap'><a href="{% url 'login' %}">Login</a></li>
+        <li class='listGap' style="margin-bottom:15px;"><a href="#">Whats Fresh</a></li>
         {% comment %} <li><a href="{% url 'login' %}">TreeSpace</a></li> {% endcomment %}
         {% comment %} <li><a href="#">Sponsors</a></li> {% endcomment %}
     </ul>
