@@ -680,6 +680,10 @@ class machine_build_model(models.Model):
         on_delete=models.CASCADE,
     )
     slot_dictionary = models.JSONField()
+    date = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
     def __str__(self):
         return str(self.machineChoice)
     

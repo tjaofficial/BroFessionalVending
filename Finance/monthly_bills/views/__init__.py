@@ -7,3 +7,4 @@ from .gas_view import *
 from .landing_view import *
 from .snacks_view import *
 from .auth_view import *
+from .analytics_view import *

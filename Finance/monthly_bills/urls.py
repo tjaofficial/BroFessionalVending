@@ -41,4 +41,5 @@ urlpatterns = [
     path("<str:type>/<str:id_tag>/archive/<str:date>", views.view_is, name="viewInventory"),
     path("<str:type>/<str:id_tag>/canta-payments", views.canta_payments, name="cantaPayments"),
     
+    path("<str:type>/<str:id_tag>/analytics", views.analytics_page, name="analyticsDash"),
 ]

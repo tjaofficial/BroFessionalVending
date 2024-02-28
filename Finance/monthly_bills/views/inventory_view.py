@@ -784,6 +784,7 @@ def universal_is(request, type, id_tag):
         'pastInventory': pastInventory
     })
  
+@lock
 def view_is(request, type, id_tag, date):
     goBack = 'options'
     machine = fleet_model.objects.get(id_tag__exact=id_tag)
@@ -815,7 +816,8 @@ def view_is(request, type, id_tag, date):
         'currentInventory': currentInventory,
         'currentInventoryData': currentInventoryData
     })
-    
+
+@lock
 def canta_payments(request, type, id_tag):
     goBack = 'options'
     machine = fleet_model.objects.get(id_tag__exact=id_tag)

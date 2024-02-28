@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from ..models import fleet_model, item_data_model
+from ..models import fleet_model, item_data_model, machine_build_model
 from ..forms import fleet_form, machine_build_form
 from django.contrib.auth.decorators import login_required
 import json
@@ -72,6 +72,9 @@ def add_fleet(request, selector):
 def machine_build_view(request, machineID):
     snackData = item_data_model.objects.all()
     machineData = fleet_model.objects.get(id_tag=machineID)
+    buildQuery = machine_build_model.objects.filter(machineChoice__id_tag=machineID).order_by('-date')
+    if buildQuery.exists():
+        form = machine_build_form(buildQuery[0])
     
     if request.method == 'POST':
         data = request.POST

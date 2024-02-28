@@ -3,7 +3,7 @@ displaySnackLanes = (elem) => {
     let htmlCode = ""
     const laneSnackGrab = document.getElementById('laneSnackGrab')
     for(let x=1; x<=parseInt(numberOfSnackLanes); x++){
-        let parseLane = laneSnackGrab.innerHTML.replace(`name="size"`, `name="size_S${x}"`).replace(`name="slots"`, `name="slots_S${x}"`).replace(`name="selectID"`, `name="selectID_S${x}"`).replace(`name="itemID"`, `name="itemID_S${x}"`);
+        let parseLane = laneSnackGrab.innerHTML.replace(`name="size"`, `name="size_S${x}"`).replace(`name="slots"`, `name="slots_S${x}"`).replace(`name="selectID"`, `name="selectID_S${x}"`).replace(`name="itemID"`, `name="itemID_S${x}"`).replace(`name="cost"`, `name="cost_S${x}"`);
         htmlCode += parseLane;
     }
     const snackCont = document.getElementById('snackCont');
@@ -15,7 +15,7 @@ displayDrinkLanes = (elem) => {
     let htmlCode = ""
     const laneDrinkGrab = document.getElementById('laneDrinkGrab')
     for(let x=1; x<=parseInt(numberOfDrinkLanes); x++){
-        let parseLane = laneDrinkGrab.innerHTML.replace(`name="size"`, `name="size_D${x}"`).replace(`name="slots"`, `name="slots_D${x}"`).replace(`name="selectID"`, `name="selectID_D${x}"`).replace(`name="itemID"`, `name="itemID_D${x}"`);
+        let parseLane = laneDrinkGrab.innerHTML.replace(`name="size"`, `name="size_D${x}"`).replace(`name="slots"`, `name="slots_D${x}"`).replace(`name="selectID"`, `name="selectID_D${x}"`).replace(`name="itemID"`, `name="itemID_D${x}"`).replace(`name="cost"`, `name="cost_S${x}"`);
         htmlCode += parseLane;
     }
     const drinkCont = document.getElementById('drinkCont');
