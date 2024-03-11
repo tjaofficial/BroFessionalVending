@@ -781,7 +781,8 @@ def universal_is(request, type, id_tag):
         'type': type, 
         'id_tag': id_tag, 
         'organizedBuildData': rebuildData,
-        'pastInventory': pastInventory
+        'pastInventory': pastInventory,
+        'goBack': 'options'
     })
  
 @lock
