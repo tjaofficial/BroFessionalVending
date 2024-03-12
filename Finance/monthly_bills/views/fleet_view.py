@@ -3,6 +3,7 @@ from ..models import fleet_model, item_data_model, machine_build_model
 from ..forms import fleet_form, machine_build_form
 from django.contrib.auth.decorators import login_required
 import json
+import datetime
 lock = login_required(login_url='login')
 
 @lock
@@ -73,6 +74,7 @@ def machine_build_view(request, machineID):
     snackData = item_data_model.objects.all()
     machineData = fleet_model.objects.get(id_tag=machineID)
     buildQuery = machine_build_model.objects.filter(machineChoice__id_tag=machineID).order_by('-date')
+    today = datetime.datetime.today()
     if buildQuery.exists():
         form = machine_build_form(buildQuery[0])
     
@@ -92,8 +94,10 @@ def machine_build_view(request, machineID):
         print(laneDict)         
         dataCopy = request.POST.copy()
         dataCopy['machineChoice'] = machineData
+        dataCopy['date'] = today
         dataCopy['slot_dictionary'] = json.dumps(laneDict)
         dataForm = machine_build_form(dataCopy)
+        print(dataForm.errors)
         if dataForm.is_valid():
             dataForm.save()
             return redirect('fleet')
