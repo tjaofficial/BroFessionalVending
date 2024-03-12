@@ -5,6 +5,8 @@ autoAddSold = (elem) => {
     const prevQty = parseInt(elem.parentNode.parentNode.children[2].children[0].value);
     const currentQty = parseInt(elem.value)
     const amountSold = prevQty - currentQty
+    console.log(prevQty);
+    console.log(currentQty);
     console.log(amountSold);
     soldInput.value = amountSold;
 }

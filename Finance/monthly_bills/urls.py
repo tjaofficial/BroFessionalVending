@@ -37,7 +37,7 @@ urlpatterns = [
     path("add_mileage_log", views.add_mileage_log, name="addMileage"),
     path("gas_log", views.gas_log, name="gasLog"),
 
-    path("<str:type>/<str:id_tag>/inventory-sheet", views.universal_is, name="inventorySheet"),
+    path("<str:type>/<str:id_tag>/inventory-sheet/<str:buildID>", views.universal_is, name="inventorySheet"),
     path("<str:type>/<str:id_tag>/archive/<str:date>", views.view_is, name="viewInventory"),
     path("<str:type>/<str:id_tag>/canta-payments", views.canta_payments, name="cantaPayments"),
     

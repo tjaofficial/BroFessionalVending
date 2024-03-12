@@ -710,10 +710,14 @@ def vmax576_rd(request, type, id_tag):
     })
 
 @lock
-def universal_is(request, type, id_tag):
+def universal_is(request, type, id_tag, buildID):
     today = datetime.date.today()
     machine = fleet_model.objects.get(id_tag__exact=id_tag)
-    machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag)
+    machineList = machine_build_model.objects.filter(machineChoice__id_tag=id_tag).order_by('-date')
+    if buildID != "default":
+        machineData = machine_build_model.objects.get(id=buildID)
+    else:
+        machineData = machineList[0]
     initial_data = {
         'id_tag': machine,
         'business': machine.location_name,
@@ -727,11 +731,14 @@ def universal_is(request, type, id_tag):
         pastInventory = False
     allItems = item_data_model.objects.all()
     organizedBuildData = sorted(machineData.slot_dictionary.items())
+    print(organizedBuildData)
     rebuildData = []
     for buildLane in organizedBuildData:
         for sItems in allItems:
                 if buildLane[1]['itemID'] == sItems.itemID:
                     rebuildData.append((buildLane[0], sItems.name))
+        if buildLane[1]['itemID'] == 'empty':
+            rebuildData.append((buildLane[0], 'EMPTY'))
     if pastInventory:
         newReBuild = []
         for rebu in rebuildData:
@@ -744,31 +751,35 @@ def universal_is(request, type, id_tag):
                
     if request.method == 'POST':
         print(request.POST)
+        data = request.POST
+        if 'machineBuild' in data.keys():
+            return redirect('inventorySheet', type, id_tag, data['machineBuild'])
         gatheredData = {}
         for buildLane in rebuildData:
-            if 'new_dates_'+str(buildLane[0]) in request.POST.keys():
+            if 'new_dates_'+str(buildLane[0]) in data.keys():
                 gatheredData[buildLane[0]] = [
-                    {'item_name': request.POST['item_'+str(buildLane[0])]},
-                    {'stock': request.POST['stock_'+str(buildLane[0])]},
-                    {'removed': str(-int(request.POST['removed_'+str(buildLane[0])]))},
-                    {'sold': request.POST['sold_'+str(buildLane[0])]},
-                    {'added': request.POST['added_'+str(buildLane[0])]},
-                    {'notes': request.POST['notes_'+str(buildLane[0])]},
-                    {'new_dates': request.POST['new_dates_'+str(buildLane[0])]}
+                    {'item_name': data['item_'+str(buildLane[0])]},
+                    {'stock': data['stock_'+str(buildLane[0])]},
+                    {'removed': str(-int(data['removed_'+str(buildLane[0])]))},
+                    {'sold': data['sold_'+str(buildLane[0])]},
+                    {'added': data['added_'+str(buildLane[0])]},
+                    {'notes': data['notes_'+str(buildLane[0])]},
+                    {'new_dates': data['new_dates_'+str(buildLane[0])]}
                 ]
             else:
                 gatheredData[buildLane[0]] = [
-                    {'item_name': request.POST['item_'+str(buildLane[0])]},
-                    {'stock': request.POST['stock_'+str(buildLane[0])]},
-                    {'removed': str(-int(request.POST['removed_'+str(buildLane[0])]))},
-                    {'sold': request.POST['sold_'+str(buildLane[0])]},
-                    {'added': request.POST['added_'+str(buildLane[0])]},
-                    {'notes': request.POST['notes_'+str(buildLane[0])]},
+                    {'item_name': data['item_'+str(buildLane[0])]},
+                    {'stock': data['stock_'+str(buildLane[0])]},
+                    {'removed': str(-int(data['removed_'+str(buildLane[0])]))},
+                    {'sold': data['sold_'+str(buildLane[0])]},
+                    {'added': data['added_'+str(buildLane[0])]},
+                    {'notes': data['notes_'+str(buildLane[0])]},
                     {'new_dates': ""}
                 ]
         gatheredJSON = json.dumps(gatheredData)
-        copyData = request.POST.copy()
+        copyData = data.copy()
         copyData['data'] = gatheredJSON
+        copyData['machineBuild'] = machineData
         data = inventory_sheets_form(copyData)
 
         if data.is_valid():
@@ -782,15 +793,16 @@ def universal_is(request, type, id_tag):
         'id_tag': id_tag, 
         'organizedBuildData': rebuildData,
         'pastInventory': pastInventory,
-        'goBack': 'options'
+        'goBack': 'options',
+        'machineList': machineList
     })
  
 @lock
 def view_is(request, type, id_tag, date):
     goBack = 'options'
     machine = fleet_model.objects.get(id_tag__exact=id_tag)
-    machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag)
     currentInventory = inventory_sheets_model.objects.get(id_tag=machine, date=date)
+    machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag, id=currentInventory.machineBuild.id)
     currentInventoryData = currentInventory
     currentInventory = sorted(json.loads(currentInventory.data).items())
 
@@ -799,8 +811,10 @@ def view_is(request, type, id_tag, date):
     rebuildData = []
     for buildLane in organizedBuildData:
         for sItems in allItems:
-                if buildLane[1]['itemID'] == sItems.itemID:
-                    rebuildData.append((buildLane[0], sItems.name))
+            if buildLane[1]['itemID'] == sItems.itemID:
+                rebuildData.append((buildLane[0], sItems.name))
+        if buildLane[1]['itemID'] == 'empty':
+            rebuildData.append((buildLane[0], 'EMPTY'))
     if currentInventory:
         newReBuild = []
         for rebu in rebuildData:

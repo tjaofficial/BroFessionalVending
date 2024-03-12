@@ -85,16 +85,15 @@ def machine_build_view(request, machineID):
         laneDict = {}
         for lane in range(1, snackLanes+1):
             laneID = "S"+str(lane)
-            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID]}
+            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID], 'cost':data['cost_'+laneID]}
             laneDict[data['selectID_'+laneID]] = buildlane
         for lane in range(1, drinkLanes+1):
             laneID = "D"+str(lane)
-            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID]}
+            buildlane = {'itemID':data['itemID_'+laneID],'slots':data['slots_'+laneID], 'size':data['size_'+laneID], 'cost':data['cost_'+laneID]}
             laneDict[data['selectID_'+laneID]] = buildlane
         print(laneDict)         
         dataCopy = request.POST.copy()
         dataCopy['machineChoice'] = machineData
-        dataCopy['date'] = today
         dataCopy['slot_dictionary'] = json.dumps(laneDict)
         dataForm = machine_build_form(dataCopy)
         print(dataForm.errors)
@@ -103,5 +102,6 @@ def machine_build_view(request, machineID):
             return redirect('fleet')
     return render(request, 'machines/machine_builds.html', {
         'machineID': machineID,
-        'snackData': snackData
+        'snackData': snackData,
+        'today': today
     })

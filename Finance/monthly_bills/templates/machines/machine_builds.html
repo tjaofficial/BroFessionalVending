@@ -12,6 +12,7 @@
         <div id="allLanes">
             <form method="POST" action=''>
                 {% csrf_token %}
+                <input type="date" name="date" value="{{today}}">
                 <div id="snackLanes">
                     <div>How many snack lanes? <input oninput="displaySnackLanes(this)" type="number" name="snack_lane_qty" style="width:80px;"></div><br>
                     <div id="snackCont"></div>
@@ -73,6 +74,7 @@
                                 What drink is being sold in this lane?
                                 <select name="itemID">
                                     <option value="">-------</option>
+                                    <option value="empty">EMPTY</option>
                                     {% for drink in snackData %}
                                         {% if drink.itemPrimaryType == 'drinks' %}
                                             <option value="{{drink.itemID}}">{{drink.name}} - {{drink.vendor}}</option>

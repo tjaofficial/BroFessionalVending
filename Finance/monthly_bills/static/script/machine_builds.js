@@ -15,7 +15,7 @@ displayDrinkLanes = (elem) => {
     let htmlCode = ""
     const laneDrinkGrab = document.getElementById('laneDrinkGrab')
     for(let x=1; x<=parseInt(numberOfDrinkLanes); x++){
-        let parseLane = laneDrinkGrab.innerHTML.replace(`name="size"`, `name="size_D${x}"`).replace(`name="slots"`, `name="slots_D${x}"`).replace(`name="selectID"`, `name="selectID_D${x}"`).replace(`name="itemID"`, `name="itemID_D${x}"`).replace(`name="cost"`, `name="cost_S${x}"`);
+        let parseLane = laneDrinkGrab.innerHTML.replace(`name="size"`, `name="size_D${x}"`).replace(`name="slots"`, `name="slots_D${x}"`).replace(`name="selectID"`, `name="selectID_D${x}"`).replace(`name="itemID"`, `name="itemID_D${x}"`).replace(`name="cost"`, `name="cost_D${x}"`);
         htmlCode += parseLane;
     }
     const drinkCont = document.getElementById('drinkCont');

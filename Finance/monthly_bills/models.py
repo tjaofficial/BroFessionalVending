@@ -518,11 +518,30 @@ class mileage_log_model(models.Model):
     def __str__(self):
         return str(self.date)
     
+class machine_build_model(models.Model):
+    machineChoice = models.ForeignKey(
+        to=fleet_model, 
+        on_delete=models.CASCADE,
+    )
+    slot_dictionary = models.JSONField()
+    date = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
+    def __str__(self):
+        return str(self.machineChoice) + ' - ' + str(self.date)
+
 class inventory_sheets_model(models.Model):
     business = models.CharField(
         max_length=30
     )
     id_tag = models.ForeignKey(to=fleet_model, on_delete=models.CASCADE)
+    machineBuild = models.ForeignKey(
+        to=machine_build_model, 
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     date = models.DateField(
         auto_now=False,
         auto_now_add=False
@@ -674,18 +693,7 @@ class item_stock_model(models.Model):
     def __str__(self):
         return str(self.itemChoice.itemID) + ' - ' + str(self.date_updated)
     
-class machine_build_model(models.Model):
-    machineChoice = models.ForeignKey(
-        to=fleet_model, 
-        on_delete=models.CASCADE,
-    )
-    slot_dictionary = models.JSONField()
-    date = models.DateField(
-        auto_now=False,
-        auto_now_add=False
-    )
-    def __str__(self):
-        return str(self.machineChoice)
+
     
 class canta_payments_model(models.Model):
     machineChoice = models.ForeignKey(

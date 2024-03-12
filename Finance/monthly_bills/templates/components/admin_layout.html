@@ -6,7 +6,7 @@
             <div class="header">
                 {% include "components/back_button.html" with destination=goBack %}
                 <a class="rightGap" href="{% url 'machineDash' type id_tag %}">Machine Dashboard</a>
-                <a class="rightGap" href="{% url 'inventorySheet' type id_tag %}">Inventory Form</a>
+                <a class="rightGap" href="{% url 'inventorySheet' type id_tag 'default' %}">Inventory Form</a>
                 <a class="rightGap" href="{% url 'cantaPayments' type id_tag %}">Cantalope Payment</a>
                 <a class="rightGap" href="{% url 'analyticsDash' type id_tag %}">Analytics</a>
                 <a href="{% url 'vmax576_rd' type id_tag %}">Restock Data</a>
