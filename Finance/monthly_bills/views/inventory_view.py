@@ -732,16 +732,16 @@ def universal_is(request, type, id_tag, buildID):
     allItems = item_data_model.objects.all()
     organizedBuildData = sorted(machineData.slot_dictionary.items())
     print(organizedBuildData)
-    rebuildData = []
+    rebuildDataStart = []
     for buildLane in organizedBuildData:
         for sItems in allItems:
-                if buildLane[1]['itemID'] == sItems.itemID:
-                    rebuildData.append((buildLane[0], sItems.name))
+            if buildLane[1]['itemID'] == sItems.itemID:
+                rebuildDataStart.append((buildLane[0], sItems.name))
         if buildLane[1]['itemID'] == 'empty':
-            rebuildData.append((buildLane[0], 'EMPTY'))
+            rebuildDataStart.append((buildLane[0], 'EMPTY'))
     if pastInventory:
         newReBuild = []
-        for rebu in rebuildData:
+        for rebu in rebuildDataStart:
             for pastInven in pastInventory:
                 if rebu[0] == pastInven[0]:
                     newReBuild.append((rebu[0], rebu[1], pastInven[1]))
@@ -794,7 +794,8 @@ def universal_is(request, type, id_tag, buildID):
         'organizedBuildData': rebuildData,
         'pastInventory': pastInventory,
         'goBack': 'options',
-        'machineList': machineList
+        'machineList': machineList,
+        'rebuildDataStart': rebuildDataStart
     })
  
 @lock
