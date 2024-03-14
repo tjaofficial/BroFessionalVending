@@ -3,7 +3,7 @@
 <script defer src="{% static 'script/machine_options.js' %}"></script>
 <script defer src="{% static 'script/inventory_fills.js' %}"></script>
 <input type="hidden" id="prevInventory" data-prev="{{pastInventory}}">
-{% for lane in rebuildDataStart%}
+{% for lane in organizedBuildData%}
 {{lane}}
 {% endfor %}
 <table style='border:1px solid black;border-collapse: collapse;width: 673px;'>
