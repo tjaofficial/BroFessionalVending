@@ -646,6 +646,7 @@ class item_data_model(models.Model):
         ('soda pops','soda pops'),
         ('juices','juices'),
         ('crackers','crackers'),
+        ('cookies','cookies'),
         ('water','water'),
     )
     name = models.CharField(
