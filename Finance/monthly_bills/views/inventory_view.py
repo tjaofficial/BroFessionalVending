@@ -753,7 +753,7 @@ def universal_is(request, type, id_tag, buildID):
         rebuildData = newReBuild
     else:
         rebuildData = rebuildDataStart
-        pastInventory = 'none'
+        pastInventory = 0
     invForm = inventory_sheets_form(initial=initial_data)
                
     if request.method == 'POST':
