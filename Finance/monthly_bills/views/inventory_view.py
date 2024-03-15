@@ -751,6 +751,8 @@ def universal_is(request, type, id_tag, buildID):
                 newList = [{'item_name': rebu[1]}, {'stock': '0'}, {'removed': '0'}, {'sold': '0'}, {'added': '0'}, {'notes': '-'}, {'new_dates': ''}]
                 newReBuild.append((rebu[0], rebu[1], newList))
         rebuildData = newReBuild
+    else:
+        rebuildData = rebuildDataStart
     invForm = inventory_sheets_form(initial=initial_data)
                
     if request.method == 'POST':
