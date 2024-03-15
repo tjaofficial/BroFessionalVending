@@ -742,9 +742,15 @@ def universal_is(request, type, id_tag, buildID):
     if pastInventory:
         newReBuild = []
         for rebu in rebuildDataStart:
+            empty = True
             for pastInven in pastInventory:
                 if rebu[0] == pastInven[0]:
                     newReBuild.append((rebu[0], rebu[1], pastInven[1]))
+                    empty = False
+            if empty == True:
+                newList = [{'item_name': rebu[1]}, {'stock': '0'}, {'removed': '0'}, {'sold': '0'}, {'added': '0'}, {'notes': '-'}, {'new_dates': ''}]
+                newReBuild.append((rebu[0], rebu[1], newList))
+            
         rebuildData = newReBuild
     print(rebuildData)
     invForm = inventory_sheets_form(initial=initial_data)
