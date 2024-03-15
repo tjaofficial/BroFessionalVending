@@ -5,6 +5,7 @@ autoAddSold = (elem) => {
     const prevInven = document.getElementById('prevInventory').dataset.prev;
     console.log(prevInven)
     if (prevInven != 'False'){
+        console.log('not right path')
         const prevQty = parseInt(elem.parentNode.parentNode.children[2].children[0].value);
         const currentQty = parseInt(elem.value)
         const amountSold = prevQty - currentQty
@@ -13,6 +14,7 @@ autoAddSold = (elem) => {
         console.log(amountSold);
         soldInput.value = amountSold;
     } else {
+        console.log('right path')
         soldInput.value = 0;
     }
 }
