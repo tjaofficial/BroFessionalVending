@@ -801,8 +801,7 @@ def universal_is(request, type, id_tag, buildID):
         'pastInventory': pastInventory,
         'goBack': 'options',
         'machineList': machineList,
-        'rebuildDataStart': rebuildDataStart,
-        'pastInventory': pastInventory
+        'rebuildDataStart': rebuildDataStart
     })
  
 @lock

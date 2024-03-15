@@ -2,6 +2,7 @@
 autoAddSold = (elem, previousInv) => {
     const selectionID = String(elem.id.replace('id_stock_', ''));
     const soldInput = document.getElementById('id_sold_'+ selectionID);
+    console.log(previousInv)
     if (previousInv){
         const prevQty = parseInt(elem.parentNode.parentNode.children[2].children[0].value);
         const currentQty = parseInt(elem.value)
