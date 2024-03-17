@@ -92,26 +92,26 @@
                     {% for snackLane in dataDict.snackLaneData %}
                     <div>
                         Is the lane large/small?
-                        <select name="size">
+                        <select name="size{{ forloop.counter }}">
                             <option value="large" {% if "large" == snackLane.1.size %}selected{% endif %}>Large</option>
                             <option value="small" {% if 'small' == snackLane.1.size %}selected{% endif %}>Small</option>
                         </select>
                     </div>
                     <div>
                         How much does this snack cost?
-                        <input type="number" step="any" name="cost" style="width:130px;" value="{{snackLane.1.cost}}">
+                        <input type="number" step="any" name="cost{{ forloop.counter }}" style="width:130px;" value="{{snackLane.1.cost}}">
                     </div>
                     <div>
                         How many slots for snacks?
-                        <input type="number" name="slots" style="width:80px;" value="{{snackLane.1.slots}}">
+                        <input type="number" name="slots{{ forloop.counter }}" style="width:80px;" value="{{snackLane.1.slots}}">
                     </div>
                     <div>
                         What is the selection ID?
-                        <input type="text" name="selectID" style="width:80px;" value="{{snackLane.0}}">
+                        <input type="text" name="selectID{{ forloop.counter }}" style="width:80px;" value="{{snackLane.0}}">
                     </div>
                     <div>
                         What snack is being sold in this lane?
-                        <select name="itemID">
+                        <select name="itemID{{ forloop.counter }}">
                             <option value="">-------</option>
                             {% for snack in snackData %}
                                 {% if snack.itemPrimaryType == 'snacks' %}
@@ -125,22 +125,22 @@
                 <div id="drinkLanesData">
                     {% for drinkLane in dataDict.drinkLaneData %}
                     <div class="singleDrinkLane">
-                        <input type="hidden" name="size" value="regular">
+                        <input type="hidden" name="size{{ forloop.counter }}" value="regular">
                         <div>
                             How much does this drink cost?{{drinkLane}}
-                            <input type="number" step="any" name="cost" style="width:130px;" value="{{drinkLane.1.cost}}">
+                            <input type="number" step="any" name="cost{{ forloop.counter }}" style="width:130px;" value="{{drinkLane.1.cost}}">
                         </div>
                         <div>
                             How many slots for drinks?
-                            <input type="number" name="slots" style="width:80px;" value="{{drinkLane.1.slots}}">
+                            <input type="number" name="slots{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.1.slots}}">
                         </div>
                         <div>
                             What is the selection ID?
-                            <input type="text" name="selectID" style="width:80px;" value="{{drinkLane.0}}">
+                            <input type="text" name="selectID{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.0}}">
                         </div>
                         <div>
                             What drink is being sold in this lane?
-                            <select name="itemID">
+                            <select name="itemID{{ forloop.counter }}">
                                 <option value="">-------</option>
                                 <option value="empty">EMPTY</option>
                                 {% for drink in snackData %}
