@@ -114,7 +114,7 @@
                         What snack is being sold in this lane?
                         <select name="itemID_S{{ forloop.counter }}">
                             <option value="">-------</option>
-                            <option value="empty">EMPTY</option>
+                            <option value="empty" {% if snackLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
                             {% for snack in snackData %}
                                 {% if snack.itemPrimaryType == 'snacks' %}
                                     <option value="{{snack.itemID}}" {% if snack.itemID == snackLane.1.itemID %}selected{% endif %}>{{snack.name}}  - {{snack.vendor}}</option>
@@ -144,8 +144,8 @@
                             What drink is being sold in this lane?
                             <select name="itemID_D{{ forloop.counter }}">
                                 <option value="">-------</option>
-                                <option value="empty">EMPTY</option>
-                                {% for drink in snackData %}
+                                <option value="empty" {% if drinkLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
+                                {% for drink in drinkData %}
                                     {% if drink.itemPrimaryType == 'drinks' %}
                                         <option value="{{drink.itemID}}" {% if drink.itemID == drinkLane.1.itemID %}selected{% endif %}>{{drink.name}} - {{drink.vendor}}</option>
                                     {% endif %}
