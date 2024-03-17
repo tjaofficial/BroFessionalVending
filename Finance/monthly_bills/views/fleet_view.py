@@ -101,8 +101,9 @@ def machine_build_view(request, machineID):
     
     if request.method == 'POST':
         data = request.POST
-        snackLanes = int(data['snack_lane_qty'])
-        drinkLanes = int(data['drink_lane_qty'])
+        if not formData:
+            snackLanes = int(data['snack_lane_qty'])
+            drinkLanes = int(data['drink_lane_qty'])
         laneDict = {}
         for lane in range(1, snackLanes+1):
             laneID = "S"+str(lane)
