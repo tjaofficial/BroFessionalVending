@@ -145,7 +145,7 @@
                             <select name="itemID_D{{ forloop.counter }}">
                                 <option value="">-------</option>
                                 <option value="empty" {% if drinkLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
-                                {% for drink in drinkData %}
+                                {% for drink in snackData %}
                                     {% if drink.itemPrimaryType == 'drinks' %}
                                         <option value="{{drink.itemID}}" {% if drink.itemID == drinkLane.1.itemID %}selected{% endif %}>{{drink.name}} - {{drink.vendor}}</option>
                                     {% endif %}
