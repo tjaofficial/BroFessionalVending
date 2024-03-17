@@ -71,12 +71,33 @@ def add_fleet(request, selector):
     
 @lock
 def machine_build_view(request, machineID):
+    formData = False
     snackData = item_data_model.objects.all()
     machineData = fleet_model.objects.get(id_tag=machineID)
     buildQuery = machine_build_model.objects.filter(machineChoice__id_tag=machineID).order_by('-date')
-    today = datetime.datetime.today()
+    today = datetime.datetime.today().date()
     if buildQuery.exists():
-        form = machine_build_form(buildQuery[0])
+        form = buildQuery[0]
+        formData = True
+        
+        dataDict = {}
+        snackLanes = 0
+        drinkLanes = 0
+        drinkLaneData = []
+        snackLaneData = []
+        for lane in form.slot_dictionary.items():
+            if lane[1]['size'] != 'regular':
+                snackLanes += 1
+                snackLaneData.append(lane)
+            else:
+                drinkLanes += 1
+                drinkLaneData.append(lane)
+            
+        dataDict['snackLanes'] = snackLanes
+        dataDict['drinkLanes'] = drinkLanes
+        dataDict['drinkLaneData'] = drinkLaneData
+        dataDict['snackLaneData'] = snackLaneData
+        print(dataDict['drinkLaneData'])
     
     if request.method == 'POST':
         data = request.POST
@@ -103,5 +124,9 @@ def machine_build_view(request, machineID):
     return render(request, 'machines/machine_builds.html', {
         'machineID': machineID,
         'snackData': snackData,
-        'today': today
+        'today': str(today),
+        'form': form,
+        'formData': formData,
+        'dataDict': dataDict
     })
+    # {% if formData %}{% else %}{% endif %}
