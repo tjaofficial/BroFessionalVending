@@ -77,11 +77,11 @@ def machine_build_view(request, machineID):
     buildQuery = machine_build_model.objects.filter(machineChoice__id_tag=machineID).order_by('-date')
     today = datetime.datetime.today().date()
     form = ''
+    dataDict = {}
     if buildQuery.exists():
         form = buildQuery[0]
         formData = True
         
-        dataDict = {}
         snackLanes = 0
         drinkLanes = 0
         drinkLaneData = []
