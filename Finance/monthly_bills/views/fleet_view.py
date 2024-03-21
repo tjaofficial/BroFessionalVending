@@ -76,6 +76,7 @@ def machine_build_view(request, machineID):
     machineData = fleet_model.objects.get(id_tag=machineID)
     buildQuery = machine_build_model.objects.filter(machineChoice__id_tag=machineID).order_by('-date')
     today = datetime.datetime.today().date()
+    form = ''
     if buildQuery.exists():
         form = buildQuery[0]
         formData = True
