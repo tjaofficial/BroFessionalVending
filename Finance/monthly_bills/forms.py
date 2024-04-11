@@ -188,7 +188,6 @@ class mileage_log_form(ModelForm):
         }
         
 class inventory_sheets_form(ModelForm):
-    collected = forms.FloatField(required=False)
     class Meta:
         model = inventory_sheets_model
         fields = ('__all__')
@@ -199,8 +198,7 @@ class inventory_sheets_form(ModelForm):
             'time_end' : forms.TimeInput(attrs={'type':'time'}),
             'technician' : forms.TextInput(attrs={'type':'text'}),
             'condition' : forms.Select(attrs={}),
-            'collected' : forms.FloatField(),
-            
+            'collected' : forms.NumberInput(attrs={'step':'0.01', 'required':True}),
             'data' : forms.TextInput(attrs={'style': 'width: 154px;'}),
         }
         

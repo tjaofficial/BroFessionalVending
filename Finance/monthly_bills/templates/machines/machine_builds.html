@@ -1,163 +1,174 @@
-{% load static %}
+{% extends "components/admin_layout.html" %}
+{% block content %}{% load static %}
 <script defer src="{% static 'script/machine_builds.js' %}"></script>
 <style>
     body{
         background-color: #cbcbff;
     }
+    .page_cont{
+        width: 580px;
+        margin: auto;
+        margin-top: 50px;
+    }
+    .fleetHeader{
+        text-align: center;
+        font-size: 25px;
+        font-weight: bold;
+    }
 </style>
-<body>
-    <div class='page_cont'>
-        <a href="{% url 'vendDash' %}">Back</a>
-        <div class='fleetHeader'>{{machineID}} Build</div>
-        <div id="allLanes">
-            <form method="POST" action=''>
-                {% csrf_token %}
+<div class='page_cont'>
+    <div class='fleetHeader'>{{id_tag}} Build</div>
+    <div id="allLanes">
+        <form method="POST" action=''>
+            {% csrf_token %}
+            <div style="text-align: center; padding-bottom: 35px;">
                 <input type="date" name="date" value="{% if formData %}{{form.date|slugify}}{% else %}{{today}}{% endif %}">
-                {% if not formData %}
-                <div id="snackLanes">
-                    <div>How many snack lanes? <input oninput="displaySnackLanes(this)" type="number" name="snack_lane_qty" id="snack_lane_qty" style="width:80px;" ></div><br>
-                    <div id="snackCont"></div>
-                    <div id="laneSnackGrab" style="display:none;">
-                        <div class="singleSnackLane">
-                            <div>
-                                Is the lane large/small?
-                                <select name="size">
-                                    <option value="large">Large</option>
-                                    <option value="small">Small</option>
-                                </select>
-                            </div>
-                            <div>
-                                How much does this snack cost?
-                                <input type="number" step="any" name="cost" style="width:130px;">
-                            </div>
-                            <div>
-                                How many slots for snacks?
-                                <input type="number" name="slots" style="width:80px;">
-                            </div>
-                            <div>
-                                What is the selection ID?
-                                <input type="text" name="selectID" style="width:80px;">
-                            </div>
-                            <div>
-                                What snack is being sold in this lane?
-                                <select name="itemID">
-                                    <option value="">-------</option>
-                                    <option value="empty">EMPTY</option>
-                                    {% for snack in snackData %}
-                                        {% if snack.itemPrimaryType == 'snacks' %}
-                                            <option value="{{snack.itemID}}">{{snack.name}}  - {{snack.vendor}}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <br>
-                    </div>
-                </div>
-                <div id="drinkLanes">
-                    <div>How many drink lanes? <input oninput="displayDrinkLanes(this)" type="number" name="drink_lane_qty" id="drink_lane_qty" style="width:80px;" ></div><br>
-                    <div id='drinkCont'></div>
-                    <div id="laneDrinkGrab" style="display:none;">
-                        <div class="singleDrinkLane">
-                            <input type="hidden" name="size" value="regular">
-                            <div>
-                                How much does this drink cost?
-                                <input type="number" step="any" name="cost" style="width:130px;">
-                            </div>
-                            <div>
-                                How many slots for drinks?
-                                <input type="number" name="slots" style="width:80px;">
-                            </div>
-                            <div>
-                                What is the selection ID?
-                                <input type="text" name="selectID" style="width:80px;">
-                            </div>
-                            <div>
-                                What drink is being sold in this lane?
-                                <select name="itemID">
-                                    <option value="">-------</option>
-                                    <option value="empty">EMPTY</option>
-                                    {% for drink in snackData %}
-                                        {% if drink.itemPrimaryType == 'drinks' %}
-                                            <option value="{{drink.itemID}}">{{drink.name}} - {{drink.vendor}}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <br>
-                    </div>
-                </div>
-                {% else %}
-                <div class="singleSnackLane">
-                    {% for snackLane in dataDict.snackLaneData %}
-                    <div>
-                        Is the lane large/small?
-                        <select name="size_S{{ forloop.counter }}">
-                            <option value="large" {% if "large" == snackLane.1.size %}selected{% endif %}>Large</option>
-                            <option value="small" {% if 'small' == snackLane.1.size %}selected{% endif %}>Small</option>
-                        </select>
-                    </div>
-                    <div>
-                        How much does this snack cost?
-                        <input type="number" step="any" name="cost_S{{ forloop.counter }}" style="width:130px;" value="{{snackLane.1.cost}}">
-                    </div>
-                    <div>
-                        How many slots for snacks?
-                        <input type="number" name="slots_S{{ forloop.counter }}" style="width:80px;" value="{{snackLane.1.slots}}">
-                    </div>
-                    <div>
-                        What is the selection ID?
-                        <input type="text" name="selectID_S{{ forloop.counter }}" style="width:80px;" value="{{snackLane.0}}">
-                    </div>
-                    <div>
-                        What snack is being sold in this lane?
-                        <select name="itemID_S{{ forloop.counter }}">
-                            <option value="">-------</option>
-                            <option value="empty" {% if snackLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
-                            {% for snack in snackData %}
-                                {% if snack.itemPrimaryType == 'snacks' %}
-                                    <option value="{{snack.itemID}}" {% if snack.itemID == snackLane.1.itemID %}selected{% endif %}>{{snack.name}}  - {{snack.vendor}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div><br>
-                    {% endfor %}
-                </div>
-                <div id="drinkLanesData">
-                    {% for drinkLane in dataDict.drinkLaneData %}
-                    <div class="singleDrinkLane">
-                        <input type="hidden" name="size_D{{ forloop.counter }}" value="regular">
+            </div>
+            {% if not formData %}
+            <div id="snackLanes">
+                <div>How many snack lanes? <input oninput="displaySnackLanes(this)" type="number" name="snack_lane_qty" id="snack_lane_qty" style="width:80px;" ></div><br>
+                <div id="snackCont"></div>
+                <div id="laneSnackGrab" style="display:none;">
+                    <div class="singleSnackLane">
                         <div>
-                            How much does this drink cost?{{drinkLane}}
-                            <input type="number" step="any" name="cost_D{{ forloop.counter }}" style="width:130px;" value="{{drinkLane.1.cost}}">
+                            Is the lane large/small?
+                            <select name="size">
+                                <option value="large">Large</option>
+                                <option value="small">Small</option>
+                            </select>
                         </div>
                         <div>
-                            How many slots for drinks?
-                            <input type="number" name="slots_D{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.1.slots}}">
+                            How much does this snack cost?
+                            <input type="number" step="any" name="cost" style="width:130px;">
+                        </div>
+                        <div>
+                            How many slots for snacks?
+                            <input type="number" name="slots" style="width:80px;">
                         </div>
                         <div>
                             What is the selection ID?
-                            <input type="text" name="selectID_D{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.0}}">
+                            <input type="text" name="selectID" style="width:80px;">
                         </div>
                         <div>
-                            What drink is being sold in this lane?
-                            <select name="itemID_D{{ forloop.counter }}">
+                            What snack is being sold in this lane?
+                            <select name="itemID">
                                 <option value="">-------</option>
-                                <option value="empty" {% if drinkLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
-                                {% for drink in snackData %}
-                                    {% if drink.itemPrimaryType == 'drinks' %}
-                                        <option value="{{drink.itemID}}" {% if drink.itemID == drinkLane.1.itemID %}selected{% endif %}>{{drink.name}} - {{drink.vendor}}</option>
+                                <option value="empty">EMPTY</option>
+                                {% for snack in snackData %}
+                                    {% if snack.itemPrimaryType == 'snacks' %}
+                                        <option value="{{snack.itemID}}">{{snack.name}}  - {{snack.vendor}}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
-                    </div><br>
-                    {% endfor %}
+                    </div>
+                    <br>
                 </div>
-                {% endif %}
-                <input type="submit" value="submit">
-            </form>
-        </div>
+            </div>
+            <div id="drinkLanes">
+                <div>How many drink lanes? <input oninput="displayDrinkLanes(this)" type="number" name="drink_lane_qty" id="drink_lane_qty" style="width:80px;" ></div><br>
+                <div id='drinkCont'></div>
+                <div id="laneDrinkGrab" style="display:none;">
+                    <div class="singleDrinkLane">
+                        <input type="hidden" name="size" value="regular">
+                        <div>
+                            How much does this drink cost?
+                            <input type="number" step="any" name="cost" style="width:130px;">
+                        </div>
+                        <div>
+                            How many slots for drinks?
+                            <input type="number" name="slots" style="width:80px;">
+                        </div>
+                        <div>
+                            What is the selection ID?
+                            <input type="text" name="selectID" style="width:80px;">
+                        </div>
+                        <div>
+                            What drink is being sold in this lane?
+                            <select name="itemID">
+                                <option value="">-------</option>
+                                <option value="empty">EMPTY</option>
+                                {% for drink in snackData %}
+                                    {% if drink.itemPrimaryType == 'drinks' %}
+                                        <option value="{{drink.itemID}}">{{drink.name}} - {{drink.vendor}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            {% else %}
+            <div class="singleSnackLane">
+                {% for snackLane in dataDict.snackLaneData %}
+                <div>
+                    Is the lane large/small?
+                    <select name="size_S{{ forloop.counter }}">
+                        <option value="large" {% if "large" == snackLane.1.size %}selected{% endif %}>Large</option>
+                        <option value="small" {% if 'small' == snackLane.1.size %}selected{% endif %}>Small</option>
+                    </select>
+                </div>
+                <div>
+                    How much does this snack cost?
+                    <input type="number" step="any" name="cost_S{{ forloop.counter }}" style="width:130px;" value="{{snackLane.1.cost}}">
+                </div>
+                <div>
+                    How many slots for snacks?
+                    <input type="number" name="slots_S{{ forloop.counter }}" style="width:80px;" value="{{snackLane.1.slots}}">
+                </div>
+                <div>
+                    What is the selection ID?
+                    <input type="text" name="selectID_S{{ forloop.counter }}" style="width:80px;" value="{{snackLane.0}}">
+                </div>
+                <div>
+                    What snack is being sold in this lane?
+                    <select name="itemID_S{{ forloop.counter }}">
+                        <option value="">-------</option>
+                        <option value="empty" {% if snackLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
+                        {% for snack in snackData %}
+                            {% if snack.itemPrimaryType == 'snacks' %}
+                                <option value="{{snack.itemID}}" {% if snack.itemID == snackLane.1.itemID %}selected{% endif %}>{{snack.name}}  - {{snack.vendor}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div><br>
+                {% endfor %}
+            </div>
+            <div id="drinkLanesData">
+                {% for drinkLane in dataDict.drinkLaneData %}
+                <div class="singleDrinkLane">
+                    <input type="hidden" name="size_D{{ forloop.counter }}" value="regular">
+                    <div>
+                        How much does this drink cost?
+                        <input type="number" step="any" name="cost_D{{ forloop.counter }}" style="width:130px;" value="{{drinkLane.1.cost}}">
+                    </div>
+                    <div>
+                        How many slots for drinks?
+                        <input type="number" name="slots_D{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.1.slots}}">
+                    </div>
+                    <div>
+                        What is the selection ID?
+                        <input type="text" name="selectID_D{{ forloop.counter }}" style="width:80px;" value="{{drinkLane.0}}">
+                    </div>
+                    <div>
+                        What drink is being sold in this lane?
+                        <select name="itemID_D{{ forloop.counter }}">
+                            <option value="">-------</option>
+                            <option value="empty" {% if drinkLane.1.itemID == 'empty' %}selected{% endif %}>EMPTY</option>
+                            {% for drink in snackData %}
+                                {% if drink.itemPrimaryType == 'drinks' %}
+                                    <option value="{{drink.itemID}}" {% if drink.itemID == drinkLane.1.itemID %}selected{% endif %}>{{drink.name}} - {{drink.vendor}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div><br>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <input type="submit" value="submit">
+        </form>
     </div>
-</body>
+</div>
+{% endblock %}

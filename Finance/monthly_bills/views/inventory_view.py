@@ -316,9 +316,6 @@ def RS900_is(request, type, id_tag):
 #ENDING HERE------------------------------------
     #new = apps.get_model('monthly_bills', 'vmax576_form').objects.all()
     invForm = inventory_sheets_form(initial=initial_data)
-     
-    
-        
                
     if request.method == 'POST':
         gatheredData = {

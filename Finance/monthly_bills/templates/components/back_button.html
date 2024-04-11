@@ -3,6 +3,8 @@
 <a class="rightGap" href="{% url 'vendDash' %}">Back</a>
 {% elif destination == 'options' %}
 <a class="rightGap" href="{% url 'machineDash' type id_tag %}">Back</a>
+{% elif destination == 'select' %}
+<a class="rightGap" href="{% url 'inventory' %}">Back</a>
 {% else %}
 {{destination}}
 {% endif %}

@@ -4,7 +4,7 @@
     <div>
         <div style='width:100%; margin-bottom: 5rem;'>
             <div class="header">
-                {% include "components/back_button.html" with destination=goBack %}
+                {% include "components/back_button.html" with destination='select' %}
                 <a class="rightGap" href="{% url 'machineDash' type id_tag %}">Machine Dashboard</a>
                 <a class="rightGap" href="{% url 'machine_build' id_tag %}">Build</a>
                 <a class="rightGap" href="{% url 'inventorySheet' type id_tag 'default' %}">Inventory Form</a>

@@ -124,11 +124,12 @@ def machine_build_view(request, machineID):
             dataForm.save()
             return redirect('fleet')
     return render(request, 'machines/machine_builds.html', {
-        'machineID': machineID,
+        'id_tag': machineID,
         'snackData': snackData,
         'today': str(today),
         'form': form,
         'formData': formData,
-        'dataDict': dataDict
+        'dataDict': dataDict,
+        'type': machineData.model
     })
     # {% if formData %}{% else %}{% endif %}
