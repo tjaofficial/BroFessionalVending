@@ -1,0 +1,18 @@
+{% load static %}
+<link href="{% static 'style/header.css' %}" rel="stylesheet">
+<body>
+    <div>
+        <div style='width:100%; margin-bottom: 5rem;'>
+            <div class="header">
+                {% include "components/back_button.html" with destination='vendDash' %}
+                <a class="rightGap" href="{% url 'view_snacks' %}">Product Dashboard</a>
+                <a class="rightGap" href="#">Product Data</a>
+                <a class="rightGap" href="{% url 'add_snack' %}">Add Product</a>
+            </div>
+            <div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,51 +1,46 @@
-{% load static %}
+{% extends "snacks/components/product_layout.html" %}
+{% block content %}{% load static %}
 <link href="{% static 'style/header.css' %}" rel="stylesheet">
 <link href="{% static 'style/machine_options.css' %}" rel="stylesheet">
 <script defer src="{% static 'script/add_sold.js' %}"></script>
-<body>
-    <div>
-        <div style='width:100%; margin-bottom: 5rem;'>
-            <div class="header">
-                <a class="rightGap" href="{% url 'vendDash' %}">Back</a>
-                <a class="rightGap" href=#>Product Data</a>
-                <a class="rightGap" href=#>Inventory Form</a>
-                <a href=#>Restock Data</a>
-            </div>
-            <div>
-                <table>
-                    <tr>
-                        <th>itemID</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Stock</th>
-                        <th>Exp Date</th>
-                    </tr>
-                    {% for snack in snackStockList %}
-                        {% if snack.1 %}
-                            <tr>
-                                <td>{{snack.0.itemID}}</td>
-                                <td>{{snack.0.name}}</td>
-                                <td>{{snack.0.itemType}}</td>
-                                <td>{{snack.1.personal_stock}}</td>
-                                <td>{{snack.1.exp_date}}</td>
-                                <td><a href="{% url 'add_stock' snack.0.itemID %}">Stock Item</a></td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td>{{snack.0.itemID}}</td>
-                                <td>{{snack.0.name}}</td>
-                                <td>{{snack.0.itemType}}</td>
-                                <td>n/a</td>
-                                <td>n/a</td>
-                                <td><a href="{% url 'add_stock' snack.0.itemID %}">Stock Item</a></td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </table>
-            </div>
-            <div>
-                <a href="{% url 'add_snack' %}">add item</a>
-            </div>
-        </div>
-    </div>
-</body>
+<style>
+    tr{
+        height: 50px;
+    }
+    td{
+        padding-left: 5px;
+    }
+</style>
+<div style="margin-top: 67px;">
+    <table style="margin: auto;">
+        <tr style="height: 25px;">
+            <th>itemID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Stock</th>
+            <th>Exp Date</th>
+        </tr>
+        {% for snack in snackStockList %}
+            {% if snack.1 %}
+                <tr>
+                    <td>{{snack.0.itemID}}</td>
+                    <td>{{snack.0.name}}</td>
+                    <td>{{snack.0.itemType}}</td>
+                    <td>{{snack.1}}</td>
+                    <td>{{snack.2}}</td>
+                    <td><a href="{% url 'add_stock' snack.0.itemID %}">Stock Item</a></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>{{snack.0.itemID}}</td>
+                    <td>{{snack.0.name}}</td>
+                    <td>{{snack.0.itemType}}</td>
+                    <td>0</td>
+                    <td>n/a</td>
+                    <td><a href="{% url 'add_stock' snack.0.itemID %}">Stock Item</a></td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

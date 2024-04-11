@@ -660,13 +660,6 @@ class item_data_model(models.Model):
         max_length=60,
         choices=typeChoices
     )
-    container_description = models.CharField(
-        max_length=60
-    )
-    vendor = models.CharField(
-        max_length=30
-    )
-    qty_per_unit = models.IntegerField()
     discontinued = models.BooleanField(
         default=False,
         null=True
@@ -687,9 +680,11 @@ class item_stock_model(models.Model):
         auto_now=False,
         auto_now_add=False
     )
-    sell_price = models.FloatField()
     cost_per_unit = models.FloatField()
-    personal_stock = models.IntegerField()
+    qty_per_unit = models.IntegerField()
+    vendor = models.CharField(
+        max_length=30
+    )
     
     def __str__(self):
         return str(self.itemChoice.itemID) + ' - ' + str(self.date_updated)
