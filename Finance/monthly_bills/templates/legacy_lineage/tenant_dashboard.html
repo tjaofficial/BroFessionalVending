@@ -1,0 +1,18 @@
+{% extends "legacy_lineage/tenant_layout.html" %}{% load static %}
+{% block content %}
+<div class="card balance-card">
+    <h2>Current Balance</h2>
+    <p><span class="amount">${{ current_balance }}</span></p>
+    <button onclick="location.href='/payment-center'">Go to Payment Center</button>
+</div>
+
+<div class="card maintenance-card">
+    <h2>Maintenance Requests</h2>
+    <p>Active Requests: <span class="active-requests">{{ active_requests }}</span></p>
+    <a href="{% url 'maintenance_request' %}">
+        <button>
+            Go to Maintenance Requests
+        </button>
+    </a>
+</div>
+{% endblock %}

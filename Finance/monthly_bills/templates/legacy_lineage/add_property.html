@@ -1,0 +1,107 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/forms.css' %}">
+<div class="form-container">
+    <h2 class="form-title">Add New Property</h2>
+    <form id="property-form" method="POST" action="">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_name">Property Name</label>
+            {{ form.name }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_address">Address</label>
+            {{ form.address }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_city">City</label>
+            {{ form.city }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_state">State</label>
+            {{ form.state }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_zip_code">ZIP Code</label>
+            {{ form.zip_code }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_owner_name">Owner Name</label>
+            {{ form.owner_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_manager_name">Manager Name</label>
+            {{ form.manager_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_manager_contact">Manager Contact</label>
+            {{ form.manager_contact }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_is_rental">Is Rental?</label>
+            {{ form.is_rental }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_rent_amount">Rent Amount</label>
+            {{ form.rent_amount }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_lease_start_date">Lease Start Date</label>
+            {{ form.lease_start_date }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_lease_end_date">Lease End Date</label>
+            {{ form.lease_end_date }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_num_units">Number of Units</label>
+            {{ form.num_units }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_square_footage">Square Footage</label>
+            {{ form.square_footage }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_year_built">Year Built</label>
+            {{ form.year_built }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_notes">Additional Notes</label>
+            {{ form.notes }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_is_active">Is Active?</label>
+            {{ form.is_active }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_maintenance_contact">Maintenance Contact</label>
+            {{ form.maintenance_contact }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_maintenance_phone">Maintenance Phone</label>
+            {{ form.maintenance_phone }}
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+    </form>
+</div>
+{% endblock %}

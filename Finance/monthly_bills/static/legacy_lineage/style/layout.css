@@ -1,0 +1,130 @@
+/* styles.css */
+
+/* General Reset */
+body, h1, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #fef6e4;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #686868;
+    color: black;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.logo img {
+    height: 40px;
+}
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1.2rem;
+    position: relative;
+}
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Dropdowns */
+.dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 100;
+    width: 200px;
+}
+.dropdown ul {
+    list-style: none;
+}
+.dropdown li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.dropdown li:last-child {
+    border-bottom: none;
+}
+.dropdown li a {
+    text-decoration: none;
+    color: inherit;
+}
+/* .hidden {
+    display: block;
+} */
+
+/* Sidebar */
+.sidebar {
+    width: 169px;
+    background-color: #455366;
+    height: 100vh;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+.sidebar nav ul {
+    list-style: none;
+}
+.sidebar nav ul li {
+    margin-bottom: 10px;
+}
+.soft-btn {
+    background-color: #717f94;
+    border: none;
+    color: black;
+    padding: 10px 15px;
+    text-align: left;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 1px 1px 5px rgb(0 0 0 / 30%);
+}
+.soft-btn:hover {
+    background-color: #333d4d;
+}
+.submenu {
+    list-style: none;
+    margin-left: 15px;
+    display: none;
+}
+
+/* Content */
+.content {
+    margin-left: 209px;
+    padding: 20px;
+    background-color: #e2e8f0;
+    min-height: 100vh;
+}

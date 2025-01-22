@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 bill_categories = (
@@ -689,8 +690,6 @@ class item_stock_model(models.Model):
     def __str__(self):
         return str(self.itemChoice.itemID) + ' - ' + str(self.date_updated)
     
-
-    
 class canta_payments_model(models.Model):
     machineChoice = models.ForeignKey(
         to=fleet_model, 
@@ -704,6 +703,172 @@ class canta_payments_model(models.Model):
     def __str__(self):
         return str(self.date) + " - " + str(self.machineChoice)
     
-    
-    
+class Tenant(models.Model):
+    # Basic Personal Details
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    phone_number = models.CharField(max_length=15)
+
+    # Address Details
+    property = models.ForeignKey(
+        'Property',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='tenants'
+    )
+    unit_number = models.CharField(max_length=10, blank=True, null=True)  # Optional
+    # Lease Details
+    lease_start_date = models.DateField()
+    lease_end_date = models.DateField()
+    monthly_rent = models.DecimalField(max_digits=10, decimal_places=2)
+    security_deposit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    # Emergency Contact
+    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    emergency_contact_phone = models.CharField(max_length=15, blank=True, null=True)
+    emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True)
+
+    # Additional Details
+    is_active = models.BooleanField(default=True)  # Whether the tenant is currently renting
+    notes = models.TextField(blank=True, null=True)  # Optional field for additional notes
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} ({self.property.address})"
+
+class Property(models.Model):
+    # Basic Property Details
+    name = models.CharField(max_length=100)  # Name or identifier for the property
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50, default='Michigan')  # Default to Michigan
+    zip_code = models.CharField(max_length=10)
+
+    # Ownership and Management
+    owner_name = models.CharField(max_length=100, blank=True, null=True)  # Optional
+    manager_name = models.CharField(max_length=100, blank=True, null=True)
+    manager_contact = models.CharField(max_length=15, blank=True, null=True)
+
+    # Rental Details
+    is_rental = models.BooleanField(default=True)  # Whether the property is rented out
+    rent_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    lease_start_date = models.DateField(blank=True, null=True)
+    lease_end_date = models.DateField(blank=True, null=True)
+    tenant = models.ForeignKey(
+        'Tenant', on_delete=models.SET_NULL, blank=True, null=True, related_name='properties'
+    )  # Optional link to a tenant
+
+    # Property Features
+    num_units = models.IntegerField(default=1)  # For multi-unit properties
+    square_footage = models.PositiveIntegerField(blank=True, null=True)  # Optional
+    year_built = models.PositiveIntegerField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)  # Additional property details
+
+    # Maintenance and Status
+    is_active = models.BooleanField(default=True)  # Whether the property is active in portfolio
+    maintenance_contact = models.CharField(max_length=100, blank=True, null=True)
+    maintenance_phone = models.CharField(max_length=15, blank=True, null=True)
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.address})"
+
+class WriteOff(models.Model):
+    CATEGORY_CHOICES = [
+        ('auto', 'Auto Expenses'),
+        ('business', 'Business Expenses'),
+        ('home_office', 'Home Office Expenses'),
+        ('meals', 'Meal Expenses'),
+        ('property', 'Property Expenses'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateField()
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.get_category_display()} - ${self.amount} on {self.date}"
+
+class Revenue(models.Model):
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"${self.amount} on {self.date}"
+
+class MaintenanceRequest(models.Model):
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('In Progress', 'In Progress'),
+        ('Resolved', 'Resolved'),
+        ('Closed', 'Closed'),
+    ]
+    MAINTENANCE_CATEGORY = [
+        ('Appliance', 'Appliance'),
+        ('Doors and locks', 'Doors and locks'),
+        ('Electrical and lighting', 'Electrical and lighting'),
+        ('Flooring', 'Flooring'),
+        ('General', 'General'),
+        ('Heating and cooling', 'Heating and cooling'),
+        ('Plumbing and bath', 'Plumbing and bath'),
+        ('Safety equipment', 'Safety equipment'),
+        ('Preventative Maintenance', 'Preventative Maintenance'),
+    ]
+
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='maintenance_requests')
+    category = models.CharField(max_length=40, choices=MAINTENANCE_CATEGORY, default='General')
+    property = models.ForeignKey(
+        'Property',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Active')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.category} ({self.status}) - {self.tenant.username}"
+
+class Transaction(models.Model):
+    TRANSACTION_TYPE_CHOICES = [
+        ('Charge', 'Charge'),
+        ('Payment', 'Payment'),
+    ]
+
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.transaction_type} - ${self.amount} for {self.tenant.username} on {self.date.strftime('%Y-%m-%d')}"
+
+class UserProfile(models.Model):
+    BUSINESS_TYPE_CHOICES = [
+        ('Vending', 'Vending'),
+        ('Legacy', 'Legacy'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    business_type = models.CharField(max_length=20, choices=BUSINESS_TYPE_CHOICES)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.business_type})"
+
     

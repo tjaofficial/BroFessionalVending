@@ -1,0 +1,39 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/view_tenants.css' %}">
+<script defer src="{% static 'legacy_lineage/script/view_tenants.js' %}"></script>
+<div class="tenants-container">
+    <h2 class="page-title">View Tenants</h2>
+
+    <!-- Search Filters -->
+    <div class="filter-bar">
+        <input type="text" id="search-name" placeholder="Search by tenant name...">
+        <input type="text" id="search-city" placeholder="Search by city...">
+        <input type="text" id="search-state" placeholder="Search by state...">
+        <button id="filter-btn" class="filter-btn">Search</button>
+    </div>
+
+    <!-- Tenant List -->
+    <div id="tenants-list" class="tenants-list">
+        {% for tenant in tenants %}
+        <div class="tenant-card">
+            <h3 class="tenant-name">{{ tenant.first_name }} {{ tenant.last_name }}</h3>
+            <p class="tenant-email">Email: {{ tenant.email }}</p>
+            <p class="tenant-phone">Phone: {{ tenant.phone_number }}</p>
+            <p class="tenant-property">Property: 
+                {% if tenant.property %}
+                    <a href="#">{{ tenant.property.address}} </a>
+                {% else %} 
+                    None 
+                {% endif %}
+            </p>
+            <p class="tenant-address">City: {{ tenant.property.city }}, State: {{ tenant.property.state }}</p>
+            <p class="tenant-lease">Lease: {{ tenant.lease_start_date }} to {{ tenant.lease_end_date }}</p>
+            <p class="tenant-status">Active: {{ tenant.is_active|yesno:"Yes,No" }}</p>
+        </div>
+        {% empty %}
+        <p>No tenants found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

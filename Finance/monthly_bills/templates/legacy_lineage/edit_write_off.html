@@ -1,0 +1,10 @@
+{% load static %}
+<div class="form-container">
+    <h2>Edit Write-Off{{writeoff_id}}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ writeOffForm.as_p }}
+        <input type="hidden" name="writeOffId" value="{{writeoff_id}}" />
+        <button type="submit" name="editButton" class="submit-btn">Update</button>
+    </form>
+</div>

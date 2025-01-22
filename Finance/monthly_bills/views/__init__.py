@@ -8,3 +8,4 @@ from .landing_view import *
 from .snacks_view import *
 from .auth_view import *
 from .analytics_view import *
+from .legacy_portal_view import *

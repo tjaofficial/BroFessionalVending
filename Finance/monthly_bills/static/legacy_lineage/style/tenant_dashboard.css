@@ -1,0 +1,93 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.main-header {
+    background-color: #5a67d8;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.tab-navigation {
+    background-color: #434190;
+    padding: 10px 0;
+}
+
+.tab-navigation ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.tab-navigation li {
+    margin: 0 15px;
+}
+
+.tab-navigation a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.tab-navigation a:hover {
+    color: #c3bffa;
+}
+
+.dashboard-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    width: 300px;
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #5a67d8;
+}
+
+.card .amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #38a169;
+}
+
+.card .active-requests {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e53e3e;
+}
+
+.card button {
+    background-color: #5a67d8;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.card button:hover {
+    background-color: #434190;
+}

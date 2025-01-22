@@ -1,0 +1,42 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/view_properties.css' %}">
+<script defer src="{% static 'legacy_lineage/script/view_properties.js' %}"></script>
+    <div class="properties-container">
+        <h2 class="page-title">View Properties</h2>
+
+        <!-- Search Filters -->
+        <div class="filter-bar">
+            <input type="text" id="search-city" placeholder="Search by city...">
+            <input type="text" id="search-state" placeholder="Search by state...">
+            <input type="text" id="search-tenant" placeholder="Search by tenant name...">
+            <button id="filter-btn" class="filter-btn">Search</button>
+        </div>
+
+        <!-- Property List -->
+        <div id="properties-list" class="properties-list">
+            {% for property in properties %}
+            <div class="property-card">
+                <h3 class="property-name">{{ property.name }}</h3>
+                <p class="property-address">{{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zip_code }}</p>
+                <p class="property-info">Owner: {{ property.owner_name }}</p>
+                <p class="property-info">Manager: {{ property.manager_name }} | Contact: {{ property.manager_contact }}</p>
+                <p class="property-info">Number of Units: {{ property.num_units }}</p>
+                <p class="property-info">Square Footage: {{ property.square_footage }} sq. ft.</p>
+                <p class="property-info">Year Built: {{ property.year_built }}</p>
+                <p class="property-info">Active: {{ property.is_active|yesno:"Yes,No" }}</p>
+                <h4>Tenants:</h4>
+                <ul class="tenants-list">
+                    {% for tenant in property.tenants.all %}
+                    <li>{{ tenant.first_name }} {{ tenant.last_name }}</li>
+                    {% empty %}
+                    <li>No tenants assigned.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% empty %}
+            <p>No properties found.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}

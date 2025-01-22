@@ -1,0 +1,25 @@
+{% load static %}
+<div class="form-container">
+    <h2>Add Write-Off</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <p>
+            <label for="id_category">Expense Category</label>
+            {{ writeOffForm.category }}
+        </p>
+        <p>
+            <label for="id_amount">Amount ($)</label>
+            {{ writeOffForm.amount }}
+        </p>
+        <p>
+            <label for="id_description">Description</label>
+            {{ writeOffForm.description }}
+        </p>
+        <p>
+            <label for="id_date">Date of Expense</label>
+            {{ writeOffForm.date }}
+        </p>
+        <button type="submit" name="addButton" class="submit-btn">Add</button>
+    </form>
+</div>
+

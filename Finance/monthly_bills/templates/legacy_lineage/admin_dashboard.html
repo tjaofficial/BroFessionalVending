@@ -1,0 +1,70 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/admin_dashboard.css' %}">
+<script defer src="{% static 'legacy_lineage/script/admin_dashboard.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <header class="dashboard-header">
+        <h1>Business Dashboard</h1>
+    </header>
+    <main class="dashboard-container">
+        <div class="tile" id="tile-1" draggable="true">
+            <h3>Total Revenue</h3>
+            <p id="total-revenue">${{ total_revenue }}</p>
+
+            <canvas id="expense-chart"></canvas>
+            <script>
+                const expenseData = {{ expenses|safe }};
+            </script>
+        </div>
+
+        <div class="tile" id="tile-2" draggable="true">
+            <h3>Expense Breakdown</h3>
+            <canvas id="expense-chart" width="300" height="300"></canvas>
+        </div>
+
+        <div class="tile" id="tile-3" draggable="true">
+            <h3>Recent Transactions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-01-01</td>
+                        <td>Auto</td>
+                        <td>$500</td>
+                    </tr>
+                    <tr>
+                        <td>2025-01-02</td>
+                        <td>Business</td>
+                        <td>$1,200</td>
+                    </tr>
+                    <tr>
+                        <td>2025-01-03</td>
+                        <td>Property</td>
+                        <td>$3,500</td>
+                    </tr>
+                    {% for transaction in recent_transactions %}
+                    <tr>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.get_category_display }}</td>
+                        <td>${{ transaction.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tile" id="tile-4" draggable="true">
+            <h3>Yearly Growth</h3>
+            <canvas id="growth-chart" width="300" height="300"></canvas>
+            <script>
+                const growthData = {{ growth_data|safe }};
+            </script>
+        </div>
+    </main>
+{% endblock %}

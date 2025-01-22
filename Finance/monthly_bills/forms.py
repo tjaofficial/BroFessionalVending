@@ -274,5 +274,144 @@ class canta_payments_form(ModelForm):
             'date': forms.DateInput(attrs={'type':'date'}),
         }
         
-        
-        
+class TenantForm(forms.ModelForm):
+    class Meta:
+        model = Tenant
+        fields = [
+            'phone_number',
+            'property', 'unit_number',
+            'lease_start_date', 'lease_end_date', 'monthly_rent', 'security_deposit',
+            'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship',
+            'is_active', 'notes'
+        ]
+
+        # Adding widgets for better user experience
+        widgets = {
+            'property': forms.Select(attrs={}),
+            'lease_start_date': forms.DateInput(attrs={'type': 'date'}),
+            'lease_end_date': forms.DateInput(attrs={'type': 'date'}),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+            'monthly_rent': forms.NumberInput(attrs={'step': '0.01'}),
+            'security_deposit': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
+        # Adding labels (optional, for clarity in forms)
+        labels = {
+            'phone_number': 'Phone Number',
+            'property': 'Assigned Property',
+            'unit_number': 'Unit Number (if applicable)',
+            'lease_start_date': 'Lease Start Date',
+            'lease_end_date': 'Lease End Date',
+            'monthly_rent': 'Monthly Rent ($)',
+            'security_deposit': 'Security Deposit ($)',
+            'emergency_contact_name': 'Emergency Contact Name',
+            'emergency_contact_phone': 'Emergency Contact Phone',
+            'emergency_contact_relationship': 'Emergency Contact Relationship',
+            'is_active': 'Is Active?',
+            'notes': 'Additional Notes',
+        }
+
+class PropertyForm(forms.ModelForm):
+    class Meta:
+        model = Property
+        fields = [
+            'name', 'address', 'city', 'state', 'zip_code',
+            'owner_name', 'manager_name', 'manager_contact',
+            'is_rental', 'rent_amount', 'lease_start_date', 'lease_end_date',
+            'num_units', 'square_footage', 'year_built', 'notes',
+            'is_active', 'maintenance_contact', 'maintenance_phone'
+        ]
+
+        widgets = {
+            'lease_start_date': forms.DateInput(attrs={'type': 'date'}),
+            'lease_end_date': forms.DateInput(attrs={'type': 'date'}),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+            'rent_amount': forms.NumberInput(attrs={'step': '0.01'}),
+            'square_footage': forms.NumberInput(attrs={'step': '1'}),
+            'year_built': forms.NumberInput(attrs={'step': '1'}),
+        }
+
+        labels = {
+            'name': 'Property Name',
+            'address': 'Address',
+            'city': 'City',
+            'state': 'State',
+            'zip_code': 'ZIP Code',
+            'owner_name': 'Owner Name',
+            'manager_name': 'Manager Name',
+            'manager_contact': 'Manager Contact',
+            'is_rental': 'Is Rental?',
+            'rent_amount': 'Rent Amount ($)',
+            'lease_start_date': 'Lease Start Date',
+            'lease_end_date': 'Lease End Date',
+            'num_units': 'Number of Units',
+            'square_footage': 'Square Footage',
+            'year_built': 'Year Built',
+            'notes': 'Additional Notes',
+            'is_active': 'Is Active?',
+            'maintenance_contact': 'Maintenance Contact',
+            'maintenance_phone': 'Maintenance Phone',
+        }
+
+class WriteOffForm(forms.ModelForm):
+    class Meta:
+        model = WriteOff
+        fields = ['category', 'amount', 'description', 'date', 'user']
+
+        widgets = {
+            'category': forms.Select(attrs={}),
+            'amount': forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+        labels = {
+            'category': 'Expense Category',
+            'amount': 'Amount ($)',
+            'description': 'Description',
+            'date': 'Date of Expense',
+        }
+
+class MaintenanceRequestForm(forms.ModelForm):
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['category', 'description', 'status', 'property']
+
+        widgets = {
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Describe the issue', 'rows': 5}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'property': forms.Select(attrs={}),
+        }
+
+        labels = {
+            'category': 'Select Category',
+            'description': 'Description',
+            'status': 'Status',
+        }
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['transaction_type', 'amount', 'description']
+
+        widgets = {
+            'transaction_type': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Enter amount'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter description (optional)', 'rows': 4}),
+        }
+
+        labels = {
+            'transaction_type': 'Transaction Type',
+            'amount': 'Amount ($)',
+            'description': 'Description',
+        }
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']

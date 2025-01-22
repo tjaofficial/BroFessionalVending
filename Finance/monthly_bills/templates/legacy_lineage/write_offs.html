@@ -1,0 +1,106 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/write_offs.css' %}">
+<script defer src="{% static 'legacy_lineage/script/write_offs.js' %}"></script>
+<div class="writeoff-container">
+    <h2 class="page-title">Expense Overview</h2>
+
+    <!-- Search and Filters -->
+    <div class="filter-bar">
+        <input type="text" id="search-bar" placeholder="Search by description or category...">
+        <select id="filter-category">
+            <option value="">All Categories</option>
+            <option value="auto">Auto Expenses</option>
+            <option value="business">Business Expenses</option>
+            <option value="home_office">Home Office Expenses</option>
+            <option value="meals">Meal Expenses</option>
+            <option value="property">Property Expenses</option>
+        </select>
+        <input type="date" id="filter-date-start" placeholder="Start Date">
+        <input type="date" id="filter-date-end" placeholder="End Date">
+        <button id="filter-btn" class="btn-filter">Filter</button>
+    </div>
+
+    <div class="summary-bar">
+        <div class="summary-item">
+            <h3>Total Auto Expenses</h3>
+            <p>${{ totals.auto|floatformat:2 }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Business Expenses</h3>
+            <p>${{ totals.business|floatformat:2 }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Home Office Expenses</h3>
+            <p>${{ totals.home_office|floatformat:2 }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Meal Expenses</h3>
+            <p>${{ totals.meals|floatformat:2 }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Property Expenses</h3>
+            <p>${{ totals.property|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button id="add-writeoff-btn" class="btn-action">Add Expense</button>
+    </div>
+    <div id="add-writeoff-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            {% include "legacy_lineage/add_write_off.html" %}
+        </div>
+    </div>
+
+    <div class="writeoff-list">
+        <h3>All Expenses</h3>
+        <table class="writeoff-table">
+            <thead>
+                <tr>
+                    <th style="width: 113px;">Date</th>
+                    <th style="">Amount</th>
+                    <th style="width: 182px;">Category</th>
+                    <th>Description</th>
+                    <th style="width: 118px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="writeoff-table-body">
+                {% for writeoff in writeoffs %}
+                <tr>
+                    <td>{{ writeoff.date }}</td>
+                    <td>${{ writeoff.amount }}</td>
+                    <td>{{ writeoff.get_category_display }}</td>
+                    <td>{{ writeoff.description }}</td>
+                    <td>
+                        <button class="btn-edit" data-id="{{ writeoff.id }}">Edit</button>
+                        <button class="btn-delete" data-id="{{ writeoff.id }}">Delete {{writeoff.id}}</button>
+                        <!-- Modals for Forms -->
+
+                        <div id="edit-writeoff-modal{{ writeoff.id }}" class="modal">
+                            <div class="modal-content">
+                                <span class="close-modal">&times;</span>
+                                {% include "legacy_lineage/edit_write_off.html" with writeoff_id=writeoff.id %}
+                            </div>
+                        </div>
+
+                        <div id="delete-writeoff-modal{{ writeoff.id }}" class="modal">
+                            <div class="modal-content">
+                                <span class="close-modal">&times;</span>
+                                {% include "legacy_lineage/delete_write_off.html" with writeoff_id=writeoff.id %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No expenses recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

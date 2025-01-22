@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Lineage LLC</title>
+    <link rel="stylesheet" href="{% static 'legacy_lineage/style/layout.css' %}">
+    <script defer src="{% static 'legacy_lineage/script/layout.js' %}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="/path/to/logo.png" alt="Logo">
+        </div>
+        <h1 class="title">Legacy Lineage LLC</h1>
+        <div class="header-right">
+            <div class="notifications">
+                <button id="notifications-btn" class="icon-btn">
+                    <span>&#128276;</span> <!-- Bell Icon -->
+                </button>
+                <div id="notifications-dropdown" class="dropdown" style="display: none;">
+                    <ul>
+                        <li>No new notifications</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="profile">
+                <button id="profile-btn" class="icon-btn">
+                    <img src="/path/to/profile.jpg" alt="Profile" class="profile-circle">
+                </button>
+                <div id="profile-dropdown" class="dropdown" style="display: none;">
+                    <ul>
+                        <li><a href="#">Account</a></li>
+                        <li><a href="#">Settings</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="main">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li>
+                        <button class="soft-btn" onclick="toggleSubmenu('dashboard-submenu')">Dashboard</button>
+                        <ul id="dashboard-submenu" class="submenu" style="display: none;">
+                            <li><a href="{% url 'admin_dash' %}">Overview</a></li>
+                            <li><a href="#">Reports</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="soft-btn" onclick="toggleSubmenu('tenants-submenu')">Tenants</button>
+                        <ul id="tenants-submenu" class="submenu" style="display: none;">
+                            <li><a href="{% url 'add_tenant' %}">Add Tenant</a></li>
+                            <li><a href="{% url 'view_tenants' %}">View Tenants</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="soft-btn" onclick="toggleSubmenu('properties-submenu')">Properties</button>
+                        <ul id="properties-submenu" class="submenu" style="display: none;">
+                            <li><a href="{% url 'add_property' %}">Add Property</a></li>
+                            <li><a href="{% url 'view_properties' %}">View Properties</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="soft-btn">
+                            <a href="{% url 'expense_overview' %}">Tax Return</a>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="soft-btn">
+                            <a href="{% url 'tenant_dashboard' %}">Tenant Dashboard</a>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="soft-btn">
+                            <a href="{% url 'register_admin' %}">Register New Admin</a>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="soft-btn">
+                            <a href="{% url 'register_admin' %}">Maintenance Requests</a>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="content">
+            {% block content %}
+            <!-- Page-specific content goes here -->
+            {% endblock %}
+        </main>
+    </div>
+</body>
+</html>

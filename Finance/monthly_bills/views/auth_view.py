@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from ..models import UserProfile
 
 def login_view(request):
     if request.method == "POST":
@@ -10,7 +11,14 @@ def login_view(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('vendDash')
+            business = UserProfile.objects.get(user=request.user).business_type
+            if business:
+                if business == "Vending":
+                    return redirect('vendDash')
+                elif business == "Legacy":
+                    return redirect('admin_dash')
+            else:
+                return redirect('tenant_dashboard')
         else:
             return redirect('login')
     else:
