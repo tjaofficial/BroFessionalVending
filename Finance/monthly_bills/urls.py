@@ -57,5 +57,6 @@ urlpatterns = [
     path('api/property/<int:pk>/', views.property_detail, name='property_detail'),
     path('tenant/dashboard/', views.tenant_dashboard, name='tenant_dashboard'),
     path('legacyportal/register-admin/', views.register_admin, name='register_admin'),
+    path('legacyportal/register-tenant/', views.register_tenant, name='register_tenant'),
     path('tenant/maintenance-request/', views.maintenance_request, name='maintenance_request'),
 ]
