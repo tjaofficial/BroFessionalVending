@@ -12,12 +12,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
             business = UserProfile.objects.get(user=request.user).business_type
-            if business:
-                if business == "Vending":
-                    return redirect('vendDash')
-                elif business == "Legacy":
-                    return redirect('admin_dash')
-            else:
+            if business == "Vending":
+                return redirect('vendDash')
+            elif business == "Legacy":
+                return redirect('admin_dash')
+            elif business == "Tenant":
                 return redirect('tenant_dashboard')
         else:
             return redirect('login')

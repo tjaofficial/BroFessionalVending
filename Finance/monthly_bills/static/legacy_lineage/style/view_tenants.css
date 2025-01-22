@@ -54,14 +54,54 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex
 }
 
 .tenant-card h3 {
     margin-bottom: 10px;
     color: #8a5a44;
+    margin-top: unset;
 }
 
 .tenant-card p {
     margin: 5px 0;
     color: #555;
+}
+.innerCardWidth{
+    width:50%;
+}
+
+
+
+.property-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 420px;
+    z-index: 10;
+    display: none;
+}
+
+.property-popup p {
+    margin: 0;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.property-popup strong {
+    color: #5a67d8;
+}
+
+.property-address:hover .property-popup {
+    display: block;
+}
+
+.link{
+    background-color: #0000ff24;
+    cursor: default;
 }

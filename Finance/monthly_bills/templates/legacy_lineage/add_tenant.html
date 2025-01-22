@@ -7,6 +7,16 @@
         {% csrf_token %}
 
         <div class="form-group">
+            <label>Select Tenant</label>
+            <select name="userProf" id="id_user" required>
+                <option value="" selected="">---------</option>
+                {% for tenant in userProf %}
+                    <option value="{{tenant.id}}">{{tenant.user.first_name}} {{tenant.user.last_name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="id_phone_number">Phone Number</label>
             {{ form.phone_number }}
         </div>
@@ -15,7 +25,6 @@
             <label for="id_property">Assigned Property</label>
             {{ form.property }}
         </div>
-        
 
         <div class="form-group">
             <label for="id_lease_start_date">Lease Start Date</label>

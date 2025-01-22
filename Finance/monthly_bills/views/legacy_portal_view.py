@@ -7,18 +7,23 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 @login_required
 def add_tenant(request):
+    userProf = UserProfile.objects.filter(business_type="Tenant")
+
     if request.method == 'POST':
         form = TenantForm(request.POST)
         if form.is_valid():
-            form.save()
+            A = form.save(commit=False)
+            A.userProf=userProf.get(id=request.POST['userProf'])
+            A.save()
             return redirect('view_tenants')  # Replace with your tenant listing page
     else:
         form = TenantForm()
     return render(request,'legacy_lineage/add_tenant.html',{
-        'form':form
+        'form':form, 'userProf': userProf
     })
 
 @login_required
@@ -232,8 +237,7 @@ def writeoff_detail(request, pk):
 @login_required
 def tenant_dashboard(request):
     # Get the currently logged-in tenant
-    this_user = "Quinton"
-    tenant = Tenant.objects.get(user__first_name=this_user).user
+    tenant = User.objects.get(id=request.user.id)
     transactionQuery = Transaction.objects.filter(tenant=tenant)
     total_charges = 1650.00
     total_payments = 825.00
@@ -295,5 +299,47 @@ def maintenance_request(request):
 
     return render(request, 'legacy_lineage/maintenance_request.html', {'form': form})
 
+@login_required
+def register_tenant(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)  # Do not save yet
+            user.email = request.POST.get('email')
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.save()  # Save after adding extra fields
+            up = UserProfile(
+                user=user
+            )
+            up.save()
+            messages.success(request, 'New tenant registered successfully.')
+            return redirect('admin_dash')  # Replace with your admin dashboard URL
+    else:
+        form = UserCreationForm()
 
+    return render(request, 'legacy_lineage/register_tenant.html', {'form': form})
 
+@login_required
+def property_detail(request, pk):
+    try:
+        property = Property.objects.get(pk=pk)
+        print(property)
+        data = {
+            'address': property.address,
+            'city': property.city,
+            'state': property.state,
+            'zip_code': property.zip_code,
+            'lease_start_date': property.lease_start_date.strftime('%Y-%m-%d'),
+            'lease_end_date': property.lease_end_date.strftime('%Y-%m-%d'),
+            'square_footage': property.square_footage,
+            'year_built': property.year_built,
+            'notes': property.notes,
+            'maintenance_contact': property.maintenance_contact,
+            'maintenance_phone': property.maintenance_phone,
+            'manager_name': property.manager_name,
+        }
+        print(data)
+        return JsonResponse(data)
+    except Property.DoesNotExist:
+        return JsonResponse({'error': 'Property not found'}, status=404)

@@ -21,18 +21,12 @@
                 <p class="property-address">{{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zip_code }}</p>
                 <p class="property-info">Owner: {{ property.owner_name }}</p>
                 <p class="property-info">Manager: {{ property.manager_name }} | Contact: {{ property.manager_contact }}</p>
+                <p class="property-info">Tenant: {{ property.tenant.userProf.user.first_name }} {{ property.tenant.userProf.user.last_name }}</p><br>
                 <p class="property-info">Number of Units: {{ property.num_units }}</p>
                 <p class="property-info">Square Footage: {{ property.square_footage }} sq. ft.</p>
                 <p class="property-info">Year Built: {{ property.year_built }}</p>
-                <p class="property-info">Active: {{ property.is_active|yesno:"Yes,No" }}</p>
-                <h4>Tenants:</h4>
-                <ul class="tenants-list">
-                    {% for tenant in property.tenants.all %}
-                    <li>{{ tenant.first_name }} {{ tenant.last_name }}</li>
-                    {% empty %}
-                    <li>No tenants assigned.</li>
-                    {% endfor %}
-                </ul>
+                <p class="property-info">Rental Ocupied: {{ property.is_rental|yesno:"Yes,No" }}</p><br>
+                <p class="property-info">Notes: {{ property.notes }}</p>
             </div>
             {% empty %}
             <p>No properties found.</p>

@@ -17,19 +17,31 @@
     <div id="tenants-list" class="tenants-list">
         {% for tenant in tenants %}
         <div class="tenant-card">
-            <h3 class="tenant-name">{{ tenant.first_name }} {{ tenant.last_name }}</h3>
-            <p class="tenant-email">Email: {{ tenant.email }}</p>
-            <p class="tenant-phone">Phone: {{ tenant.phone_number }}</p>
-            <p class="tenant-property">Property: 
-                {% if tenant.property %}
-                    <a href="#">{{ tenant.property.address}} </a>
-                {% else %} 
-                    None 
-                {% endif %}
-            </p>
-            <p class="tenant-address">City: {{ tenant.property.city }}, State: {{ tenant.property.state }}</p>
-            <p class="tenant-lease">Lease: {{ tenant.lease_start_date }} to {{ tenant.lease_end_date }}</p>
-            <p class="tenant-status">Active: {{ tenant.is_active|yesno:"Yes,No" }}</p>
+            <div class="innerCardWidth">
+                <h3 class="tenant-name">{{ tenant.userProf.user.first_name }} {{ tenant.userProf.user.last_name }}</h3>
+                <p class="tenant-email">Email: {{ tenant.userProf.user.email }}</p>
+                <p class="tenant-phone">Phone: {{ tenant.phone_number }}</p>
+                <p class="tenant-property property-address" data-property-id="{{ tenant.property.id}}">Property: 
+                    {% if tenant.property %}
+                        <span class="link">{{ tenant.property.address}}</span>
+                        <div class="property-popup" id="popup-{{ tenant.property.id }}">
+                            <p><strong>Property Address:</strong> {{ tenant.property.address }}</p>
+                            <p><strong>City:</strong> {{ tenant.property.city }}</p>
+                            <p><strong>State:</strong> {{ tenant.property.state }}</p>
+                            <p><strong>Rent Amount:</strong> ${{ tenant.property.rent_amount }}</p>
+                        </div>
+                    {% else %} 
+                        None 
+                    {% endif %}
+                </p>
+                <p class="tenant-rent">Monthly Rent: ${{ tenant.monthly_rent }}</p>
+                <p class="tenant-deposit">Security deposit: ${{ tenant.security_deposit }}</p>
+                <p class="tenant-lease">Lease: {{ tenant.lease_start_date }} to {{ tenant.lease_end_date }}</p>
+                <p class="tenant-status">Active: {{ tenant.is_active|yesno:"Yes,No" }}</p>
+            </div>
+            <div class="innerCardWidth">
+                <p class="tenant-notes">Notes: {{ tenant.notes }}</p>
+            </div>
         </div>
         {% empty %}
         <p>No tenants found.</p>

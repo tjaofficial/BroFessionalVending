@@ -705,7 +705,7 @@ class canta_payments_model(models.Model):
     
 class Tenant(models.Model):
     # Basic Personal Details
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    userProf = models.ForeignKey('UserProfile', on_delete=models.CASCADE, blank=True, null=True)
     phone_number = models.CharField(max_length=15)
 
     # Address Details
@@ -737,7 +737,7 @@ class Tenant(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} ({self.property.address})"
+        return f"{self.userProf} ({self.property.address})"
 
 class Property(models.Model):
     # Basic Property Details
@@ -860,6 +860,7 @@ class UserProfile(models.Model):
     BUSINESS_TYPE_CHOICES = [
         ('Vending', 'Vending'),
         ('Legacy', 'Legacy'),
+        ('Tenant', 'Tenant'),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

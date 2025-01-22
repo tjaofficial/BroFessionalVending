@@ -54,6 +54,7 @@ urlpatterns = [
     path('legacyportal/expense_overview/delete/<int:pk>/', views.delete_writeoff, name='delete_writeoff'),
     path('legacyportal/admin_dash', views.dashboard, name='admin_dash'),
     path('api/writeoff/<int:pk>/', views.writeoff_detail, name='writeoff_detail'),
+    path('api/property/<int:pk>/', views.property_detail, name='property_detail'),
     path('tenant/dashboard/', views.tenant_dashboard, name='tenant_dashboard'),
     path('legacyportal/register-admin/', views.register_admin, name='register_admin'),
     path('tenant/maintenance-request/', views.maintenance_request, name='maintenance_request'),
