@@ -14,7 +14,7 @@ def add_tenant(request):
         form = TenantForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_dash')  # Replace with your tenant listing page
+            return redirect('view_tenants')  # Replace with your tenant listing page
     else:
         form = TenantForm()
     return render(request,'legacy_lineage/add_tenant.html',{
@@ -27,7 +27,7 @@ def add_property(request):
         form = PropertyForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('property_list')  # Replace with your redirect page
+            return redirect('view_properties')  # Replace with your redirect page
     else:
         form = PropertyForm()
     return render(request, 'legacy_lineage/add_property.html', {
