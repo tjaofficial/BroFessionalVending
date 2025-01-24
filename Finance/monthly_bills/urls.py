@@ -59,4 +59,8 @@ urlpatterns = [
     path('legacyportal/register-admin/', views.register_admin, name='register_admin'),
     path('legacyportal/register-tenant/', views.register_tenant, name='register_tenant'),
     path('tenant/maintenance-request/', views.maintenance_request, name='maintenance_request'),
+    path('tenant/make-payments/', views.payment_center, name='make_payments'),
+    path('create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
+    path('get-tenant-payment-info/<int:tenant_id>/', views.get_tenant_payment_info, name='get_tenant_payment_info'),
+
 ]

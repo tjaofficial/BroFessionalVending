@@ -1,0 +1,25 @@
+{% load static %}
+<div class="form-container">
+    <h2>Add Income</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input id="id_transaction_type" type="hidden" value="Income" name="transaction_type" >
+        <p>
+            <label for="id_category">Income Category</label>
+            {{ incomeForm.category }}
+        </p>
+        <p>
+            <label for="id_amount">Amount ($)</label>
+            {{ incomeForm.amount }}
+        </p>
+        <p>
+            <label for="id_description">Description</label>
+            {{ incomeForm.description }}
+        </p>
+        <p>
+            <label for="id_date">Date of Collection</label>
+            {{ incomeForm.date }}
+        </p>
+        <button type="submit" name="addIncomeButton" class="submit-btn">Add</button>
+    </form>
+</div>

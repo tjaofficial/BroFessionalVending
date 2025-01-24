@@ -1,0 +1,75 @@
+.tenant-info {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: left;
+    width: 400px;
+}
+
+.tenant-info h2 {
+    font-size: 1.5rem;
+    color: #5a67d8;
+    margin-bottom: 10px;
+}
+
+.tenant-info p {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+#card-element {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    background-color: #f8f8f8;
+}
+
+#autopay {
+    margin: 10px;
+    vertical-align: middle;
+}
+
+button {
+    background-color: #5a67d8;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #434190;
+}
+
+#payment-result {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: green;
+}
+
+#error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: none;
+}
+#payment-form{
+    width: 400px;
+}

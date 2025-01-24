@@ -786,13 +786,25 @@ class WriteOff(models.Model):
         ('home_office', 'Home Office Expenses'),
         ('meals', 'Meal Expenses'),
         ('property', 'Property Expenses'),
+        ('rent', 'Rent'),
+        ('house_sold', 'House Sold'),
+        ('deposit', 'Deposit'),
+        ('tax_return', 'Tax Return')
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+
+    TRANSACTION_TYPE_CHOICES = [
+        ('Expense', 'Expense'),
+        ('Income', 'Income'),
+    ]
+
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     date = models.DateField()
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES, default='Expense')
     last_updated = models.DateTimeField(auto_now=True)
+    added_by = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='writeoffs',null=True,  # Allow null temporarily
+    blank=True)
 
     def __str__(self):
         return f"{self.get_category_display()} - ${self.amount} on {self.date}"
@@ -846,8 +858,16 @@ class Transaction(models.Model):
         ('Payment', 'Payment'),
     ]
 
-    tenant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
+    CATEGORY_CHOICES = [
+        ('Rent', 'Rent'),
+        ('Fee', 'Fee'),
+        ('Deposit', 'Deposit'),
+        ('Other', 'Other'),
+    ]
+
+    tenant = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='transactions')
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="Other")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -872,4 +892,40 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} ({self.business_type})"
 
+class TransactionCharge(models.Model):
+    CATEGORY_CHOICES = [
+        ('Rent', 'Rent'),
+        ('Fee', 'Fee'),
+        ('Deposit', 'Deposit'),
+        ('Other', 'Other'),
+    ]
+
+    tenant = models.ForeignKey('Tenant', on_delete=models.CASCADE)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="Other")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    due_date = models.DateField(auto_now=False, auto_now_add=False)
+    is_paid = models.BooleanField(default=False)  # New field to indicate payment status
+
+    def __str__(self):
+        return f"Charge - ${self.amount} for {self.tenant.username} on {self.date.strftime('%Y-%m-%d')}"
     
+class TransactionPayment(models.Model):
+    CATEGORY_CHOICES = [
+        ('Rent', 'Rent'),
+        ('Fee', 'Fee'),
+        ('Deposit', 'Deposit'),
+        ('Other', 'Other'),
+    ]
+    transaction_charge = models.ForeignKey('TransactionCharge', on_delete=models.SET_NULL, related_name='transactionsPayment', blank=True, null=True)
+    tenant = models.ForeignKey('Tenant', on_delete=models.CASCADE)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="Other")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Payment - ${self.amount} for {self.tenant.username} on {self.date.strftime('%Y-%m-%d')}"

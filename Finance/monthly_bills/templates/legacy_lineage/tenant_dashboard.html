@@ -3,7 +3,7 @@
 <div class="card balance-card">
     <h2>Current Balance</h2>
     <p><span class="amount">${{ current_balance }}</span></p>
-    <button onclick="location.href='/payment-center'">Go to Payment Center</button>
+    <a href="{% url 'make_payments' %}"><button>Go to Payment Center</button></a>
 </div>
 
 <div class="card maintenance-card">

@@ -2,6 +2,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'legacy_lineage/style/write_offs.css' %}">
 <script defer src="{% static 'legacy_lineage/script/write_offs.js' %}"></script>
+
+
 <div class="writeoff-container">
     <h2 class="page-title">Expense Overview</h2>
 
@@ -45,13 +47,24 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="action-buttons">
-        <button id="add-writeoff-btn" class="btn-action">Add Expense</button>
+    <div class="add-btn-container">
+        <div class="action-buttons">
+            <button id="add-writeoff-btn" class="btn-action">Add Expense</button>
+        </div>
+        <div class="action-buttons">
+            <button id="add-income-btn" class="btn-action">Add Income</button>
+        </div>
     </div>
     <div id="add-writeoff-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             {% include "legacy_lineage/add_write_off.html" %}
+        </div>
+    </div>
+    <div id="add-income-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            {% include "legacy_lineage/add_income.html" %}
         </div>
     </div>
 
@@ -71,7 +84,7 @@
                 {% for writeoff in writeoffs %}
                 <tr>
                     <td>{{ writeoff.date }}</td>
-                    <td>${{ writeoff.amount }}</td>
+                    <td><span class="{% if writeoff.transaction_type == 'Expense' %}expenseStyle{% else %}incomeStyle{% endif %}">{% if writeoff.transaction_type == 'Expense' %}-{% endif %}${{ writeoff.amount }}</span></td>
                     <td>{{ writeoff.get_category_display }}</td>
                     <td>{{ writeoff.description }}</td>
                     <td>

@@ -353,12 +353,13 @@ class PropertyForm(forms.ModelForm):
             'maintenance_phone': 'Maintenance Phone',
         }
 
-class WriteOffForm(forms.ModelForm):
+class AddExpenseForm(forms.ModelForm):
     class Meta:
         model = WriteOff
-        fields = ['category', 'amount', 'description', 'date', 'user']
+        fields = ['transaction_type', 'category', 'amount', 'description', 'date', 'added_by']
 
         widgets = {
+            'transaction_type': forms.Select(attrs={}),
             'category': forms.Select(attrs={}),
             'amount': forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
@@ -366,11 +367,53 @@ class WriteOffForm(forms.ModelForm):
         }
 
         labels = {
+            'transaction_type': 'Transaction Type',
             'category': 'Expense Category',
             'amount': 'Amount ($)',
             'description': 'Description',
             'date': 'Date of Expense',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transaction_type'].choices = [('Expense', 'Expense')]  # Restrict to 'Expense' only
+        self.fields['category'].choices = [
+            ('auto', 'Auto Expenses'),
+            ('business', 'Business Expenses'),
+            ('home_office', 'Home Office Expenses'),
+            ('meals', 'Meal Expenses'),
+            ('property', 'Property Expenses')
+        ]
+
+class AddIncomeForm(forms.ModelForm):
+    class Meta:
+        model = WriteOff
+        fields = ['transaction_type', 'category', 'amount', 'description', 'date', 'added_by']
+
+        widgets = {
+            'transaction_type': forms.Select(attrs={}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+
+        labels = {
+            'transaction_type': 'Transaction Type',
+            'category': 'Category',
+            'amount': 'Amount',
+            'description': 'Description',
+            'date': 'Date',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.fields['transaction_type'].choices = [('Income', 'Income')]  # Restrict to 'Income' only
+        self.fields['category'].choices = [
+            ('house_sold', 'House Sold'),
+            ('tax_return', 'Tax Return')
+        ]
+
 
 class MaintenanceRequestForm(forms.ModelForm):
     class Meta:
@@ -393,15 +436,17 @@ class MaintenanceRequestForm(forms.ModelForm):
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['transaction_type', 'amount', 'description']
+        fields = ['transaction_type', 'amount', 'description', 'category']
 
         widgets = {
+            'category': forms.Select(attrs={'class': 'form-control'}),
             'transaction_type': forms.Select(attrs={'class': 'form-control'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Enter amount'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter description (optional)', 'rows': 4}),
         }
 
         labels = {
+            'category': 'Transaction Category',
             'transaction_type': 'Transaction Type',
             'amount': 'Amount ($)',
             'description': 'Description',

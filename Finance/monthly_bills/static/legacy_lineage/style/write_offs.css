@@ -176,6 +176,7 @@ body {
 .action-buttons {
     text-align: center;
     margin-bottom: 20px;
+    padding: 0 15px;
 }
 
 .btn-action {
@@ -191,4 +192,15 @@ body {
 
 .btn-action:hover {
     background-color: #434190;
+}
+
+.add-btn-container{
+    display: flex;
+    justify-content: center;
+}
+.expenseStyle{
+    color: red;
+}
+.incomeStyle{
+    color: rgb(0, 79, 0);
 }

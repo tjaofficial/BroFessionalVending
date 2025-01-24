@@ -1,13 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from ..forms import TenantForm, PropertyForm, WriteOffForm, MaintenanceRequestForm
+from ..forms import TenantForm, PropertyForm, AddExpenseForm, MaintenanceRequestForm, AddIncomeForm
 from ..models import Property, Tenant, WriteOff, Revenue, MaintenanceRequest, Transaction, UserProfile
 from django.db.models import Sum
-from django.db.models.functions import ExtractYear
+from django.db.models.functions import ExtractYear, Upper
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import User
+import stripe
+from django.conf import settings
+import json
+
+
 
 @login_required
 def add_tenant(request):
@@ -101,32 +106,38 @@ def expense_overview(request):
     }
 
     writeoffs = WriteOff.objects.all().order_by('-date')
+    for x in writeoffs:
+        x.added_by = UserProfile.objects.get(user=request.user)
+        x.save()
 
     if request.method == 'POST':
         copy_request = request.POST.copy()
-        copy_request['user'] = request.user
+        copy_request['added_by'] = UserProfile.objects.get(user=request.user)
         if 'deleteButton' in request.POST.keys():
             writeoffInstance = WriteOff.objects.get(id=request.POST['writeOffId'])
             writeoffInstance.delete()
         else:
-            if 'addButton' in request.POST.keys():
-                form = WriteOffForm(copy_request)
+            if 'addExpenseButton' in request.POST.keys():
+                form = AddExpenseForm(copy_request)
+            elif 'addIncomeButton' in request.POST.keys():
+                form = AddIncomeForm(copy_request)
             elif 'editButton' in request.POST.keys():
                 writeoffInstance = WriteOff.objects.get(id=request.POST['writeOffId'])
-                form = WriteOffForm(request.POST, instance=writeoffInstance)
+                form = AddExpenseForm(request.POST, instance=writeoffInstance)
 
             if form.is_valid():
                 form.save()
                 return redirect('expense_overview')
         return redirect('expense_overview')
     else:
-        writeOffForm = WriteOffForm()
-        print('hello')
+        expenseForm = AddExpenseForm()
+        incomeForm = AddIncomeForm()
 
     context = {
         'totals': totals,
         'writeoffs': writeoffs,
-        'writeOffForm': writeOffForm,
+        'expenseForm': expenseForm,
+        'incomeForm': incomeForm,
     }
 
     
@@ -137,12 +148,12 @@ def add_writeoff(request):
     if request.method == 'POST':
         copy_request = request.POST.copy()
         copy_request['user'] = request.user
-        form = WriteOffForm(copy_request)
+        form = AddExpenseForm(copy_request)
         if form.is_valid():
             form.save()
             return redirect('expense_overview')
     else:
-        form = WriteOffForm()
+        form = AddExpenseForm()
 
     return render(request, 'legacy_lineage/add_write_off.html', {'form': form})
 
@@ -150,12 +161,12 @@ def add_writeoff(request):
 def edit_writeoff(request, pk):
     writeoff = get_object_or_404(WriteOff, pk=pk)
     if request.method == 'POST':
-        form = WriteOffForm(request.POST, instance=writeoff)
+        form = AddExpenseForm(request.POST, instance=writeoff)
         if form.is_valid():
             form.save()
             return redirect('expense_overview')
     else:
-        form = WriteOffForm(instance=writeoff)
+        form = AddExpenseForm(instance=writeoff)
 
     return render(request, 'legacy_lineage/edit_write_off.html', {'form': form, 'writeoff': writeoff})
 
@@ -170,30 +181,17 @@ def delete_writeoff(request, pk):
 
 @login_required
 def dashboard(request):
-    # Handle search filters
-    search_description = request.GET.get('description', '').strip()
-    search_category = request.GET.get('category', '').strip()
-    date_start = request.GET.get('date_start', None)
-    date_end = request.GET.get('date_end', None)
-
+    
     # Revenue Data
     total_revenue = Revenue.objects.aggregate(Sum('amount'))['amount__sum'] or 0
     yearly_revenue = Revenue.objects.filter(date__year=2023).aggregate(Sum('amount'))['amount__sum'] or 0
 
     # Expense Data with Filters
     writeoffs = WriteOff.objects.all()
-
-    if search_description:
-        writeoffs = writeoffs.filter(description__icontains=search_description)
-    if search_category:
-        writeoffs = writeoffs.filter(category=search_category)
-    if date_start:
-        writeoffs = writeoffs.filter(date__gte=date_start)
-    if date_end:
-        writeoffs = writeoffs.filter(date__lte=date_end)
-
     expenses_by_category = writeoffs.values('category').annotate(total=Sum('amount'))
-    expense_totals = {item['category']: item['total'] for item in expenses_by_category}
+
+    expense_totals = {item['category']: float(item['total']) for item in expenses_by_category}
+    print(expense_totals)
 
     # Recent Transactions (Filtered)
     recent_transactions = writeoffs.order_by('-date')[:5]
@@ -210,10 +208,6 @@ def dashboard(request):
         'expenses': expense_totals,
         'recent_transactions': recent_transactions,
         'growth_data': list(growth_data),  # Convert QuerySet to a list for JavaScript
-        'search_description': search_description,
-        'search_category': search_category,
-        'date_start': date_start,
-        'date_end': date_end,
     }
 
     return render(request, 'legacy_lineage/admin_dashboard.html', context)
@@ -237,7 +231,7 @@ def writeoff_detail(request, pk):
 @login_required
 def tenant_dashboard(request):
     # Get the currently logged-in tenant
-    tenant = User.objects.get(id=request.user.id)
+    tenant = UserProfile.objects.get(user=request.user)
     transactionQuery = Transaction.objects.filter(tenant=tenant)
     total_charges = 1650.00
     total_payments = 825.00
@@ -253,10 +247,10 @@ def tenant_dashboard(request):
     #total_payments = Transaction.objects.filter(tenant=tenant).aggregate(total=models.Sum('amount'))['total'] or 0
 
     # Count active maintenance requests
-    active_requests = MaintenanceRequest.objects.filter(tenant=tenant, status='Active').count()
+    active_requests = MaintenanceRequest.objects.filter(tenant=tenant.user, status='Active').count()
 
     context = {
-        'tenant_name': tenant.first_name,
+        'tenant_name': tenant.user.first_name,
         'current_balance': current_balance,
         'active_requests': active_requests,
     }
@@ -310,7 +304,7 @@ def register_tenant(request):
             user.last_name = request.POST.get('last_name')
             user.save()  # Save after adding extra fields
             up = UserProfile(
-                user=user
+                user=user, business_type="Tenant"
             )
             up.save()
             messages.success(request, 'New tenant registered successfully.')
@@ -343,3 +337,74 @@ def property_detail(request, pk):
         return JsonResponse(data)
     except Property.DoesNotExist:
         return JsonResponse({'error': 'Property not found'}, status=404)
+    
+def create_payment_intent(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            tenant_id = data['tenant_id']
+
+            # Fetch tenant details
+            tenant = Tenant.objects.get(id=tenant_id)
+            amount = int(tenant.monthly_rent * 100)  # Convert to cents
+
+            # Create a PaymentIntent for the rent
+            payment_intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency='usd',
+                payment_method_types=['card'],
+            )
+
+            return JsonResponse({'clientSecret': payment_intent['client_secret']})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+def payment_center(request):
+
+    return render(request, "legacy_lineage/make_payment.html",{
+
+    })
+
+def get_tenant_payment_info(request, tenant_id):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        # Fetch tenant details
+        tenant = Tenant.objects.get(id=tenant_id)
+
+        # Prepare tenant's payment information
+        tenant_info = {
+            'name': f'{tenant.userProf.user.first_name} {tenant.userProf.user.last_name}',
+            'email': tenant.userProf.user.email,
+            'rent_amount': tenant.monthly_rent,  # Example rent amount
+            'due_date': tenant.lease_start_date.strftime('%Y-%m-%d'),  # Format due date
+        }
+
+        return JsonResponse(tenant_info)
+
+    except Tenant.DoesNotExist:
+        return JsonResponse({'error': 'Tenant not found'}, status=404)
+
+def setup_autopay(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            tenant_id = data['tenant_id']
+            payment_method_id = data['payment_method_id']
+
+            # Attach the payment method to the tenant's Stripe customer
+            tenant = Tenant.objects.get(id=tenant_id)
+            stripe.Customer.modify(
+                tenant.stripe_customer_id,
+                invoice_settings={"default_payment_method": payment_method_id},
+            )
+
+            # Create a subscription for auto-pay
+            stripe.Subscription.create(
+                customer=tenant.stripe_customer_id,
+                items=[{"price": "your_price_id"}],  # Replace with actual price ID
+            )
+
+            return JsonResponse({'message': 'Auto-pay enabled'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)

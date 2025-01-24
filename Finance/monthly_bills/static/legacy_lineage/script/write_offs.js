@@ -52,12 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get buttons and modals
     const addWriteoffBtn = document.getElementById('add-writeoff-btn');
     const addWriteoffModal = document.getElementById('add-writeoff-modal');
-
+    const addIncomeBtn = document.getElementById('add-income-btn');
+    const addIncomeModal = document.getElementById('add-income-modal');
     const deleteButtons = document.querySelectorAll('.btn-delete');
 
     // Open Add Modal
     addWriteoffBtn.addEventListener('click', () => {
         addWriteoffModal.style.display = "block";
+    });
+    addIncomeBtn.addEventListener('click', () => {
+        addIncomeModal.style.display = "block";
     });
 
     // Open Delete Modal

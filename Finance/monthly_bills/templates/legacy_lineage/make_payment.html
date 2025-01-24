@@ -1,0 +1,26 @@
+{% extends "legacy_lineage/tenant_layout.html" %}{% load static %}
+{% block content %}
+<div>
+    <script defer src="{% static 'legacy_lineage/script/stripe_payment.js' %}"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="{% static 'legacy_lineage/style/stripe_payment.css' %}">
+    <div class="tenant-info">
+        <h2 style="margin-top: 0px;">Make A Payment: </h2>
+        <p><strong>Tenant Name:</strong> <span id="tenant-name"></span></p>
+        <p><strong>Email:</strong> <span id="tenant-email"></span></p>
+        <p><strong>Rent Amount:</strong> <span id="tenant-rent"></span></p>
+        <p><strong>Due Date:</strong> <span id="tenant-due-date"></span></p>
+    </div>
+
+    <form id="payment-form">
+        <div id="card-element"></div>
+        <label>
+            <input type="checkbox" id="autopay" />
+            Enable Auto-Pay
+        </label>
+        <button id="submit">Pay Rent</button>
+    </form>
+
+    <div id="payment-result"></div>
+</div>
+{% endblock %}
