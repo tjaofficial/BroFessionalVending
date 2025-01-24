@@ -107,7 +107,7 @@ def expense_overview(request):
 
     writeoffs = WriteOff.objects.all().order_by('-date')
     for x in writeoffs:
-        x.added_by = UserProfile.objects.get(user=request.user)
+        x.added_by = UserProfile.objects.get(user__first_name="Joyce")
         x.save()
 
     if request.method == 'POST':
