@@ -20,53 +20,6 @@ def view_snacks_view(request):
     inventoryQuery = inventory_sheets_model.objects.all()
     snackStockList = []
 
-    for shit in itemDatabase:
-        newHomeInventory = home_inventory_model(
-            item=shit
-        )
-        newHomeInventory.save()
-        
-    # for shit in stockDatabase:
-    #     change = shit.qty_per_unit * shit.qty_of_units
-    #     inventory = home_inventory_model.objects.get(item__id=shit.id)
-    #     inventory.update_stock(change, "Restocked")
-
-
-    # for shit in inventoryQuery:
-    #     newDict = {}
-    #     jsonString = json.loads(shit.data)
-    #     #print(jsonString)
-    #     for laneKey in jsonString.keys():
-    #         #print(laneKey)
-    #         newDict[str(laneKey)] = {}
-    #         newLaneDict = newDict[str(laneKey)]
-    #         laneDataList = jsonString[str(laneKey)]
-    #         item_name = laneDataList[0]['item_name']
-    #         stocky = laneDataList[1]['stock']
-    #         removed = laneDataList[2]['removed']
-    #         sold = laneDataList[3]['sold']
-    #         added = laneDataList[4]['added']
-    #         notes = laneDataList[5]['notes']
-    #         if len(laneDataList) == 7:
-    #             new_dates = laneDataList[6]['new_dates']
-    #         else:
-    #             new_dates = ""
-
-    #         newLaneDict['item_name'] = int(item_name)
-    #         newLaneDict['stock'] = int(stocky)
-    #         newLaneDict['removed'] = int(removed)
-    #         newLaneDict['sold'] = int(sold)
-    #         newLaneDict['added'] = int(added)
-    #         newLaneDict['notes'] = int(notes)
-    #         newLaneDict['new_dates'] = int(new_dates)
-    #     print(newDict)
-
-    #     shit.data = json.dumps(newDict)
-    #     shit.save()
-
-
-
-
     # Get the latest stock entry per item (if available)
     latest_stock = (
         item_stock_model.objects
@@ -97,42 +50,14 @@ def view_snacks_view(request):
             categorized_inventory[primary_type] = {}
 
         if secondary_type not in categorized_inventory[primary_type]:
-            categorized_inventory[primary_type][secondary_type] = [item]
-
-
-
-
-
-
+            categorized_inventory[primary_type][secondary_type] = []
+        
+        if item not in categorized_inventory[primary_type][secondary_type]:
+            categorized_inventory[primary_type][secondary_type].append(item)
 
     newShit = item_data_model.objects.all().order_by('itemID')
     newShit = newShit.filter(itemPrimaryType="drinks")
     print(categorized_inventory)
-
-    for snack in itemDatabase:
-        #print(snack)
-        match = False
-        addingStock = 0
-        closestExp = 'n/a'
-        for stock in stockDatabase:
-            if stock.itemChoice == snack:
-                match = True
-                #break
-                addingStock += stock.qty_per_unit
-                if closestExp == 'n/a' or closestExp > stock.exp_date:
-                    closestExp = stock.exp_date
-        addedToMachine = 0
-        for inventory in inventoryQuery:
-            machineLayout = inventory.data
-            for x in machineLayout:
-                itemName = machineLayout[x]['item_name']
-                itemsAdded = int(machineLayout[x]['added'])
-                if itemName == snack.name:
-                    addedToMachine += itemsAdded
-        stockLeft = addingStock - addedToMachine
-        snackStockList.append((snack, stockLeft, closestExp))
-        #print(match)
-    #print(snackStockList)
     
     return render(request, 'snacks/view_snacks.html',{
         'itemDatabase': itemDatabase, 
