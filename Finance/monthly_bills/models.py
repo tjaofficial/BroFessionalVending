@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 # Create your models here.
 bill_categories = (
@@ -563,8 +565,8 @@ class inventory_sheets_model(models.Model):
         choices=conditions,
     )
     collected = models.FloatField()
-    data = models.CharField(
-        max_length=10000,
+    data = models.JSONField(
+        default=dict
     )
     general_notes = models.CharField(max_length=10000, default='none')
     def __str__(self):
@@ -685,6 +687,9 @@ class item_stock_model(models.Model):
     qty_per_unit = models.IntegerField()
     vendor = models.CharField(
         max_length=30
+    )
+    qty_of_units = models.IntegerField(
+        default=1
     )
     
     def __str__(self):
@@ -929,3 +934,28 @@ class TransactionPayment(models.Model):
 
     def __str__(self):
         return f"Payment - ${self.amount} for {self.tenant.username} on {self.date.strftime('%Y-%m-%d')}"
+    
+class home_inventory_model(models.Model):
+    item = models.OneToOneField(item_data_model, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+    log = models.TextField(default="", blank=True)  # Stores update history
+
+    def update_stock(self, change, action):
+        """
+        Updates stock and appends changes to log.
+        change: Number of items added (+) or removed (-)
+        action: Description of what happened (e.g., "Restocked", "Added to machine")
+        """
+        old_qty = self.quantity
+        self.quantity += change
+        self.log += f"\n{timezone.now().strftime('%Y-%m-%d %H:%M:%S')} - {action}: {old_qty} → {self.quantity} (Change: {change})"
+        self.save()
+
+    def __str__(self):
+        return f"{self.item.name} - {self.quantity} at home"
+
+
+
+
+
+

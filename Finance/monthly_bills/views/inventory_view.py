@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from ..models import cantaLogs_model, price_model, fleet_model, machine_stock_model, vmax576_model, inventory_sheets_model, machine_build_model, item_data_model, canta_payments_model
+from ..models import home_inventory_model, cantaLogs_model, price_model, fleet_model, machine_stock_model, vmax576_model, inventory_sheets_model, machine_build_model, item_data_model, canta_payments_model
 from ..forms import cantaLogs_form, machine_stock_form, vmax576_form, inventory_sheets_form, vending_finance_form, canta_payments_form
 from ..utils import productName
 import datetime
@@ -723,7 +723,7 @@ def universal_is(request, type, id_tag, buildID):
     }
     pastInventory = inventory_sheets_model.objects.filter(id_tag=machine).order_by('-date')
     if pastInventory.exists():
-        pastInventory = sorted(json.loads(pastInventory[0].data).items())
+        pastInventory = sorted(pastInventory[0].data.items())
     else:
         pastInventory = False
     allItems = item_data_model.objects.all()
@@ -742,10 +742,11 @@ def universal_is(request, type, id_tag, buildID):
             empty = True
             for pastInven in pastInventory:
                 if rebu[0] == pastInven[0]:
+                    print(pastInven[1])
                     newReBuild.append((rebu[0], rebu[1], pastInven[1]))
                     empty = False
             if empty == True:
-                newList = [{'item_name': rebu[1]}, {'stock': '0'}, {'removed': '0'}, {'sold': '0'}, {'added': '0'}, {'notes': '-'}, {'new_dates': ''}]
+                newList = {'item_name': rebu[1], 'stock': '0', 'removed': '0', 'sold': '0', 'added': '0', 'notes': '-', 'new_dates': ''}
                 newReBuild.append((rebu[0], rebu[1], newList))
         rebuildData = newReBuild
     else:
@@ -760,33 +761,42 @@ def universal_is(request, type, id_tag, buildID):
         gatheredData = {}
         for buildLane in rebuildData:
             if 'new_dates_'+str(buildLane[0]) in data.keys():
-                gatheredData[buildLane[0]] = [
-                    {'item_name': data['item_'+str(buildLane[0])]},
-                    {'stock': data['stock_'+str(buildLane[0])]},
-                    {'removed': str(-int(data['removed_'+str(buildLane[0])]))},
-                    {'sold': data['sold_'+str(buildLane[0])]},
-                    {'added': data['added_'+str(buildLane[0])]},
-                    {'notes': data['notes_'+str(buildLane[0])]},
-                    {'new_dates': data['new_dates_'+str(buildLane[0])]}
-                ]
+                gatheredData[buildLane[0]] = {
+                    'item_name': data['item_'+str(buildLane[0])],
+                    'stock': data['stock_'+str(buildLane[0])],
+                    'removed': str(-int(data['removed_'+str(buildLane[0])])),
+                    'sold': data['sold_'+str(buildLane[0])],
+                    'added': data['added_'+str(buildLane[0])],
+                    'notes': data['notes_'+str(buildLane[0])],
+                    'new_dates': data['new_dates_'+str(buildLane[0])]
+                }
             else:
-                gatheredData[buildLane[0]] = [
-                    {'item_name': data['item_'+str(buildLane[0])]},
-                    {'stock': data['stock_'+str(buildLane[0])]},
-                    {'removed': str(-int(data['removed_'+str(buildLane[0])]))},
-                    {'sold': data['sold_'+str(buildLane[0])]},
-                    {'added': data['added_'+str(buildLane[0])]},
-                    {'notes': data['notes_'+str(buildLane[0])]},
-                    {'new_dates': ""}
-                ]
-        gatheredJSON = json.dumps(gatheredData)
+                gatheredData[buildLane[0]] = {
+                    'item_name': data['item_'+str(buildLane[0])],
+                    'stock': data['stock_'+str(buildLane[0])],
+                    'removed': str(-int(data['removed_'+str(buildLane[0])])),
+                    'sold': data['sold_'+str(buildLane[0])],
+                    'added': data['added_'+str(buildLane[0])],
+                    'notes': data['notes_'+str(buildLane[0])],
+                    'new_dates': ""
+                }
+        gatheredJSON = json.loads(json.dumps(gatheredData))
         copyData = data.copy()
         copyData['data'] = gatheredJSON
         copyData['machineBuild'] = machineData
         data = inventory_sheets_form(copyData)
 
         if data.is_valid():
-            data.save()
+            A = data.save()
+            jsonData = A.data
+
+            for key, itemData in jsonData.items():
+                itemName = itemData['item_name']
+                itemID = item_data_model.objects.get(name=itemName).id
+                at_home_stock_for_item = home_inventory_model.objects.get(item__id=itemID)
+                change = -int(itemData['added'])
+                at_home_stock_for_item.update_stock(change, "Added to machine")
+
             print('save')
             return redirect('machineDash', type, id_tag)
     
@@ -808,7 +818,7 @@ def view_is(request, type, id_tag, date):
     currentInventory = inventory_sheets_model.objects.get(id_tag=machine, date=date)
     machineData = machine_build_model.objects.get(machineChoice__id_tag=id_tag, id=currentInventory.machineBuild.id)
     currentInventoryData = currentInventory
-    currentInventory = sorted(json.loads(currentInventory.data).items())
+    currentInventory = sorted(currentInventory.data.items())
 
     allItems = item_data_model.objects.all()
     organizedBuildData = sorted(machineData.slot_dictionary.items())

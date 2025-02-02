@@ -13,4 +13,26 @@ def getItemPriceByName(id_tag, item_name):
     if buildQuery.exists():
         buildQuery = buildQuery[0]
         print(buildQuery.slot_dictionary)
-    
+
+def find_machines_with_item(itemID):
+    # Total Sold Query adn Amount
+    machines_with_item = []
+
+    # Get all machine records
+    machines = machine_build_model.objects.all()
+
+    for machine in machines:
+        try:
+            # Get slot dictionary
+            slot_dict = machine.slot_dictionary  # JSONField, already a dict
+
+            for lane, details in slot_dict.items():
+                if details.get("itemID") == itemID:
+                    machines_with_item.append({
+                        "machine": str(machine.machineChoice),
+                        "date": str(machine.date),
+                        "lane": lane,  # Store the lane where the itemID was found
+                    })
+        except Exception as e:
+            print(f"Error processing machine {machine}: {e}")
+    return machines_with_item

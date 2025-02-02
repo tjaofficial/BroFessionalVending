@@ -1,0 +1,210 @@
+{% extends "snacks/components/product_layout.html" %}
+{% block content %}{% load static %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f4f9;
+    }
+    .container {
+        max-width: 900px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+    }
+    .section {
+        margin-bottom: 30px;
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .button {
+        padding: 8px 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .button:hover {
+        background: #0056b3;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+    }
+    .tabs {
+        display: flex;
+        gap: 10px;
+    }
+    .tab {
+        cursor: pointer;
+        padding: 10px;
+        background: #ddd;
+        border-radius: 5px;
+    }
+    .tab.active {
+        background: #007bff;
+        color: white;
+    }
+    .graph-container {
+        display: none;
+    }
+    .graph-container.active {
+        display: block;
+    }
+</style>
+<div class="container">
+    <h1>{{item.name}} - Item Details</h1>
+    
+    <!-- Section 1: Item Info -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Item Information</h2>
+            <button class="button" onclick="openModal()">Edit</button>
+        </div>
+        <p><strong>Item ID:</strong> {{item.itemID}}</p>
+        <p><strong>Primary Type:</strong> {{item.itemPrimaryType|capfirst}}</p>
+        <p><strong>Secondary Type:</strong> {{item.itemSecondaryType|capfirst}}</p>
+        <p><strong>Status:</strong> <input type="checkbox" id="status-toggle" {% if item.discontinued %}checked{% endif %}></p>
+        <a href="{% url 'add_stock' item.itemID %}"><button class="button">Add Stock</button></a>
+    </div>
+    
+    <!-- Section 2: Statistics -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Statistics</h2>
+            <select id="timeframe" onchange="updateTimeframeOptions()">
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="annual">Annual</option>
+                <option value="alltime">All-Time</option>
+            </select>
+            <select id="timeframe-options"></select>
+            <select id="machine-selector">
+                <option value="all">All Machines</option>
+                {% for machine in machines%}
+                    <option value="{{machine.machine}}">{{machine.machine}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p><strong>Total Cost:</strong> <span id="total-cost">$500</span></p>
+        <p><strong>Total Sold:</strong> <span id="total-sold">200 units</span></p>
+        <p><strong>Total Revenue:</strong> <span id="total-revenue">$800</span></p>
+        <p><strong>Total Loss:</strong> <span id="total-loss">$50</span></p>
+    </div>
+    
+    <!-- Section 3: Graphs -->
+    <div class="section">
+        <h2>Graphs</h2>
+        <div class="tabs">
+            <div class="tab active" onclick="showGraph('quantity')">Quantity Sold</div>
+            <div class="tab" onclick="showGraph('revenue')">Revenue</div>
+            <div class="tab" onclick="showGraph('cost')">Cost</div>
+        </div>
+        <div id="quantity" class="graph-container active">[Graph: Quantity Sold]</div>
+        <div id="revenue" class="graph-container">[Graph: Revenue]</div>
+        <div id="cost" class="graph-container">[Graph: Cost]</div>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+    function showGraph(graphId) {
+        document.querySelectorAll('.graph-container').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(graphId).classList.add('active');
+        event.target.classList.add('active');
+    }
+    function updateTimeframeOptions() {
+        let timeframe = document.getElementById('timeframe').value;
+        let options = document.getElementById('timeframe-options');
+        options.innerHTML = "";
+        if (timeframe === "weekly") {
+            for (let i = 1; i <= 52; i++) {
+                options.innerHTML += `<option value="week${i}">Week ${i}</option>`;
+            }
+        } else if (timeframe === "monthly") {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            months.forEach((month, index) => {
+                options.innerHTML += `<option value="month${index+1}">${month}</option>`;
+            });
+        } else if (timeframe === "annual") {
+            for (let year = 2022; year <= new Date().getFullYear(); year++) {
+                options.innerHTML += `<option value="year${year}">${year}</option>`;
+            }
+        }
+    }
+    document.getElementById("timeframe").addEventListener("change", updateStatistics);
+    document.getElementById("timeframe-options").addEventListener("change", updateStatistics);
+    document.getElementById("machine-selector").addEventListener("change", updateStatistics);
+
+    async function updateStatistics() {
+        let timeframe = document.getElementById("timeframe").value;
+        let selectedOption = document.getElementById("timeframe-options").value;
+        let machine = document.getElementById("machine-selector").value;
+
+        try {
+            // Fetch data from the API
+            let response = await fetch(`/api/get-statistics/?timeframe=${timeframe}&selectedOption=${selectedOption}&machine=${machine}&itemID={{item.itemID}}`);
+            let data = await response.json();
+
+            // Update the statistics section dynamically
+            document.getElementById("total-cost").innerText = `$${data.totalCost}`;
+            document.getElementById("total-sold").innerText = `${data.totalSold} units`;
+            document.getElementById("total-revenue").innerText = `$${data.totalRevenue}`;
+            document.getElementById("total-loss").innerText = `$${data.totalLoss}`;
+
+        } catch (error) {
+            console.error("Error fetching statistics:", error);
+        }
+    }
+
+
+    // Mock function simulating data fetch (replace with real API call)
+    function fetchStatisticsData(timeframe, selectedOption, machine) {
+        console.log(`Fetching data for ${timeframe}, option: ${selectedOption}, machine: ${machine}`);
+
+        // Example mock data (Replace this with actual backend data)
+        return {
+            totalCost: Math.floor(Math.random() * 1000),
+            totalSold: Math.floor(Math.random() * 500),
+            totalRevenue: Math.floor(Math.random() * 2000),
+            totalLoss: Math.floor(Math.random() * 200),
+        };
+    }
+    function showGraph(graphId) {
+        document.querySelectorAll('.graph-container').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(graphId).classList.add('active');
+        event.target.classList.add('active');
+        updateData();
+    }
+
+</script>
+{% endblock %}

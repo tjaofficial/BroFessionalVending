@@ -1,75 +1,163 @@
-.tenant-info {
-    background-color: #fff;
+
+  
+  .payment-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: auto;
+    gap: 20px;
+  }
+  
+  .account-snapshot,
+  .payment-form {
+    background: #fff;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 48%;
+  }
+  
+  .account-snapshot h2 {
+    margin: 0 0 10px;
+  }
+  
+  .account-snapshot .balance {
+    font-size: 2rem;
+    margin: 10px 0;
+  }
+  
+  .account-snapshot .description {
+    color: #666;
+  }
+  
+  .payment-form h2 {
     margin-bottom: 20px;
-    text-align: left;
-    width: 400px;
-}
-
-.tenant-info h2 {
-    font-size: 1.5rem;
-    color: #5a67d8;
-    margin-bottom: 10px;
-}
-
-.tenant-info p {
-    font-size: 1rem;
-    margin: 5px 0;
-}
-
-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    text-align: center;
-}
-
-#card-element {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+  }
+  
+  .dropdown {
     margin-bottom: 20px;
-    font-size: 1rem;
-    background-color: #f8f8f8;
-}
-
-#autopay {
-    margin: 10px;
-    vertical-align: middle;
-}
-
-button {
-    background-color: #5a67d8;
+  }
+  
+  .dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 10px;
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .dropdown-content {
+    /* padding: 10px;
+    border: 1px solid #ddd; */
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden; /* Prevent content from spilling during animation */
+    max-height: 0; /* Start with a height of 0 */
+    /* height: 0; */
+    transition: max-height 0.7s ease; /* Smooth transition for max-height */
+    display: block; /* Always block, hide with max-height instead */
+  }
+  
+  .security-code {
+    margin: 20px 0;
+  }
+  
+  #pay-button {
+    background: #5a67d8;
     color: #fff;
     border: none;
     padding: 10px 15px;
     font-size: 1rem;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
     width: 100%;
-}
+  }
+  
+  #pay-button:hover {
+    background: #434190;
+  }
+  
 
-button:hover {
-    background-color: #434190;
-}
 
-#payment-result {
-    margin-top: 20px;
-    font-size: 1rem;
-    color: green;
-}
 
-#error-message {
-    color: red;
+
+
+
+  .payment-method-section {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  
+  .header-left span {
+    font-weight: bold;
+  }
+  
+  .selected-method {
+    display: flex;
+    align-items: end;
+  }
+  
+  .selected-method img {
+    margin-right: 8px;
+  }
+  
+  .rewards-section {
+    background-color: #fef9e7;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
     font-size: 0.9rem;
-    margin-top: 10px;
-    display: none;
-}
-#payment-form{
-    width: 400px;
-}
+    color: #333;
+  }
+  
+  .payment-options {
+    margin-bottom: 15px;
+  }
+  
+  .payment-options label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .payment-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .add-new-payment {
+    margin-bottom: 15px;
+  }
+  
+  .add-new-payment button {
+    background-color: #5a67d8;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .add-new-payment button:hover {
+    background-color: #434190;
+  }
+  
+  .payment-icons img {
+    margin-right: 5px;
+  }
+  

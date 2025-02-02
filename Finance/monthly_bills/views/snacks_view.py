@@ -1,19 +1,116 @@
 from django.shortcuts import render, redirect
-from ..models import item_data_model, item_stock_model, inventory_sheets_model
+from ..models import machine_build_model, home_inventory_model, item_data_model, item_stock_model, inventory_sheets_model
 from ..forms import item_data_form, item_stock_form
+from ..utils import find_machines_with_item
 import datetime
 from django.contrib.auth.decorators import login_required
 import json
+from django.db.models import OuterRef, Subquery
+from django.db import models
+from django.http import JsonResponse 
+from django.db.models import Sum, F
+from django.db.models.functions import Cast
+
 lock = login_required(login_url='login')
 
 @lock
 def view_snacks_view(request):
-    itemDatabase = item_data_model.objects.all()
+    itemDatabase = item_data_model.objects.all().order_by('itemID')
     stockDatabase = item_stock_model.objects.all().order_by('-date_updated')
     inventoryQuery = inventory_sheets_model.objects.all()
     snackStockList = []
+
+    for shit in itemDatabase:
+        newHomeInventory = home_inventory_model(
+            item=shit
+        )
+        newHomeInventory.save()
+        
+    # for shit in stockDatabase:
+    #     change = shit.qty_per_unit * shit.qty_of_units
+    #     inventory = home_inventory_model.objects.get(item__id=shit.id)
+    #     inventory.update_stock(change, "Restocked")
+
+
+    # for shit in inventoryQuery:
+    #     newDict = {}
+    #     jsonString = json.loads(shit.data)
+    #     #print(jsonString)
+    #     for laneKey in jsonString.keys():
+    #         #print(laneKey)
+    #         newDict[str(laneKey)] = {}
+    #         newLaneDict = newDict[str(laneKey)]
+    #         laneDataList = jsonString[str(laneKey)]
+    #         item_name = laneDataList[0]['item_name']
+    #         stocky = laneDataList[1]['stock']
+    #         removed = laneDataList[2]['removed']
+    #         sold = laneDataList[3]['sold']
+    #         added = laneDataList[4]['added']
+    #         notes = laneDataList[5]['notes']
+    #         if len(laneDataList) == 7:
+    #             new_dates = laneDataList[6]['new_dates']
+    #         else:
+    #             new_dates = ""
+
+    #         newLaneDict['item_name'] = int(item_name)
+    #         newLaneDict['stock'] = int(stocky)
+    #         newLaneDict['removed'] = int(removed)
+    #         newLaneDict['sold'] = int(sold)
+    #         newLaneDict['added'] = int(added)
+    #         newLaneDict['notes'] = int(notes)
+    #         newLaneDict['new_dates'] = int(new_dates)
+    #     print(newDict)
+
+    #     shit.data = json.dumps(newDict)
+    #     shit.save()
+
+
+
+
+    # Get the latest stock entry per item (if available)
+    latest_stock = (
+        item_stock_model.objects
+        .filter(itemChoice=OuterRef('pk'))
+        .order_by('-date_updated')  # Get the most recent stock entry
+    )
+    latest_qty = (
+        home_inventory_model.objects
+        .filter(item=OuterRef('pk'))
+        .values('quantity')[:1]
+    )
+    # Query all items, attaching latest stock details (or default values)
+    inventory = item_data_model.objects.annotate(
+        latest_qty=Subquery(latest_qty, output_field=models.IntegerField()),
+        latest_exp_date=Subquery(latest_stock.values('exp_date')[:1], output_field=models.DateField())
+    ).order_by('itemPrimaryType', 'itemSecondaryType', 'itemID')
+    print(inventory.values()[0])
+
+
+
+    # Organizing data into a structured format
+    categorized_inventory = {}
+    for item in inventory:
+        primary_type = item.itemPrimaryType
+        secondary_type = item.itemSecondaryType
+
+        if primary_type not in categorized_inventory:
+            categorized_inventory[primary_type] = {}
+
+        if secondary_type not in categorized_inventory[primary_type]:
+            categorized_inventory[primary_type][secondary_type] = [item]
+
+
+
+
+
+
+
+    newShit = item_data_model.objects.all().order_by('itemID')
+    newShit = newShit.filter(itemPrimaryType="drinks")
+    print(categorized_inventory)
+
     for snack in itemDatabase:
-        print(snack)
+        #print(snack)
         match = False
         addingStock = 0
         closestExp = 'n/a'
@@ -26,23 +123,32 @@ def view_snacks_view(request):
                     closestExp = stock.exp_date
         addedToMachine = 0
         for inventory in inventoryQuery:
-            machineLayout = json.loads(inventory.data)
+            machineLayout = inventory.data
             for x in machineLayout:
-                itemName = machineLayout[x][0]['item_name']
-                itemsAdded = int(machineLayout[x][4]['added'])
+                itemName = machineLayout[x]['item_name']
+                itemsAdded = int(machineLayout[x]['added'])
                 if itemName == snack.name:
                     addedToMachine += itemsAdded
         stockLeft = addingStock - addedToMachine
         snackStockList.append((snack, stockLeft, closestExp))
-        print(match)
-    print(snackStockList)
+        #print(match)
+    #print(snackStockList)
     
     return render(request, 'snacks/view_snacks.html',{
         'itemDatabase': itemDatabase, 
         'stockDatabase': stockDatabase,
-        'snackStockList': snackStockList
+        'snackStockList': snackStockList,
+        'categorized_inventory': categorized_inventory
     })
     
+def view_individual_snack_view(request, itemID):
+    item_data_query = item_data_model.objects.get(itemID=itemID)
+    machines_with_item = find_machines_with_item(itemID)
+    return render(request, 'snacks/view_individual_snack.html',{
+        'item': item_data_query,
+        'machines': machines_with_item
+
+    })
 
 @lock
 def add_snack_view(request):
@@ -71,8 +177,99 @@ def add_stock_view(request, itemID):
         data = request.POST
         formData = item_stock_form(data)
         if formData.is_valid():
-            formData.save()
+            A = formData.save()
+            at_home_stock_for_item = home_inventory_model.objects.get(item__itemID=itemID)
+            change = int(A.qty_per_unit) * int(A.qty_of_units)
+            at_home_stock_for_item.update_stock(change, "Restocked")
             return redirect('view_snacks')
     return render(request, 'snacks/add_stock.html',{
         'snackDataForm': form
     })
+
+def get_statistics(request):
+    # Extract parameters from the request
+    timeframe = request.GET.get("timeframe", "alltime")
+    selected_option = request.GET.get("selectedOption", None)
+    machine = request.GET.get("machine", "all")
+    itemID = request.GET['itemID']
+
+    # Define a filter dictionary
+    filters = {}
+
+    # # Filter by machine if not "all"
+    # if machine != "all":
+    #     filters["id_tag"] = machine
+
+    # Get the current date
+    today = datetime.date.today()
+
+    # Timeframe filtering
+    if timeframe == "weekly":
+        week_start = today - datetime.timedelta(days=today.weekday())
+        week_end = week_start + datetime.timedelta(days=6)
+        filters["date__range"] = [week_start, week_end]
+
+    elif timeframe == "monthly":
+        if selected_option:
+            month = int(selected_option.split("month")[1])  # Extract month number
+            filters["date__year"] = today.year
+            filters["date__month"] = month
+
+    elif timeframe == "annual":
+        if selected_option:
+            year = int(selected_option.split("year")[1])  # Extract year number
+            filters["date__year"] = year
+
+    # Total Cost Query and Calc
+    filters2 = {'date_updated'+k[4:] if k[:4] == 'date' else k: v for k, v in filters.items()}
+    print(filters2)
+    total_cost = (
+        item_stock_model.objects
+        .filter(itemChoice__itemID=itemID, **filters2)
+        .annotate(product=F('cost_per_unit') * F('qty_of_units'))
+        .aggregate(total=Sum('product'))['total'] or 0
+    )
+
+    # Total Sold Query adn Amount
+    machines_with_item = find_machines_with_item(itemID)
+    total_sold = 0
+    # Query all relevant inventory records
+    
+    inventory_records = inventory_sheets_model.objects.filter(**filters, **({"id_tag__id_tag": machine} if machine != "all" else {}))
+ 
+    for record in inventory_records:
+        try:
+            record_data = record.data  # JSONField (already a dict)
+            # Loop through machines and lanes to find sold values
+            for machine_info in machines_with_item:
+                machine_id = machine_info["machine"]
+                lane = machine_info["lane"]  # Dynamic lane key
+                # Ensure the correct machine ID matches
+                if record.id_tag.id_tag == machine_id and lane in record_data:
+                    sold_value = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
+                    total_sold += sold_value
+
+        except (json.JSONDecodeError, KeyError, ValueError):
+            continue  # Skip malformed data
+
+    # Query the database
+    data = inventory_sheets_model.objects.filter(**filters).aggregate(
+        #total_sold=Sum("data__sold"),  # Assuming `data` field stores JSON where `sold` exists
+        total_revenue=Sum("collected"),  # Modify this if revenue is calculated differently
+        total_loss=Sum("data__removed"),  # Modify this based on how you define losses
+    )
+    #print(total_sold2)
+    # Handle None values by defaulting to 0
+    response_data = {
+        "totalCost": total_cost or 0,
+        "totalSold": total_sold or 0,
+        "totalRevenue": data["total_revenue"] or 0,
+        "totalLoss": data["total_loss"] or 0,
+    }
+
+    return JsonResponse(response_data)
+
+
+
+
+

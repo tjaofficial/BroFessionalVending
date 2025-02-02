@@ -24,7 +24,7 @@
         <tr>
             <td>{{lane.0}}</td>
             <td class="c1">{{lane.1}}<input readonly type="hidden" name="item_{{lane.0}}" value="{{lane.1}}" style="width: 154px;" maxlength="30" required="" id="id_item_name_{{lane.0}}"></td>
-            <td style='display:none;'><input id="prev{{lane.0}}" type="number" style="width:44px;text-align:center;" value="{% if pastInventory %}{{ lane.2.1.stock|add:lane.2.4.added|add:lane.2.2.removed }}{% endif %}"></td>
+            <td style='display:none;'><input id="prev{{lane.0}}" type="number" style="width:44px;text-align:center;" value="{% if pastInventory %}{{ lane.2.stock|add:lane.2.added|add:lane.2.removed }}{% endif %}"></td>
             <td class="c2"><input oninput="autoAddSold(this)" type="number" name="stock_{{lane.0}}" style="width:44px;" maxlength="200" required="" id="id_stock_{{lane.0}}"></td>
             <td class="c3"><input readonly type="number" name="sold_{{lane.0}}" style="width:44px; background:#8080805c;" maxlength="200" required="" id="id_sold_{{lane.0}}"></td>
             <td class="c6"><input type="number" name="removed_{{lane.0}}" style="width:44px;" maxlength="200" required="" id="removed_{{lane.0}}"></td>

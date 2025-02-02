@@ -1,26 +1,118 @@
 {% extends "legacy_lineage/tenant_layout.html" %}{% load static %}
 {% block content %}
-<div>
-    <script defer src="{% static 'legacy_lineage/script/stripe_payment.js' %}"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="{% static 'legacy_lineage/style/stripe_payment.css' %}">
-    <div class="tenant-info">
-        <h2 style="margin-top: 0px;">Make A Payment: </h2>
-        <p><strong>Tenant Name:</strong> <span id="tenant-name"></span></p>
-        <p><strong>Email:</strong> <span id="tenant-email"></span></p>
-        <p><strong>Rent Amount:</strong> <span id="tenant-rent"></span></p>
-        <p><strong>Due Date:</strong> <span id="tenant-due-date"></span></p>
+<script defer src="{% static 'legacy_lineage/script/stripe_payment.js' %}"></script>
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/stripe_payment.css' %}">
+<div class="payment-container">
+    <!-- Account Snapshot Section -->
+    <div class="account-snapshot" style="height: 7rem;">
+      <h2>Account Snapshot</h2>
+      <p class="balance">$0.00</p>
+      <p class="description">Current Due (Includes past due, deposits)</p>
     </div>
 
-    <form id="payment-form">
-        <div id="card-element"></div>
-        <label>
-            <input type="checkbox" id="autopay" />
-            Enable Auto-Pay
-        </label>
-        <button id="submit">Pay Rent</button>
-    </form>
+    <!-- Payment Form Section -->
+    <div class="payment-form" style="width: 38rem;">
+      <h2>Make a One-Time Payment</h2>
 
-    <div id="payment-result"></div>
-</div>
+      <!-- Payment Method -->
+      <div class="payment-method-section">
+        <!-- Header -->
+        <div class="section-header" onclick="toggleDropdown('payment-method-content')">
+          <div class="header-left" style="display: flex; width: 100%;">
+            <span>Payment Method</span>
+            <div class="selected-method" style="flex-direction: column; width: 64%;">
+                {% comment %} <svg alt="Visa Logo" height="512px" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="形状_1_3_" style="enable-background:new    ;"><g id="形状_1"><g><path d="M211.328,184.445l-23.465,144.208h37.542l23.468-144.208     H211.328z M156.276,184.445l-35.794,99.185l-4.234-21.358l0.003,0.007l-0.933-4.787c-4.332-9.336-14.365-27.08-33.31-42.223     c-5.601-4.476-11.247-8.296-16.705-11.559l32.531,124.943h39.116l59.733-144.208H156.276z M302.797,224.48     c0-16.304,36.563-14.209,52.629-5.356l5.357-30.972c0,0-16.534-6.288-33.768-6.288c-18.632,0-62.875,8.148-62.875,47.739     c0,37.26,51.928,37.723,51.928,57.285c0,19.562-46.574,16.066-61.944,3.726l-5.586,32.373c0,0,16.763,8.148,42.382,8.148     c25.616,0,64.272-13.271,64.272-49.37C355.192,244.272,302.797,240.78,302.797,224.48z M455.997,184.445h-30.185     c-13.938,0-17.332,10.747-17.332,10.747l-55.988,133.461h39.131l7.828-21.419h47.728l4.403,21.419h34.472L455.997,184.445z      M410.27,277.641l19.728-53.966l11.098,53.966H410.27z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#005BAC;"/></g></g></g><g id="形状_1_2_" style="enable-background:new    ;"><g id="形状_1_1_"><g><path d="M104.132,198.022c0,0-1.554-13.015-18.144-13.015H25.715     l-0.706,2.446c0,0,28.972,5.906,56.767,28.033c26.562,21.148,35.227,47.51,35.227,47.51L104.132,198.022z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#F6AC1D;"/></g></g></g></svg> {% endcomment %}
+              <span style="font-weight: normal;">Main Card</span>
+              <span style="font-weight: normal;">Ending in 1918</span>
+            </div>
+          </div>
+          <div class="header-right">
+            <span>&#9660;</span> <!-- Dropdown Arrow -->
+          </div>
+        </div>
+      
+        <!-- Content -->
+        <div class="dropdown-content" id="payment-method-content">
+          <!-- Rewards Section -->
+          <div class="rewards-section">
+            <p>Eligible for maximum Rewards</p>
+          </div>
+      
+          <!-- Payment Options -->
+          <div class="payment-options">
+            <label>
+              <input type="radio" name="payment-method" value="card" checked />
+              <div class="payment-option">
+                <img src="https://via.placeholder.com/20x12" alt="Visa Logo" />
+                <span>Main Card Ending in 1918</span>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="payment-method" value="cash" />
+              <div class="payment-option">
+                <img src="https://via.placeholder.com/20x12" alt="Cash Logo" />
+                <span>Pay by Cash</span>
+              </div>
+            </label>
+          </div>
+      
+          <!-- Add New Payment -->
+          <div class="add-new-payment">
+            <button onclick="addPaymentMethod()">+ Add New Payment Account</button>
+          </div>
+      
+          <!-- Accepted Payment Icons -->
+          <div class="payment-icons">
+            <img src="https://via.placeholder.com/40x20" alt="Visa" />
+            <img src="https://via.placeholder.com/40x20" alt="MasterCard" />
+            <img src="https://via.placeholder.com/40x20" alt="Amex" />
+            <img src="https://via.placeholder.com/40x20" alt="Discover" />
+            <img src="https://via.placeholder.com/40x20" alt="UnionPay" />
+            <img src="https://via.placeholder.com/40x20" alt="Check" />
+          </div>
+        </div>
+      </div>
+      
+
+      <!-- Payment Amount -->
+      <div class="dropdown">
+        <div class="dropdown-header" onclick="toggleDropdown('payment-amount')">
+          <p>Payment Amount</p>
+          <span>&#9660;</span>
+        </div>
+        <div class="dropdown-content" id="payment-amount">
+          <label>
+            <input type="radio" name="payment-amount" value="full" checked />
+            Current Due + Prepay Upcoming ($1,290.00)
+          </label>
+          <label>
+            <input type="radio" name="payment-amount" value="other" />
+            Other Amount
+            <input type="number" placeholder="Enter amount" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Payment Date -->
+      <div class="dropdown">
+        <div class="dropdown-header" onclick="toggleDropdown('payment-date')">
+          <p>Payment Date</p>
+          <span>&#9660;</span>
+        </div>
+        <div class="dropdown-content" id="payment-date">
+          <input type="date" id="payment-date-input" />
+        </div>
+      </div>
+
+      <!-- Security Code -->
+      <div class="security-code">
+        <label for="security-code">Security Code</label>
+        <input type="text" id="security-code" placeholder="Enter CVV" />
+      </div>
+
+      <button id="pay-button" onclick="submitPayment()">Review Payment</button>
+    </div>
+  </div>
+
+  <script src="payment.js"></script>
 {% endblock %}

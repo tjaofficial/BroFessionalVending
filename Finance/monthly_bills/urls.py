@@ -22,7 +22,10 @@ urlpatterns = [
     path("view_snacks", views.view_snacks_view, name="view_snacks"),
     path("add_stock/<str:itemID>", views.add_stock_view, name="add_stock"),
     path("<str:machineID>/build", views.machine_build_view, name="machine_build"),
-    
+    path("view_snacks/item/<str:itemID>", views.view_individual_snack_view, name="view_individual_snack"),
+    path("api/get-statistics/", views.get_statistics, name="get-statistics"),
+
+
     path("vending", views.vending_dashboard, name="vendDash"),
     path("fleet", views.fleet, name="fleet"),
     path("addFleet/<str:selector>", views.add_fleet, name="addFleet"),

@@ -3,14 +3,95 @@
 <link href="{% static 'style/header.css' %}" rel="stylesheet">
 <link href="{% static 'style/machine_options.css' %}" rel="stylesheet">
 <script defer src="{% static 'script/add_sold.js' %}"></script>
-<style>
+{% comment %} <style>
     tr{
         height: 50px;
     }
     td{
         padding-left: 5px;
     }
+</style> {% endcomment %}
+<style>
+    .tableHeaderGray{
+        font-size: 11px;
+        padding: 3px;
+        text-align: center;
+    }
+    .catContainer{
+
+    }
+    .subCatContainer{
+        margin-left: 30px;
+    }
+    table {
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+    .category {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    .subcategory {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .clickable-row {
+        cursor: pointer;
+    }
+    .clickable-row:hover {
+        background-color: #f1f1f1;
+    }
 </style>
+<div style="padding: 50px">
+    <h1>Inventory</h1>
+    {% for primaryCat, subCatData in categorized_inventory.items%}
+        <div class="catContainer">
+            <div class="category">{{primaryCat|upper}}</div>
+            {% for secondaryCat, itemData in subCatData.items %}
+            <div class="subCatContainer">
+                <div class="subcategory">{{secondaryCat|upper}}</div>
+                <table>
+                    <tr>
+                        <th class="tableHeaderGray" style="width: 75px;">item id</th>
+                        <th class="tableHeaderGray" style="width: 221px;">name</th>
+                        <th class="tableHeaderGray" style="width: 30px;">qty</th>
+                        <th class="tableHeaderGray" style="width: 135px;">exp date</th>
+                    </tr>
+                    {% for item in itemData %}
+                    <tr class="clickable-row" data-id="{{item.itemID}}">
+                        <td>{{item.itemID}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.latest_qty}}</td>
+                        <td>{{item.latest_exp_date}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rows = document.querySelectorAll(".clickable-row");
+            rows.forEach(row => {
+                row.addEventListener("click", function () {
+                    const itemId = this.getAttribute("data-id");
+                    window.location.href = `view_snacks/item/${itemId}`;
+                });
+            });
+        });
+    </script>
+</div>
 <div style="margin-top: 67px;">
     <table style="margin: auto;">
         <tr style="height: 25px;">
