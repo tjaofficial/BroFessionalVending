@@ -189,8 +189,8 @@ def get_statistics(request):
                 # Ensure the correct machine ID matches
                 if record.id_tag.id_tag == machine_id and lane in record_data:
                     sold_qty = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
-                    sold_price = machine_info['cost']
-                    total_revenue += (int(sold_price) * int(sold_qty))
+                    sold_price = float(machine_info['cost'])
+                    total_revenue += (sold_price * sold_qty)
                     total_sold += sold_qty
                     sales_data.append({"date": str(record.date), "sold": sold_qty, "amount":(sold_price * sold_qty)})
         except (json.JSONDecodeError, KeyError, ValueError):
