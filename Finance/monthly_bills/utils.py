@@ -28,10 +28,13 @@ def find_machines_with_item(itemID):
 
             for lane, details in slot_dict.items():
                 if details.get("itemID") == itemID:
+                    print(machine)
+                    print(details.get("cost", 1.50))
                     machines_with_item.append({
                         "machine": str(machine.machineChoice),
                         "date": str(machine.date),
                         "lane": lane,  # Store the lane where the itemID was found
+                        "cost": details.get("cost", 1.50)
                     })
         except Exception as e:
             print(f"Error processing machine {machine}: {e}")

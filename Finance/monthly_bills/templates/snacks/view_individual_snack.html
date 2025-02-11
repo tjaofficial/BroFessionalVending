@@ -1,24 +1,33 @@
 {% extends "snacks/components/product_layout.html" %}
 {% block content %}{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: #f4f4f9;
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #1e1e2f, #3b3b58);
+        color: white;
     }
     .container {
         max-width: 900px;
-        margin: auto;
-        background: white;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.1);
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     }
-    h1 {
+    h1, h2 {
         text-align: center;
+        font-weight: 600;
     }
     .section {
         margin-bottom: 30px;
+        padding: 15px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
     }
     .section-header {
         display: flex;
@@ -26,16 +35,63 @@
         align-items: center;
     }
     .button {
-        padding: 8px 12px;
-        background: #007bff;
+        padding: 10px 15px;
+        background: #ff4b5c;
         color: white;
         border: none;
         cursor: pointer;
         border-radius: 5px;
+        transition: 0.3s;
     }
     .button:hover {
-        background: #0056b3;
+        background: #ff1e42;
     }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        text-align: center;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .stat-card h3 {
+        font-size: 18px;
+        margin: 0;
+        color: #ff4b5c;
+    }
+    .stat-card span {
+        font-size: 22px;
+        font-weight: bold;
+        display: block;
+        margin-top: 5px;
+    }
+    .filters {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .filters select {
+        padding: 8px;
+        border-radius: 5px;
+        border: none;
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        font-weight: bold;
+    }
+
+
+
+
+
+
+
+
     .modal {
         display: none;
         position: fixed;
@@ -52,26 +108,49 @@
         padding: 20px;
         border-radius: 10px;
         width: 400px;
+        color: black;
     }
     .tabs {
         display: flex;
-        gap: 10px;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
     }
     .tab {
         cursor: pointer;
-        padding: 10px;
-        background: #ddd;
-        border-radius: 5px;
+        padding: 12px 20px;
+        background: #3b3b58;
+        color: white;
+        border-radius: 8px;
+        transition: 0.3s;
     }
     .tab.active {
-        background: #007bff;
-        color: white;
+        background: #ff4b5c;
     }
     .graph-container {
         display: none;
+        text-align: center;
     }
     .graph-container.active {
         display: block;
+    }
+    table {
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        text-align: center;
+    }
+    th {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    tr:hover{
+        background-color: rgb(0 0 0 / 35%);
     }
 </style>
 <div class="container">
@@ -87,31 +166,68 @@
         <p><strong>Primary Type:</strong> {{item.itemPrimaryType|capfirst}}</p>
         <p><strong>Secondary Type:</strong> {{item.itemSecondaryType|capfirst}}</p>
         <p><strong>Status:</strong> <input type="checkbox" id="status-toggle" {% if item.discontinued %}checked{% endif %}></p>
-        <a href="{% url 'add_stock' item.itemID %}"><button class="button">Add Stock</button></a>
+        <a href="{% url 'add_stock' item.itemID %}">
+            <button class="button">Add Stock</button>
+        </a>
+        <a href="#">
+            <button class="button">Expired Stock</button>
+        </a>
     </div>
     
-    <!-- Section 2: Statistics -->
+
+    <!-- Section 2: Improved Statistics Display -->
     <div class="section">
         <div class="section-header">
             <h2>Statistics</h2>
+        </div>
+        <div class="filters">
             <select id="timeframe" onchange="updateTimeframeOptions()">
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
                 <option value="annual">Annual</option>
                 <option value="alltime">All-Time</option>
             </select>
+            <select id="year-selector" style="display: none;"></select>
             <select id="timeframe-options"></select>
             <select id="machine-selector">
                 <option value="all">All Machines</option>
-                {% for machine in machines%}
-                    <option value="{{machine.machine}}">{{machine.machine}}</option>
+                {% for machine in machines %}
+                    <option value="{{ machine.machine }}">{{ machine.machine }}</option>
                 {% endfor %}
             </select>
         </div>
-        <p><strong>Total Cost:</strong> <span id="total-cost">$500</span></p>
-        <p><strong>Total Sold:</strong> <span id="total-sold">200 units</span></p>
-        <p><strong>Total Revenue:</strong> <span id="total-revenue">$800</span></p>
-        <p><strong>Total Loss:</strong> <span id="total-loss">$50</span></p>
+        <div class="stats-container">
+            <div>
+                <div class="stat-card" style="margin-bottom: 15px;">
+                    <h3>Total Cost ($)</h3>
+                    <span id="total-cost">TBD</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Bought (Qty)</h3>
+                    <span id="total-bought">TBD</span>
+                </div>
+            </div>
+            <div>
+                <div class="stat-card" style="margin-bottom: 15px;">
+                    <h3>Total Revenue ($)</h3>
+                    <span id="total-revenue">TBD</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Sold (Qty)</h3>
+                    <span id="total-sold">TBD</span>
+                </div>
+            </div>
+            <div>
+                <div class="stat-card" style="margin-bottom: 15px;">
+                    <h3>Total Loss ($)</h3>
+                    <span id="total-loss">TBD</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Loss (Qty)</h3>
+                    <span id="total-loss-qty">TBD</span>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Section 3: Graphs -->
@@ -122,13 +238,45 @@
             <div class="tab" onclick="showGraph('revenue')">Revenue</div>
             <div class="tab" onclick="showGraph('cost')">Cost</div>
         </div>
-        <div id="quantity" class="graph-container active">[Graph: Quantity Sold]</div>
+        <div id="quantity" class="graph-container active">
+            <canvas id="quantitySoldChart" style="background-color: white; height: 350px;"></canvas>        
+        </div>
         <div id="revenue" class="graph-container">[Graph: Revenue]</div>
         <div id="cost" class="graph-container">[Graph: Cost]</div>
+    </div>
+
+    <!-- Section 4: Transactions Table -->
+    <div class="section" style="justify-items: anchor-center;">
+        <h2>Purchase Transactions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 112px;">Date Bought</th>
+                    <th style="width: 280px;">Vendor</th>
+                    <th style="width: 62px;">Qty/Unit</th>
+                    <th style="width: 44px;">Qty</th>
+                    <th style="width: 72px;">Cost/Unit</th>
+                    <th style="width: 115px;">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase in transactions %}
+                <tr>
+                    <td>{{purchase.date_updated}}</td>
+                    <td>{{purchase.vendor}}</td>
+                    <td>{{purchase.qty_per_unit}}</td>
+                    <td>{{purchase.qty_of_units}}</td>
+                    <td>${{purchase.cost_per_unit|floatformat:"2"}}</td>
+                    <td>${{purchase.total_cost|floatformat:"2"}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
+    let quantitySoldChart;
     function openModal() {
         document.getElementById('editModal').style.display = 'flex';
     }
@@ -144,22 +292,41 @@
     function updateTimeframeOptions() {
         let timeframe = document.getElementById('timeframe').value;
         let options = document.getElementById('timeframe-options');
+        let yearSelector = document.getElementById('year-selector');
+    
         options.innerHTML = "";
+        yearSelector.innerHTML = "";
+        yearSelector.style.display = "none"; // Hide by default
+    
         if (timeframe === "weekly") {
             for (let i = 1; i <= 52; i++) {
                 options.innerHTML += `<option value="week${i}">Week ${i}</option>`;
             }
         } else if (timeframe === "monthly") {
+            // Show the year selector
+            yearSelector.style.display = "inline-block";
+            
+            // Populate months
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             months.forEach((month, index) => {
                 options.innerHTML += `<option value="month${index+1}">${month}</option>`;
             });
+    
+            // Populate years dynamically
+            let currentYear = new Date().getFullYear();
+            for (let year = 2022; year <= currentYear; year++) {
+                yearSelector.innerHTML += `<option value="year${year}">${year}</option>`;
+            }
         } else if (timeframe === "annual") {
-            for (let year = 2022; year <= new Date().getFullYear(); year++) {
+            // Populate years
+            yearSelector.style.display = "inline-block";
+            let currentYear = new Date().getFullYear();
+            for (let year = 2022; year <= currentYear; year++) {
                 options.innerHTML += `<option value="year${year}">${year}</option>`;
             }
         }
     }
+    
     document.getElementById("timeframe").addEventListener("change", updateStatistics);
     document.getElementById("timeframe-options").addEventListener("change", updateStatistics);
     document.getElementById("machine-selector").addEventListener("change", updateStatistics);
@@ -168,23 +335,32 @@
         let timeframe = document.getElementById("timeframe").value;
         let selectedOption = document.getElementById("timeframe-options").value;
         let machine = document.getElementById("machine-selector").value;
-
+        let year = document.getElementById("year-selector").value; // Get the selected year
+    
+        let queryParams = `/api/get-statistics/?timeframe=${timeframe}&selectedOption=${selectedOption}&machine=${machine}&itemID={{item.itemID}}`;
+    
+        // Append the year if "Monthly" or "Annual" is selected
+        if (timeframe === "monthly" || timeframe === "annual") {
+            queryParams += `&year=${year}`;
+        }
+    
         try {
-            // Fetch data from the API
-            let response = await fetch(`/api/get-statistics/?timeframe=${timeframe}&selectedOption=${selectedOption}&machine=${machine}&itemID={{item.itemID}}`);
+            let response = await fetch(queryParams);
             let data = await response.json();
-
+    
             // Update the statistics section dynamically
             document.getElementById("total-cost").innerText = `$${data.totalCost}`;
             document.getElementById("total-sold").innerText = `${data.totalSold} units`;
             document.getElementById("total-revenue").innerText = `$${data.totalRevenue}`;
             document.getElementById("total-loss").innerText = `$${data.totalLoss}`;
-
+            document.getElementById("total-bought").innerText = `${data.totalBought} units`;
+    
+            // Update Chart Data
+            updateQuantitySoldChart(data.sales_over_time);
         } catch (error) {
             console.error("Error fetching statistics:", error);
         }
     }
-
 
     // Mock function simulating data fetch (replace with real API call)
     function fetchStatisticsData(timeframe, selectedOption, machine) {
@@ -203,8 +379,43 @@
         document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
         document.getElementById(graphId).classList.add('active');
         event.target.classList.add('active');
-        updateData();
+        updateStatistics();
     }
+    updateStatistics();
 
+    // Function to generate the Quantity Sold Chart
+    function updateQuantitySoldChart(salesData) {
+        let ctx = document.getElementById("quantitySoldChart").getContext("2d");
+
+        let labels = salesData.map(entry => entry.date);  // Extract dates
+        let salesValues = salesData.map(entry => entry.sold); // Extract sold quantity
+
+        if (quantitySoldChart) {
+            quantitySoldChart.destroy(); // Destroy existing chart before creating a new one
+        }
+
+        quantitySoldChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Quantity Sold",
+                    data: salesValues,
+                    backgroundColor: "rgba(255, 75, 92, 0.2)",
+                    borderColor: "#ff4b5c",
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: "Date" } },
+                    y: { title: { display: true, text: "Units Sold" }, beginAtZero: true }
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}

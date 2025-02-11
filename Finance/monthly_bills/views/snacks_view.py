@@ -68,10 +68,17 @@ def view_snacks_view(request):
     
 def view_individual_snack_view(request, itemID):
     item_data_query = item_data_model.objects.get(itemID=itemID)
+    item_stock_query = (
+        item_stock_model.objects
+        .filter(itemChoice__itemID=itemID)
+        .order_by("-date_updated")  # Order by most recent first
+        .annotate(total_cost=F("qty_of_units") * F("cost_per_unit"))  # Multiply fields
+    )
     machines_with_item = find_machines_with_item(itemID)
     return render(request, 'snacks/view_individual_snack.html',{
         'item': item_data_query,
-        'machines': machines_with_item
+        'machines': machines_with_item,
+        'transactions': item_stock_query
 
     })
 
@@ -146,7 +153,7 @@ def get_statistics(request):
             filters["date__year"] = year
 
     # Total Cost Query and Calc
-    filters2 = {'date_updated'+k[4:] if k[:4] == 'date' else k: v for k, v in filters.items()}
+    filters2 = {'date_updated'+ k[4:] if k[:4] == 'date' else k: v for k, v in filters.items()}
     print(filters2)
     total_cost = (
         item_stock_model.objects
@@ -155,9 +162,19 @@ def get_statistics(request):
         .aggregate(total=Sum('product'))['total'] or 0
     )
 
+    total_bought = (
+        item_stock_model.objects
+        .filter(itemChoice__itemID=itemID, **filters2)
+        .annotate(product=F('qty_per_unit') * F('qty_of_units'))
+        .aggregate(total=Sum('product'))['total'] or 0
+    )
+
     # Total Sold Query adn Amount
     machines_with_item = find_machines_with_item(itemID)
+    lanes = [m["lane"] for m in machines_with_item]  # Extract lanes
     total_sold = 0
+    total_revenue = 0
+    sales_data = []
     # Query all relevant inventory records
     
     inventory_records = inventory_sheets_model.objects.filter(**filters, **({"id_tag__id_tag": machine} if machine != "all" else {}))
@@ -171,9 +188,11 @@ def get_statistics(request):
                 lane = machine_info["lane"]  # Dynamic lane key
                 # Ensure the correct machine ID matches
                 if record.id_tag.id_tag == machine_id and lane in record_data:
-                    sold_value = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
-                    total_sold += sold_value
-
+                    sold_qty = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
+                    sold_price = machine_info['cost']
+                    total_revenue += (sold_price * sold_qty)
+                    total_sold += sold_qty
+                    sales_data.append({"date": str(record.date), "sold": sold_qty, "amount":(sold_price * sold_qty)})
         except (json.JSONDecodeError, KeyError, ValueError):
             continue  # Skip malformed data
 
@@ -183,13 +202,35 @@ def get_statistics(request):
         total_revenue=Sum("collected"),  # Modify this if revenue is calculated differently
         total_loss=Sum("data__removed"),  # Modify this based on how you define losses
     )
-    #print(total_sold2)
-    # Handle None values by defaulting to 0
+    
+    # Get the correct time range
+    today = datetime.date.today()
+    if timeframe == "weekly":
+        start_date = today - datetime.timedelta(days=today.weekday())  # Start of the week
+    elif timeframe == "monthly":
+        start_date = datetime.date(today.year, int(selected_option.replace("month", "")), 1)
+    elif timeframe == "annual":
+        start_date = datetime.date(int(selected_option.replace("year", "")), 1, 1)
+    else:
+        start_date = datetime.date(2022, 1, 1)  # All-time data since 2022
+
+    filters["date__gte"] = start_date  # Filter transactions from this date onward
+
+    # Get sales data
+    # sales_data = (
+    #     inventory_records
+    #     .values("date")
+    #     .annotate(sold=Sum("data__sold"))
+    #     .order_by("date")
+    # )
+    print(list(sales_data))
     response_data = {
         "totalCost": total_cost or 0,
         "totalSold": total_sold or 0,
-        "totalRevenue": data["total_revenue"] or 0,
+        "totalRevenue": total_revenue or 0,
         "totalLoss": data["total_loss"] or 0,
+        "totalBought": total_bought or 0,
+        "sales_over_time": list(sales_data)
     }
 
     return JsonResponse(response_data)
