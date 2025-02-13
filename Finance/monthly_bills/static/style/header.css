@@ -5,8 +5,12 @@
     justify-content: center;
     margin-top: 20px;
 }
-body{
-    margin: 0px;
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #1e1e2f, #3b3b58);
+    color: white;
 }
 .rightGap{
     margin-right: 1rem;

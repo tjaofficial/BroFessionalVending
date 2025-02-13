@@ -5,23 +5,25 @@
 <div style='margin-top:4rem;text-align:center;'>
     Cash Collected: ${{totalCollected|floatformat:2}}<br><br>
     <table id="logList" class='mainTable'>
-        <tr>
-            <th colspan=7 style='text-align:center;padding:5px;'>Inventory Logs</th>
-        </tr>
-        <tr>
-            <th class='c1'>Date</th>
-            <th class='c2'>Technician</th>
-            <th class='c3'>Start Time</th>
-            <th class='c4'>Stop Time</th>
-            <th class='c5'>Condition</th>
-            <th class='c6'>Collected</th>
-            <th class='c7'>Notes</th>
-        </tr>
+        <thead>
+            <tr>
+                <th colspan=7 style='text-align:center;padding:5px;'>Inventory Logs</th>
+            </tr>
+            <tr>
+                <th class='c1'>Date</th>
+                <th class='c2'>Technician</th>
+                <th class='c3'>Start Time</th>
+                <th class='c4'>Stop Time</th>
+                <th class='c5'>Condition</th>
+                <th class='c6'>Collected</th>
+                <th class='c7'>Notes</th>
+            </tr>
+        </thead>
         
         {% for log in dataAll %}
             {% if log.2 == 'inventory' %}
-                <tr class="logLine">
-                    <td class='c1'><a href="{% url 'viewInventory' type id_tag log.1.date %}">{{log.1.date}}</a></td>
+            <tr class="logLine" onclick="window.location.href='{% url 'viewInventory' type id_tag log.1.date %}';">
+                    <td class='c1'>{{log.1.date}}</td>
                     <td class='c2'>{{log.1.technician}}</td>
                     <td class='c3'>{{log.1.time_start}}</td>
                     <td class='c4'>{{log.1.time_end}}</td>
@@ -31,7 +33,7 @@
                 </tr>
             {% else %}
                 <tr class="logLine">
-                    <td class='c1'><a href="{% url 'viewInventory' type id_tag log.1.date %}">{{log.1.date}}</a></td>
+                    <td class='c1'>{{log.1.date}}</td>
                     <td class='c2' style="background: black;"></td>
                     <td class='c3' style="background: black;"></td>
                     <td class='c4' style="background: black;"></td>
@@ -41,15 +43,6 @@
                 </tr>
             {% endif %}
         {% endfor%}
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td style="text-align:right;">Cash Collected:</td>
-            <td style="text-align:center;"></td>
-            <td></td>
-        </tr>
     </table>
 </div>
 {% endblock %}

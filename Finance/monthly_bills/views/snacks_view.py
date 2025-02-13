@@ -124,36 +124,80 @@ def get_statistics(request):
     selected_option = request.GET.get("selectedOption", None)
     machine = request.GET.get("machine", "all")
     itemID = request.GET['itemID']
-
+    year = request.GET.get("year", None)
+    print(request.GET)
     # Define a filter dictionary
     filters = {}
-
-    # # Filter by machine if not "all"
-    # if machine != "all":
-    #     filters["id_tag"] = machine
 
     # Get the current date
     today = datetime.date.today()
 
     # Timeframe filtering
+    if selected_option:
+        year = int(year.replace("year", ""))
+        if timeframe == "monthly":
+                month = int(selected_option.replace("month", ""))  # Extract month number
+                filters["date__year"] = year # Use correct year filtering
+                filters["date__month"] = month
+        elif timeframe == "annual":
+            if year:
+                filters["date__year"] = year
+
+    # Apply machine filtering
+    if machine != "all":
+        filters["id_tag__id_tag"] = machine
+
+    # Get the correct time range
+    today = datetime.date.today()
     if timeframe == "weekly":
-        week_start = today - datetime.timedelta(days=today.weekday())
-        week_end = week_start + datetime.timedelta(days=6)
-        filters["date__range"] = [week_start, week_end]
-
+        start_date = today - datetime.timedelta(days=today.weekday())  # Start of the week
     elif timeframe == "monthly":
-        if selected_option:
-            month = int(selected_option.split("month")[1])  # Extract month number
-            filters["date__year"] = today.year
-            filters["date__month"] = month
-
+        start_date = datetime.date(today.year, int(selected_option.replace("month", "")), 1)
     elif timeframe == "annual":
-        if selected_option:
-            year = int(selected_option.split("year")[1])  # Extract year number
-            filters["date__year"] = year
+        start_date = datetime.date(int(selected_option.replace("year", "")), 1, 1)
+    else:
+        start_date = datetime.date(2022, 1, 1)  # All-time data since 2022
+
+    filters["date__gte"] = start_date  # Filter transactions from this date onward
+
+    print(f"DEBUG: Filters applied: {filters}")  # Debugging statement
+
+    # Process total cost, revenue, sold items, etc.
+    machines_with_item = find_machines_with_item(itemID)
+    print(machines_with_item)
+    total_sold = 0
+    total_revenue = 0
+    total_loss_qty = 0
+    total_loss = 0
+    sales_data = []
+    # Query all relevant inventory records
+    
+    inventory_records = inventory_sheets_model.objects.filter(**filters)
+ 
+    for record in inventory_records:
+        try:
+            record_data = record.data  # JSONField (already a dict)
+
+            # Get only the lanes that contain the specific item
+            relevant_lanes = [m["lane"] for m in machines_with_item if m["machine"] == record.id_tag.id_tag]
+
+            for lane in relevant_lanes:
+                if lane in record_data:  # Check if this lane exists in record_data
+                    sold_qty = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
+                    sold_price = float(next(m["cost"] for m in machines_with_item if m["lane"] == lane and m["machine"] == record.id_tag.id_tag))
+                    loss_qty = int(record_data[lane].get("removed", 0))
+
+                    total_revenue += (sold_price * sold_qty)
+                    total_sold += sold_qty
+                    total_loss_qty += loss_qty
+                    total_loss += (sold_price * loss_qty)
+
+                    sales_data.append({"date": str(record.date), "sold": sold_qty, "amount": (sold_price * sold_qty)})
+        except (json.JSONDecodeError, KeyError, ValueError):
+            continue  # Skip malformed data
 
     # Total Cost Query and Calc
-    filters2 = {'date_updated'+ k[4:] if k[:4] == 'date' else k: v for k, v in filters.items()}
+    filters2 = {'date_updated'+ k[4:] if k[:4] == 'date' else k: v for k, v in filters.items() if k in ["date_updated", "exp_date", "itemChoice"]}
     print(filters2)
     total_cost = (
         item_stock_model.objects
@@ -169,33 +213,6 @@ def get_statistics(request):
         .aggregate(total=Sum('product'))['total'] or 0
     )
 
-    # Total Sold Query adn Amount
-    machines_with_item = find_machines_with_item(itemID)
-    lanes = [m["lane"] for m in machines_with_item]  # Extract lanes
-    total_sold = 0
-    total_revenue = 0
-    sales_data = []
-    # Query all relevant inventory records
-    
-    inventory_records = inventory_sheets_model.objects.filter(**filters, **({"id_tag__id_tag": machine} if machine != "all" else {}))
- 
-    for record in inventory_records:
-        try:
-            record_data = record.data  # JSONField (already a dict)
-            # Loop through machines and lanes to find sold values
-            for machine_info in machines_with_item:
-                machine_id = machine_info["machine"]
-                lane = machine_info["lane"]  # Dynamic lane key
-                # Ensure the correct machine ID matches
-                if record.id_tag.id_tag == machine_id and lane in record_data:
-                    sold_qty = int(record_data[lane].get("sold", 0))  # Get sold value for this lane
-                    sold_price = float(machine_info['cost'])
-                    total_revenue += (sold_price * sold_qty)
-                    total_sold += sold_qty
-                    sales_data.append({"date": str(record.date), "sold": sold_qty, "amount":(sold_price * sold_qty)})
-        except (json.JSONDecodeError, KeyError, ValueError):
-            continue  # Skip malformed data
-
     # Query the database
     data = inventory_sheets_model.objects.filter(**filters).aggregate(
         #total_sold=Sum("data__sold"),  # Assuming `data` field stores JSON where `sold` exists
@@ -203,18 +220,7 @@ def get_statistics(request):
         total_loss=Sum("data__removed"),  # Modify this based on how you define losses
     )
     
-    # Get the correct time range
-    today = datetime.date.today()
-    if timeframe == "weekly":
-        start_date = today - datetime.timedelta(days=today.weekday())  # Start of the week
-    elif timeframe == "monthly":
-        start_date = datetime.date(today.year, int(selected_option.replace("month", "")), 1)
-    elif timeframe == "annual":
-        start_date = datetime.date(int(selected_option.replace("year", "")), 1, 1)
-    else:
-        start_date = datetime.date(2022, 1, 1)  # All-time data since 2022
-
-    filters["date__gte"] = start_date  # Filter transactions from this date onward
+    
 
     # Get sales data
     # sales_data = (
@@ -228,9 +234,10 @@ def get_statistics(request):
         "totalCost": total_cost or 0,
         "totalSold": total_sold or 0,
         "totalRevenue": total_revenue or 0,
-        "totalLoss": data["total_loss"] or 0,
+        "totalLoss": -(total_loss) or 0,
         "totalBought": total_bought or 0,
-        "sales_over_time": list(sales_data)
+        "sales_over_time": list(sales_data),
+        "totalLoss_qty": total_loss_qty or 0
     }
 
     return JsonResponse(response_data)

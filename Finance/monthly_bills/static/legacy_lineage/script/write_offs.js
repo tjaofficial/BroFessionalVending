@@ -81,8 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
     editButtons1.forEach(button => {
         button.addEventListener('click', async (event) => {
             const writeoffId = event.target.getAttribute('data-id');
-            console.log(writeoffId)
-            const editWriteoffModal1 = document.getElementById('edit-writeoff-modal'+writeoffId);
+            console.log("Clicked Write-off ID:", writeoffId);
+
+            const editWriteoffModal1 = document.getElementById('edit-writeoff-modal' + writeoffId);
             const editForm = editWriteoffModal1.querySelector('form');
             const modalCloseButton = editWriteoffModal1.querySelector('.close-modal');
             // Fetch write-off data from the server

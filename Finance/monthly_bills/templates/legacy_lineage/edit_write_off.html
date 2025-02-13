@@ -3,7 +3,23 @@
     <h2>Edit Write-Off{{writeoff_id}}</h2>
     <form method="POST">
         {% csrf_token %}
-        {{ writeOffForm.as_p }}
+        <input id="id_transaction_type" type="hidden" value="Expense" name="transaction_type" >
+        <p>
+            <label for="id_category">Expense Category</label>
+            {{ expenseForm.category }}
+        </p>
+        <p>
+            <label for="id_amount">Amount ($)</label>
+            {{ expenseForm.amount }}
+        </p>
+        <p>
+            <label for="id_description">Description</label>
+            {{ expenseForm.description }}
+        </p>
+        <p>
+            <label for="id_date">Date of Expense</label>
+            {{ expenseForm.date }}
+        </p>
         <input type="hidden" name="writeOffId" value="{{writeoff_id}}" />
         <button type="submit" name="editButton" class="submit-btn">Update</button>
     </form>

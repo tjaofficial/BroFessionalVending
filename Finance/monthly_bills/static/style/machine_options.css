@@ -18,14 +18,19 @@ table{
     border-collapse: collapse;
 }
 th, td {
-    border:1px solid black;
+    border: 1px solid rgb(255 255 255 / 22%);
     border-collapse: collapse;
 }
 .mainTable{
     width:100%;
     max-width: 1069px;
     margin:auto;
-    background-color: #f1eace;
+    background-color: #ffffff42;
+    border-radius: 10px;
+    overflow: hidden;
+}
+thead{
+    background-color: #ffffff29;
 }
 .c1{
     width: 124px;
@@ -120,7 +125,7 @@ th, td {
     color: black;
 }
 #logList td{
-    padding: 7px;
+    padding: 15px 7px;
 }
 .logLine:hover{
     background-color: #a6a08c;

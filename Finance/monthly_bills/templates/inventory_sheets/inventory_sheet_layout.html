@@ -47,9 +47,12 @@
             </tr>
         </table>
     </form>
-    <form action="" method="POST" class='form' style="width: 742px; margin: auto;">
+    <form action="" method="POST" class='form' style="width: 742px; margin: auto; border-radius: 10px;
+    background-color: #ffffff3b;
+    padding: 44px 63px;
+    margin-top: 7rem;">
         {% csrf_token %}
-        <table style='margin-top: 7rem;'>
+        <table>
             <tr>
                 <th>{{invForm.business.label}}:{{invForm.business}}</th>
                 <th>{{invForm.id_tag.label}}:{{invForm.id_tag}}</th>

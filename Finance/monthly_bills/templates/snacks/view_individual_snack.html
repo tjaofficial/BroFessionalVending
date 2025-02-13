@@ -1,158 +1,8 @@
 {% extends "snacks/components/product_layout.html" %}
 {% block content %}{% load static %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(135deg, #1e1e2f, #3b3b58);
-        color: white;
-    }
-    .container {
-        max-width: 900px;
-        margin: 40px auto;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 20px;
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    }
-    h1, h2 {
-        text-align: center;
-        font-weight: 600;
-    }
-    .section {
-        margin-bottom: 30px;
-        padding: 15px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .button {
-        padding: 10px 15px;
-        background: #ff4b5c;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.3s;
-    }
-    .button:hover {
-        background: #ff1e42;
-    }
-
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-        text-align: center;
-    }
-    .stat-card {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    .stat-card h3 {
-        font-size: 18px;
-        margin: 0;
-        color: #ff4b5c;
-    }
-    .stat-card span {
-        font-size: 22px;
-        font-weight: bold;
-        display: block;
-        margin-top: 5px;
-    }
-    .filters {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-    .filters select {
-        padding: 8px;
-        border-radius: 5px;
-        border: none;
-        background: rgba(255, 255, 255, 0.3);
-        color: white;
-        font-weight: bold;
-    }
-
-
-
-
-
-
-
-
-    .modal {
-        display: none;
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 400px;
-        color: black;
-    }
-    .tabs {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-    .tab {
-        cursor: pointer;
-        padding: 12px 20px;
-        background: #3b3b58;
-        color: white;
-        border-radius: 8px;
-        transition: 0.3s;
-    }
-    .tab.active {
-        background: #ff4b5c;
-    }
-    .graph-container {
-        display: none;
-        text-align: center;
-    }
-    .graph-container.active {
-        display: block;
-    }
-    table {
-        border-collapse: collapse;
-        margin-top: 15px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    th, td {
-        padding: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        text-align: center;
-    }
-    th {
-        background: rgba(255, 255, 255, 0.3);
-    }
-    tr:hover{
-        background-color: rgb(0 0 0 / 35%);
-    }
-</style>
+<link href="{% static 'style/view_individual_snack.css' %}" rel="stylesheet">
+<script defer src="{% static 'script/view_individual_snack.js' %}"></script>
 <div class="container">
     <h1>{{item.name}} - Item Details</h1>
     
@@ -182,12 +32,10 @@
         </div>
         <div class="filters">
             <select id="timeframe" onchange="updateTimeframeOptions()">
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
+                <option value="monthly" selected>Monthly</option>
                 <option value="annual">Annual</option>
-                <option value="alltime">All-Time</option>
             </select>
-            <select id="year-selector" style="display: none;"></select>
+            <select id="year-selector"></select>
             <select id="timeframe-options"></select>
             <select id="machine-selector">
                 <option value="all">All Machines</option>
@@ -277,103 +125,15 @@
 
 <script>
     let quantitySoldChart;
+
     function openModal() {
         document.getElementById('editModal').style.display = 'flex';
     }
+
     function closeModal() {
         document.getElementById('editModal').style.display = 'none';
     }
-    function showGraph(graphId) {
-        document.querySelectorAll('.graph-container').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-        document.getElementById(graphId).classList.add('active');
-        event.target.classList.add('active');
-    }
-    function updateTimeframeOptions() {
-        let timeframe = document.getElementById('timeframe').value;
-        let options = document.getElementById('timeframe-options');
-        let yearSelector = document.getElementById('year-selector');
-    
-        options.innerHTML = "";
-        yearSelector.innerHTML = "";
-        yearSelector.style.display = "none"; // Hide by default
-    
-        if (timeframe === "weekly") {
-            for (let i = 1; i <= 52; i++) {
-                options.innerHTML += `<option value="week${i}">Week ${i}</option>`;
-            }
-        } else if (timeframe === "monthly") {
-            // Show the year selector
-            yearSelector.style.display = "inline-block";
-            
-            // Populate months
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            months.forEach((month, index) => {
-                options.innerHTML += `<option value="month${index+1}">${month}</option>`;
-            });
-    
-            // Populate years dynamically
-            let currentYear = new Date().getFullYear();
-            for (let year = 2022; year <= currentYear; year++) {
-                yearSelector.innerHTML += `<option value="year${year}">${year}</option>`;
-            }
-        } else if (timeframe === "annual") {
-            // Populate years
-            yearSelector.style.display = "inline-block";
-            let currentYear = new Date().getFullYear();
-            for (let year = 2022; year <= currentYear; year++) {
-                options.innerHTML += `<option value="year${year}">${year}</option>`;
-            }
-        }
-    }
-    
-    document.getElementById("timeframe").addEventListener("change", updateStatistics);
-    document.getElementById("timeframe-options").addEventListener("change", updateStatistics);
-    document.getElementById("machine-selector").addEventListener("change", updateStatistics);
 
-    async function updateStatistics() {
-        let timeframe = document.getElementById("timeframe").value;
-        let selectedOption = document.getElementById("timeframe-options").value;
-        let machine = document.getElementById("machine-selector").value;
-        let year = document.getElementById("year-selector").value; // Get the selected year
-    
-        let queryParams = `/api/get-statistics/?timeframe=${timeframe}&selectedOption=${selectedOption}&machine=${machine}&itemID={{item.itemID}}`;
-    
-        // Append the year if "Monthly" or "Annual" is selected
-        if (timeframe === "monthly" || timeframe === "annual") {
-            queryParams += `&year=${year}`;
-        }
-    
-        try {
-            let response = await fetch(queryParams);
-            let data = await response.json();
-    
-            // Update the statistics section dynamically
-            document.getElementById("total-cost").innerText = `$${data.totalCost}`;
-            document.getElementById("total-sold").innerText = `${data.totalSold} units`;
-            document.getElementById("total-revenue").innerText = `$${data.totalRevenue}`;
-            document.getElementById("total-loss").innerText = `$${data.totalLoss}`;
-            document.getElementById("total-bought").innerText = `${data.totalBought} units`;
-    
-            // Update Chart Data
-            updateQuantitySoldChart(data.sales_over_time);
-        } catch (error) {
-            console.error("Error fetching statistics:", error);
-        }
-    }
-
-    // Mock function simulating data fetch (replace with real API call)
-    function fetchStatisticsData(timeframe, selectedOption, machine) {
-        console.log(`Fetching data for ${timeframe}, option: ${selectedOption}, machine: ${machine}`);
-
-        // Example mock data (Replace this with actual backend data)
-        return {
-            totalCost: Math.floor(Math.random() * 1000),
-            totalSold: Math.floor(Math.random() * 500),
-            totalRevenue: Math.floor(Math.random() * 2000),
-            totalLoss: Math.floor(Math.random() * 200),
-        };
-    }
     function showGraph(graphId) {
         document.querySelectorAll('.graph-container').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -381,17 +141,86 @@
         event.target.classList.add('active');
         updateStatistics();
     }
-    updateStatistics();
 
-    // Function to generate the Quantity Sold Chart
+    function updateTimeframeOptions() {
+        let timeframe = document.getElementById('timeframe').value;
+        let options = document.getElementById('timeframe-options');
+        let yearSelector = document.getElementById('year-selector');
+
+        options.innerHTML = "";
+        yearSelector.innerHTML = "";
+        yearSelector.style.display = "inline-block";
+
+        let currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
+        let currentYear = new Date().getFullYear(); // Get current year
+
+        if (timeframe === "monthly") {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            months.forEach((month, index) => {
+                let isSelected = (index + 1 === currentMonth) ? "selected" : "";
+                options.innerHTML += `<option value="month${index+1}" ${isSelected}>${month}</option>`;
+            });
+        }
+
+        for (let year = 2022; year <= currentYear; year++) {
+            let isSelected = (year === currentYear) ? "selected" : "";
+            yearSelector.innerHTML += `<option value="year${year}" ${isSelected}>${year}</option>`;
+        }
+    }
+
+    function initializePage() {
+        updateTimeframeOptions();
+        setTimeout(updateStatistics, 500); // Ensure dropdowns populate first
+    }
+
+    document.addEventListener("DOMContentLoaded", initializePage);
+
+    document.getElementById("timeframe").addEventListener("change", updateStatistics);
+    document.getElementById("timeframe-options").addEventListener("change", updateStatistics);
+    document.getElementById("machine-selector").addEventListener("change", updateStatistics);
+    document.getElementById("year-selector").addEventListener("change", updateStatistics);
+
+    async function updateStatistics() {
+        let timeframe = document.getElementById("timeframe").value;
+        let selectedOptionElement = document.getElementById("timeframe-options");
+        let yearElement = document.getElementById("year-selector");
+        let machine = document.getElementById("machine-selector").value;
+    
+        let selectedOption = selectedOptionElement?.value || "month" + (new Date().getMonth() + 1);
+        let year = yearElement?.value || new Date().getFullYear(); // Ensure correct year format
+    
+        if (timeframe === "annual") {
+            selectedOption = `year${year}`;  // Ensure correct formatting for annual selection
+        }
+    
+        let queryParams = `/api/get-statistics/?timeframe=${timeframe}&selectedOption=${selectedOption}&machine=${machine}&itemID={{item.itemID}}&year=${year}`;
+    
+        try {
+            let response = await fetch(queryParams);
+            let data = await response.json();
+    
+            document.getElementById("total-cost").innerText = `$${parseFloat(data.totalCost).toFixed(2)}`;
+            document.getElementById("total-revenue").innerText = `$${parseFloat(data.totalRevenue).toFixed(2)}`;
+            document.getElementById("total-loss").innerText = `-$${parseFloat(data.totalLoss).toFixed(2)}`;
+    
+            document.getElementById("total-sold").innerText = `${data.totalSold} units`;
+            document.getElementById("total-loss-qty").innerText = `${data.totalLoss_qty}`;
+            document.getElementById("total-bought").innerText = `${data.totalBought} units`;
+    
+            updateQuantitySoldChart(data.sales_over_time);
+        } catch (error) {
+            console.error("Error fetching statistics:", error);
+        }
+    }
+
     function updateQuantitySoldChart(salesData) {
         let ctx = document.getElementById("quantitySoldChart").getContext("2d");
 
-        let labels = salesData.map(entry => entry.date);  // Extract dates
-        let salesValues = salesData.map(entry => entry.sold); // Extract sold quantity
+        let labels = salesData.map(entry => entry.date);
+        let salesValues = salesData.map(entry => entry.sold);
 
         if (quantitySoldChart) {
-            quantitySoldChart.destroy(); // Destroy existing chart before creating a new one
+            quantitySoldChart.destroy();
         }
 
         quantitySoldChart = new Chart(ctx, {
