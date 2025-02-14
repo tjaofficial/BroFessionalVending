@@ -32,3 +32,5 @@ admin.site.register(MaintenanceRequest)
 admin.site.register(Transaction)
 admin.site.register(UserProfile)
 admin.site.register(home_inventory_model)
+admin.site.register(LossStockModel)
+

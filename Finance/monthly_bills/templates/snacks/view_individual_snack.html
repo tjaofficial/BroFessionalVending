@@ -20,10 +20,10 @@
             <button class="button">Add Stock</button>
         </a>
         <a href="#">
-            <button class="button">Expired Stock</button>
+            <button class="button" onclick="openExpiredStockModal()">Expired Stock</button>
         </a>
     </div>
-    
+    {% include "snacks/loss_stock.html" %}
 
     <!-- Section 2: Improved Statistics Display -->
     <div class="section">
@@ -224,7 +224,7 @@
         }
 
         quantitySoldChart = new Chart(ctx, {
-            type: "line",
+            type: "bar",
             data: {
                 labels: labels,
                 datasets: [{

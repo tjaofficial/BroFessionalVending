@@ -2,28 +2,37 @@
 {% block content2 %}{% load static %}
 <style>
     #is_main_table td{
-        border: 1px solid black;
+        border-bottom: 1px solid black;
         padding: 8px 9px;
+    }
+    #is_main_table{
+        width: unset;
+    }
+    .main_table_cont{
+        border-radius: 10px;
+        background-color: #ffffff33;
+        padding: 13px;
+        width: 800px;
     }
 </style>
 {% comment %} <script defer src="{% static 'script/machine_options.js' %}"></script> {% endcomment %}
 <script defer src="{% static 'script/inventory_fills.js' %}"></script>
 <input type="hidden" id="prevInventory" data-prev="{{pastInventory}}">
-<div style="border-radius: 10px;
-    background-color: #ffffff33;
-    padding: 10px;">
-    <table id="is_main_table" style='border-collapse: collapse;width: 673px;'>
-        <tr style='text-align: center; font-weight: bolder;'>
-            <td>ID</td>
-            <td class="c1">Item Name</td>
-            <td style='display:none;'>Prev</td>
-            <td class="c2">Qty</td>
-            <td class="c3">Sold</td>
-            <td class="c6">Removed</td>
-            <td class="c4">Added</td>
-            <td class="c5">New Dates</td>
-            <td class="c5">Notes</td>
-        </tr>
+<div class="main_table_cont">
+    <table id="is_main_table" style='border-collapse: collapse;'>
+        <thead style="background-color: #0000007d;">
+            <tr style='text-align: center; font-weight: bolder;'>
+                <td>ID</td>
+                <td class="c1">Item Name</td>
+                <td style='display:none;'>Prev</td>
+                <td class="c2">Qty</td>
+                <td class="c3">Sold</td>
+                <td class="c6">Removed</td>
+                <td class="c4">Added</td>
+                <td class="c5">New Dates</td>
+                <td class="c5">Notes</td>
+            </tr>
+        </thead>
         {% comment %} <tr>
             <td>
                 <input type="hidden" name="data" style="width: 154px;" maxlength="400" required="" id="id_data">

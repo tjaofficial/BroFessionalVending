@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from ..models import machine_build_model, home_inventory_model, item_data_model, item_stock_model, inventory_sheets_model
-from ..forms import item_data_form, item_stock_form
+from django.http import HttpResponseRedirect
+from ..models import machine_build_model, home_inventory_model, item_data_model, item_stock_model, inventory_sheets_model, LossStockModel
+from ..forms import item_data_form, item_stock_form, LossStockForm
 from ..utils import find_machines_with_item
 import datetime
 from django.contrib.auth.decorators import login_required
@@ -74,11 +75,27 @@ def view_individual_snack_view(request, itemID):
         .order_by("-date_updated")  # Order by most recent first
         .annotate(total_cost=F("qty_of_units") * F("cost_per_unit"))  # Multiply fields
     )
+
+    if request.method == "POST":
+        form = LossStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))  # Redirect to same page
+    else:
+        initial_data = {
+            'reported_by': request.user.first_name + " " + request.user.last_name,
+        }
+        form = LossStockForm(
+            initial=initial_data,
+            itemID=itemID
+        )
     machines_with_item = find_machines_with_item(itemID)
+    print(f"DEBUG: Machines with {itemID}: {machines_with_item}")  # Debugging print statement
     return render(request, 'snacks/view_individual_snack.html',{
         'item': item_data_query,
         'machines': machines_with_item,
-        'transactions': item_stock_query
+        'transactions': item_stock_query,
+        "theLossForm": form
 
     })
 
@@ -169,11 +186,12 @@ def get_statistics(request):
     total_revenue = 0
     total_loss_qty = 0
     total_loss = 0
-    sales_data = []
     # Query all relevant inventory records
     
     inventory_records = inventory_sheets_model.objects.filter(**filters)
  
+    sales_data_dict = {}  # Dictionary to track sales by date
+
     for record in inventory_records:
         try:
             record_data = record.data  # JSONField (already a dict)
@@ -192,10 +210,21 @@ def get_statistics(request):
                     total_loss_qty += loss_qty
                     total_loss += (sold_price * loss_qty)
 
-                    sales_data.append({"date": str(record.date), "sold": sold_qty, "amount": (sold_price * sold_qty)})
+                    record_date = str(record.date)  # Convert date to string
+                
+                    # If date exists, update the values
+                    if record_date in sales_data_dict:
+                        sales_data_dict[record_date]["sold"] += sold_qty
+                        sales_data_dict[record_date]["amount"] += (sold_price * sold_qty)
+                    else:
+                        sales_data_dict[record_date] = {
+                            "date": record_date,
+                            "sold": sold_qty,
+                            "amount": (sold_price * sold_qty)
+                        }
         except (json.JSONDecodeError, KeyError, ValueError):
             continue  # Skip malformed data
-
+    sales_data = list(sales_data_dict.values())
     # Total Cost Query and Calc
     filters2 = {'date_updated'+ k[4:] if k[:4] == 'date' else k: v for k, v in filters.items() if k in ["date_updated", "exp_date", "itemChoice"]}
     print(filters2)

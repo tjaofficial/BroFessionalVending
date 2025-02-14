@@ -954,6 +954,18 @@ class home_inventory_model(models.Model):
     def __str__(self):
         return f"{self.item.name} - {self.quantity} at home"
 
+class LossStockModel(models.Model):
+    item_stock = models.ManyToManyField("item_stock_model", related_name="loss_records")
+    qty_of_item = models.PositiveIntegerField(default=0)  # Quantity lost
+    reason = models.TextField()  # Reason for loss
+    date = models.DateField(auto_now_add=True)  # Date of loss
+    reported_by = models.CharField(max_length=50, blank=True, null=True)  # Who reported the loss
+    machine_id = models.CharField(max_length=30, blank=True, null=True)  # If loss happened in a specific machine
+
+    def __str__(self):
+        return f"Loss on {self.date} - {self.qty_of_item} units"
+
+
 
 
 

@@ -1,0 +1,26 @@
+<div id="expiredStockModal" class="modal" style="flex-direction: column;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeExpiredStockModal()">&times;</span>
+        <h2>Report Expired Stock</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <label for="id_item_stock">Select Item Stock:</label>
+            {{ theLossForm.item_stock }}<br>
+
+            <label for="id_qty_of_item">Quantity Lost:</label>
+            {{ theLossForm.qty_of_item }}<br>
+
+            <label for="id_reason">Reason for Loss:</label>
+            {{ theLossForm.reason }}<br>
+
+            <label for="id_reported_by">Reported By:</label>
+            {{ theLossForm.reported_by }}<br>
+
+            <label for="id_machine_id">Select Machine ID (if applicable):</label>
+            {{ theLossForm.machine_id }}<br>
+
+            <button type="submit" name="submitLoss" class="button">Submit</button>
+        </form>
+    </div>
+</div>

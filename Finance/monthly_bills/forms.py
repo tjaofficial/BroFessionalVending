@@ -3,6 +3,7 @@ from django import forms
 from django.forms import ModelForm, Textarea
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .utils import find_machines_with_item
 import datetime
 
 # class add_bills_form(ModelForm):
@@ -414,7 +415,6 @@ class AddIncomeForm(forms.ModelForm):
             ('tax_return', 'Tax Return')
         ]
 
-
 class MaintenanceRequestForm(forms.ModelForm):
     class Meta:
         model = MaintenanceRequest
@@ -460,3 +460,46 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+
+class LossStockForm(forms.ModelForm):
+    machine_id = forms.ChoiceField(choices=[], required=False, widget=forms.Select(attrs={"class": "form-control"}))
+
+    def __init__(self, *args, **kwargs):
+        itemID = kwargs.pop('itemID', None)  # Get itemID if provided
+        super(LossStockForm, self).__init__(*args, **kwargs)
+
+        
+        if itemID:
+            machines_with_item = find_machines_with_item(itemID)
+            
+            machine_choices = [("", "Select a machine")]  # Blank option at the top
+            
+            # Only assign choices if machines exist
+            if machines_with_item:
+                machine_choices += [
+                    (m["machine"], f"{m['machine']} (Lane {m['lane']})") for m in machines_with_item
+                ]
+            else:
+                machine_choices.append(("", "No machines available"))
+
+            self.fields["machine_id"].choices = machine_choices  # Assign filtered choices
+    
+    class Meta:
+        model = LossStockModel
+        fields = ["item_stock", "qty_of_item", "reason", "reported_by", "machine_id"]
+        widgets = {
+            "item_stock": forms.Select(attrs={"class": "form-control"}),
+            "qty_of_item": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "reason": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "reported_by": forms.TextInput(attrs={"class": "form-control"}),
+            "machine_id": forms.Select(attrs={"class": "form-control"}),  # Dropdown for machine_id
+        }
+
+
+
+
+
+
+
+
+
