@@ -1,0 +1,33 @@
+{% extends "legacy_lineage/tenant_layout.html" %}{% load static %}
+{% block content %}
+<script src="https://js.stripe.com/v3/"></script>
+<script defer src="{% static 'legacy_lineage/script/review_payment.js' %}"></script>
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/review_payment.css' %}">
+
+<div class="review-container">
+    <h2>Review Your Payment</h2>
+    
+    <div class="payment-summary">
+        <p><strong>Tenant:</strong> {{ tenant.userProf.user.first_name }} {{ tenant.userProf.user.last_name }}</p>
+        <p><strong>Payment Amount:</strong> ${{ amount }}</p>
+        <p><strong>Payment Method:</strong> Ending in {{ payment_method.last4 }}</p>
+        <p><strong>Payment Date:</strong> {{ payment_date|default:"Processing Immediately" }}</p>
+        <br><br>
+        <p>Your payment of <strong>${{ amount }}</strong> will be scheduled for <strong>{{ payment_date|default:"Processing Immediately" }}</strong>. </p>    
+        {% comment %} <p>The confirmation code is <strong>2290209</strong>.</p> {% endcomment %}
+    </div>
+
+    <div class="button-group">
+        <form id="payment-form" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="amount" value="{{ amount }}">
+            <input type="hidden" name="payment_method_id" value="{{ payment_method.id }}">
+            <input type="hidden" name="payment_date" value="{{ payment_date }}">
+            <button type="submit" id="confirm-payment-btn">Confirm Payment</button>
+        </form>
+        <a href="{% url 'make_payments' %}" class="cancel-link">Cancel</a>
+    </div>
+
+    <div id="payment-error-message" class="error-message" style="display:none;"></div>
+</div>
+{% endblock %}

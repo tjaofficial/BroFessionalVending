@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..forms import TenantForm, PropertyForm, AddExpenseForm, MaintenanceRequestForm, AddIncomeForm
-from ..models import Property, Tenant, WriteOff, Revenue, MaintenanceRequest, Transaction, UserProfile
+from ..models import PaymentMethod, Property, Tenant, WriteOff, Revenue, MaintenanceRequest, Transaction, UserProfile
+from ..utils import payment_charges_totals
 from django.db.models import Sum
 from django.db.models.functions import ExtractYear, Upper
 from django.http import JsonResponse
@@ -9,8 +10,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 import stripe
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import json
+from datetime import datetime, date
+from decimal import Decimal
+from django.urls import reverse
 
 
 
@@ -228,26 +233,15 @@ def writeoff_detail(request, pk):
 @login_required
 def tenant_dashboard(request):
     # Get the currently logged-in tenant
-    tenant = UserProfile.objects.get(user=request.user)
-    transactionQuery = Transaction.objects.filter(tenant=tenant)
-    total_charges = 1650.00
-    total_payments = 825.00
-    for trans in transactionQuery:
-        if trans.transaction_type == 'charge':
-            total_charges += float(trans.amount)
-        else:
-            total_payments += float(trans.amount)
-    current_balance = total_payments - total_charges
-    
-    # Calculate the current balance (total charges - total payments)
-    #total_charges = tenant.charges.aggregate(total=models.Sum('amount'))['total'] or 0
-    #total_payments = Transaction.objects.filter(tenant=tenant).aggregate(total=models.Sum('amount'))['total'] or 0
+    userProf = UserProfile.objects.get(user=request.user)
+    tenant = Tenant.objects.get(userProf=userProf)
+    current_balance = payment_charges_totals(tenant)
 
     # Count active maintenance requests
-    active_requests = MaintenanceRequest.objects.filter(tenant=tenant.user, status='Active').count()
+    active_requests = MaintenanceRequest.objects.filter(tenant=userProf.user, status='Active').count()
 
     context = {
-        'tenant_name': tenant.user.first_name,
+        'tenant_name': userProf.user.first_name,
         'current_balance': current_balance,
         'active_requests': active_requests,
     }
@@ -335,6 +329,24 @@ def property_detail(request, pk):
     except Property.DoesNotExist:
         return JsonResponse({'error': 'Property not found'}, status=404)
     
+def payment_center(request):
+    tenant = Tenant.objects.get(userProf__user=request.user)
+    current_balance = payment_charges_totals(tenant)
+    # stripe_process_fee = ((-current_balance) * Decimal(.029)) + Decimal(.30)
+    prepay_amount = current_balance - tenant.monthly_rent
+    print(current_balance)
+    print(prepay_amount)
+    return render(request, "legacy_lineage/make_payment.html",{
+        "tenant": tenant,
+        "current_balance": -current_balance,
+        "prepay_amount": -prepay_amount,
+        # 'stripe_process_fee': stripe_process_fee
+    })
+
+@login_required
+def add_payment_method_page(request):
+    return render(request, "legacy_lineage/add_payment.html")
+
 def create_payment_intent(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
     if request.method == 'POST':
@@ -357,11 +369,252 @@ def create_payment_intent(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-def payment_center(request):
+@csrf_exempt
+def save_payment_method(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if request.method == "POST":
+        # try:
+        data = json.loads(request.body)
+        payment_method_id = data.get("payment_method_id")
+        tenant = Tenant.objects.get(userProf__user=request.user)  # Ensure user is authenticated
 
-    return render(request, "legacy_lineage/make_payment.html",{
+        if not payment_method_id or not tenant.stripe_payment_data:
+            return JsonResponse({"error": "Invalid request"}, status=400)
+        else:
+            tenantStripe = tenant.stripe_payment_data
 
+        # Create a Stripe customer if they don't already have one
+        if not tenantStripe.stripe_customer_id:
+            customer = stripe.Customer.create(
+                email=request.user.email,
+                name=request.user.get_full_name(),
+            )
+            tenantStripe.stripe_customer_id = customer.id
+            tenant.save()
+
+        # Attach payment method to the customer
+        stripe.PaymentMethod.attach(
+            payment_method_id,
+            customer=tenantStripe.stripe_customer_id
+        )
+
+        # Set default payment method for future charges
+        stripe.Customer.modify(
+            tenantStripe.stripe_customer_id,
+            invoice_settings={"default_payment_method": payment_method_id}
+        )
+
+        # Store the payment method locally in the database
+        tenantStripe.stripe_payment_method_id = payment_method_id
+        payment_method = stripe.PaymentMethod.retrieve(payment_method_id)
+
+        tenantStripe.last4 = payment_method.card.last4,  # Store last 4 digits for reference
+        tenantStripe.brand = payment_method.card.brand
+        tenantStripe.save()
+
+        return JsonResponse({"success": True})
+        # except Exception as e:
+        #     return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+# Redirect back to Payment Center after adding the payment method
+def add_payment_success(request):
+    return redirect("payment_center")
+
+def review_payment(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    tenant = Tenant.objects.get(userProf__user=request.user)
+    selected_amount = request.GET.get("amount")  
+    selected_method_id = request.GET.get("method")  
+    selected_date = request.GET.get("date")  
+    print(f"Payment Method: {selected_method_id}")
+    # Fetch the correct Payment Method
+    try:
+        selected_method = PaymentMethod.objects.get(id=selected_method_id, tenant=tenant)
+    except PaymentMethod.DoesNotExist:
+        messages.error(request, "Invalid payment method selected.")
+        return redirect("make_payments")
+
+    # Convert amount selection to actual value
+    current_balance = payment_charges_totals(tenant)
+    prepay_amount = current_balance - tenant.monthly_rent
+
+    if not selected_amount:
+        messages.error(request, "No payment amount selected.")
+        return redirect("payment_center")
+    else:
+        if selected_amount == "full":
+            selected_amount = -current_balance
+        elif selected_amount == "full-pre":
+            selected_amount = -prepay_amount
+        else:
+            selected_amount = Decimal(selected_amount)
+
+    if request.method == "POST":
+        print(f"Processing Payment - Method: {selected_method_id}, Amount: {selected_amount}, Date: {selected_date}")
+        payment_date_obj = datetime.strptime(selected_date, "%Y-%m-%d").date() if selected_date else date.today()
+        if payment_date_obj == date.today():
+            # **Process payment immediately**
+            try:
+                stripe.PaymentIntent.create(
+                    amount=int(selected_amount * 100),  # Convert to cents
+                    currency="usd",
+                    customer=tenant.stripe_payment_data.stripe_customer_id,
+                    payment_method=selected_method.stripe_payment_method_id,
+                    confirm=True,
+                    return_url=request.build_absolute_uri(reverse("payment_success"))
+                )
+                # Save transaction to database
+                Transaction.objects.create(
+                    tenant=tenant.userProf,
+                    tenantChoice=tenant,
+                    transaction_type="Payment",
+                    category="Rent",
+                    amount=selected_amount,
+                    description="Monthly Rent Payment",
+                    status="Completed",
+                    payment_method=selected_method
+                )
+                messages.success(request, "Payment was successful!")
+                return redirect("make_payments")
+            except stripe.error.CardError as e:
+                error_message = f"Payment failed: {str(e)}"
+                print(error_message)
+                print('CHECK 1')
+                messages.error(request, f"Card error: {e.user_message}")
+            except stripe.error.StripeError as e:
+                error_message = f"Payment failed: {str(e)}"
+                print(error_message)
+                print('CHECK 2')
+                messages.error(request, f"Payment failed: {str(e)}")
+            except ValueError as e:
+                error_message = f"Payment failed: {str(e)}"
+                print(error_message)
+                print('CHECK 3')
+                messages.error(request, str(e))  # Custom validation errors
+            except Exception as e:
+                error_message = f"Payment failed: {str(e)}"
+                print(error_message)
+                print('CHECK 4')
+                messages.error(request, f"Unexpected error: {str(e)}")
+            return redirect("payment_cancel")
+        else:
+            # **Schedule the payment for the future**
+            Transaction.objects.create(
+                tenant=tenant,
+                transaction_type="Payment",
+                amount=selected_amount,
+                description="Scheduled Rent Payment",
+                category="Rent",
+                scheduled_date=payment_date_obj,
+                status="Scheduled",
+                payment_method=selected_method  # Associate payment method
+            )
+            messages.success(request, f"Payment has been scheduled for {selected_date}.")
+            return redirect("payment_scheduled")
+
+    return render(request, "legacy_lineage/review_payment.html", {
+        "tenant": tenant,
+        "amount": Decimal(selected_amount),
+        "payment_method": selected_method,
+        "payment_date": selected_date,
     })
+
+def process_payment(request):
+    if request.method == "POST":
+        tenant = Tenant.objects.get(userProf__user=request.user)
+        amount = request.POST.get("amount")
+        payment_method_id = request.POST.get("payment_method_id")
+        payment_date = request.POST.get("payment_date")
+
+        try:
+            amount_in_cents = int(Decimal(amount) * 100)
+
+            # If the payment is scheduled for the future, store it instead of charging now
+            if payment_date and payment_date > str(datetime.today().date()):
+                # Store the scheduled payment for later processing
+                Transaction.objects.create(
+                    tenant=tenant.userProf,
+                    tenantChoice=tenant,
+                    transaction_type="Payment",
+                    description="Scheduled Rent Payment",
+                    amount=Decimal(amount),
+                    scheduled_date=payment_date,  # Save the future date
+                    status="Pending"
+                )
+                messages.success(request, f"Payment scheduled for {payment_date}.")
+                return redirect("payment_success")
+
+            # Charge the card immediately via Stripe
+            charge = stripe.PaymentIntent.create(
+                amount=amount_in_cents,
+                currency="usd",
+                payment_method=payment_method_id,
+                confirm=True,
+                customer=tenant.stripe_customer_id,
+                description="Monthly Rent Payment"
+            )
+
+            # Save the successful payment
+            Transaction.objects.create(
+                tenant=tenant,
+                transaction_type="Payment",
+                description="Monthly Rent Payment",
+                amount=amount,
+                status="Completed"
+            )
+
+            messages.success(request, "Payment was successful!")
+            return redirect("payment_success")
+
+        except stripe.error.CardError as e:
+            messages.error(request, f"Payment failed: {e.error.message}")
+            return redirect("payment_failed")
+
+    return redirect("make_payment")
+
+def payment_success(request):
+    return render(request, "legacy_lineage/payment_success.html")
+
+def payment_cancel(request):
+    return render(request, "legacy_lineage/payment_cancel.html")
+
+
+
+
+
+@csrf_exempt
+def create_checkout_session(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            amount = int(data["amount"])  # Ensure it's in cents
+            tenant_email = data.get("email", "customer@example.com")
+
+            # Create a Stripe Checkout Session
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                customer_email=tenant_email,
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "product_data": {
+                                "name": "Rent Payment",
+                            },
+                            "unit_amount": amount,  # Amount in cents
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                mode="payment",
+                success_url="http://127.0.0.1:8000/payment-success/",
+                cancel_url="http://127.0.0.1:8000/payment-cancel/",
+            )
+            return JsonResponse({"sessionId": session.id})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
 def get_tenant_payment_info(request, tenant_id):
     stripe.api_key = settings.STRIPE_SECRET_KEY

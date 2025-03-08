@@ -1,0 +1,8 @@
+{% extends "legacy_lineage/tenant_layout.html" %}
+{% block content %}
+<div class="error-container">
+    <h2>Payment Failed</h2>
+    <p>There was an issue processing your payment. Please try again.</p>
+    <a href="{% url 'make_payments' %}">Return to Payment Center</a>
+</div>
+{% endblock %}

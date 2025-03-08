@@ -56,14 +56,25 @@ urlpatterns = [
     path('legacyportal/expense_overview/edit/<int:pk>/', views.edit_writeoff, name='edit_writeoff'),
     path('legacyportal/expense_overview/delete/<int:pk>/', views.delete_writeoff, name='delete_writeoff'),
     path('legacyportal/admin_dash', views.dashboard, name='admin_dash'),
+    path('legacyportal/register-admin/', views.register_admin, name='register_admin'),
+    path('legacyportal/register-tenant/', views.register_tenant, name='register_tenant'),
     path('api/writeoff/<int:pk>/', views.writeoff_detail, name='writeoff_detail'),
     path('api/property/<int:pk>/', views.property_detail, name='property_detail'),
     path('tenant/dashboard/', views.tenant_dashboard, name='tenant_dashboard'),
-    path('legacyportal/register-admin/', views.register_admin, name='register_admin'),
-    path('legacyportal/register-tenant/', views.register_tenant, name='register_tenant'),
     path('tenant/maintenance-request/', views.maintenance_request, name='maintenance_request'),
     path('tenant/make-payments/', views.payment_center, name='make_payments'),
+    path("tenant/add-payment/", views.add_payment_method_page, name="add_payment_method"),
+    path("tenant/review-payment/", views.review_payment, name="review_payment"),
+    path("tenant/process-payment/", views.process_payment, name="process_payment"),
     path('create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
     path('get-tenant-payment-info/<int:tenant_id>/', views.get_tenant_payment_info, name='get_tenant_payment_info'),
+    path("create-checkout-session/", views.create_checkout_session, name="create_checkout_session"),
+    path("payment_success/", views.payment_success, name="payment_success"),
+    path("payment_cancel/", views.payment_cancel, name="payment_cancel"),
+    path("save-payment-method/", views.save_payment_method, name="save_payment_method"),
+    path("add-payment-success/", views.add_payment_success, name="add_payment_success"),
+
+    #`/tenant/review-payment/?amount=${selectedAmount}`
+
 
 ]

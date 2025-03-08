@@ -1,4 +1,5 @@
-from .models import machine_stock_model, item_data_model, machine_build_model
+from .models import Transaction, machine_stock_model, item_data_model, machine_build_model
+from decimal import Decimal
 
 def productName(id_tag):
     stockModel = machine_stock_model.objects.filter(id_tag__id_tag__exact=id_tag, discontinued=False).order_by('itemID')
@@ -39,3 +40,21 @@ def find_machines_with_item(itemID):
         except Exception as e:
             print(f"Error processing machine {machine}: {e}")
     return machines_with_item
+
+def payment_charges_totals(tenant):
+    transactionQuery = Transaction.objects.filter(tenantChoice=tenant)
+    total_charges = 0
+    total_payments = 0
+    for trans in transactionQuery:
+        if trans.transaction_type == 'Charge':
+            total_charges += Decimal(trans.amount)
+        else:
+            total_payments += Decimal(trans.amount)
+    current_balance = total_payments - total_charges
+    return current_balance
+
+
+
+
+
+

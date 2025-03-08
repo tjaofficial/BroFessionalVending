@@ -1,0 +1,105 @@
+/* Add Payment Page Styles */
+.payment-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 71vh;
+    background-color: #f9f9f9;
+}
+
+.payment-form {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 38rem;
+}
+
+.payment-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.payment-section {
+    margin-bottom: 15px;
+}
+
+.payment-section label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.payment-section input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+.payment-section input:focus {
+    border-color: #5a67d8;
+    outline: none;
+    background-color: #fff;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.half-width {
+    width: 48%;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.cancel-btn {
+    background-color: #ccc;
+    color: #333;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background-color: #b3b3b3;
+}
+
+#add-card-btn {
+    background-color: #5a67d8;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: bold;
+}
+
+#add-card-btn:hover {
+    background-color: #434190;
+}
+
+.stripe-card-input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    margin-top: 5px;
+}

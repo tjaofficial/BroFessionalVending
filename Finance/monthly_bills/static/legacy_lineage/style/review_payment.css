@@ -1,0 +1,55 @@
+.review-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.payment-summary p {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#confirm-payment-btn {
+    background-color: #5a67d8;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#confirm-payment-btn:hover {
+    background-color: #434190;
+}
+
+.cancel-link {
+    text-decoration: none;
+    color: #d9534f;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.cancel-link:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}

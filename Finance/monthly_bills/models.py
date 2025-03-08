@@ -741,6 +741,14 @@ class Tenant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    #Payment Profile
+    stripe_payment_data = models.ForeignKey(
+        'PaymentMethod',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
     def __str__(self):
         return f"{self.userProf} ({self.property.address})"
 
@@ -870,16 +878,28 @@ class Transaction(models.Model):
         ('Other', 'Other'),
     ]
 
+    STATUS_CHOICES = [
+        ('Completed', 'Completed'),
+        ('Scheduled', 'Scheduled'),
+        ('Pending', 'Pending'),
+        ('Failed', 'Failed'),
+        ('Canceled', 'Canceled'),
+    ]
+
     tenant = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='transactions')
+    tenantChoice = models.ForeignKey('Tenant', on_delete=models.CASCADE, blank=True, null=True)
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="Other")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, blank=True, null=True)
+    payment_method = models.ForeignKey('PaymentMethod', on_delete=models.CASCADE, blank=True, null=True)
+    scheduled_date = models.DateTimeField(auto_now=False, auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.transaction_type} - ${self.amount} for {self.tenant.username} on {self.date.strftime('%Y-%m-%d')}"
+        return f"{self.transaction_type} - ${self.amount} for {self.tenant.user.username} on {self.date.strftime('%Y-%m-%d')}"
 
 class UserProfile(models.Model):
     BUSINESS_TYPE_CHOICES = [
@@ -964,6 +984,17 @@ class LossStockModel(models.Model):
 
     def __str__(self):
         return f"Loss on {self.date} - {self.qty_of_item} units"
+    
+class PaymentMethod(models.Model):
+    tenantChoice = models.OneToOneField("Tenant", on_delete=models.CASCADE, null=True, blank=True)
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
+    stripe_payment_method_id = models.CharField(max_length=255, null=True, blank=True)
+    last4 = models.CharField(max_length=4, null=True, blank=True)
+    brand = models.CharField(max_length=50, null=True, blank=True)
+    added_on = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.brand} ending in {self.last4} for {self.tenantChoice}"
 
 
 

@@ -1,0 +1,49 @@
+{% extends "legacy_lineage/tenant_layout.html" %}{% load static %}
+{% block content %}
+<script src="https://js.stripe.com/v3/"></script>
+<script defer src="{% static 'legacy_lineage/script/add_payment.js' %}"></script>
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/add_payment.css' %}">
+
+<div class="payment-container">
+    <div class="payment-form" style="width: 38rem;">
+        <h2>Add a New Payment Method</h2>
+
+        <!-- Cardholder Name -->
+        <div class="payment-section">
+            <label for="cardholder-name">Cardholder Name</label>
+            <input type="text" id="cardholder-name" placeholder="Enter full name" required>
+        </div>
+
+        <!-- Card Number -->
+        <div class="payment-section">
+            <label for="card-element">Card Number</label>
+            <div id="card-element" class="stripe-card-input"></div>
+        </div>
+
+
+        <!-- Expiration & CVC -->
+        <div class="payment-row">
+            <div class="payment-section half-width">
+                <label for="exp-date">Expiration Date</label>
+                <input type="text" id="exp-date" placeholder="MM / YY" required>
+            </div>
+            <div class="payment-section half-width">
+                <label for="cvc">CVC</label>
+                <input type="text" id="cvc" placeholder="CVC" required>
+            </div>
+        </div>
+
+        <!-- Billing ZIP Code -->
+        <div class="payment-section">
+            <label for="billing-zip">Billing ZIP Code</label>
+            <input type="text" id="billing-zip" placeholder="ZIP Code" required>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-row">
+            <button class="cancel-btn" onclick="window.history.back()">Cancel</button>
+            <button id="add-card-btn">Add Card Account</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

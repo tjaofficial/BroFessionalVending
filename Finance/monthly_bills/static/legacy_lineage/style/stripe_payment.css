@@ -1,5 +1,42 @@
+.security-code input {
+  width: calc(100% - 20px);
+  text-align: center;
+}
 
+.payment-section input::placeholder {
+  color: #aaa;
+}
+.payment-section input[type="number"],
+.payment-section input[type="text"],
+.payment-section input[type="date"] {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+    margin-top: 5px;
+}
+
+.payment-section input[type="number"]:focus,
+.payment-section input[type="text"]:focus,
+.payment-section input[type="date"]:focus {
+    border-color: #5a67d8;
+    outline: none;
+    background-color: #fff;
+}
   
+
+
+
+
+
+
+
+
+
+
+
   .payment-container {
     display: flex;
     justify-content: space-between;
@@ -57,6 +94,7 @@
     /* height: 0; */
     transition: max-height 0.7s ease; /* Smooth transition for max-height */
     display: block; /* Always block, hide with max-height instead */
+    padding: 0px;
   }
   
   .security-code {
@@ -82,9 +120,13 @@
 
 
 
+#payment-amount label{
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+}
 
-
-  .payment-method-section {
+  .payment-section {
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -102,6 +144,7 @@
   
   .header-left span {
     font-weight: bold;
+    align-content: center;
   }
   
   .selected-method {
@@ -125,22 +168,30 @@
   .payment-options {
     margin-bottom: 15px;
   }
-  
+  .payment-options hr{
+    border-color: #00000014;
+  }
   .payment-options label {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     cursor: pointer;
+    min-height: 50px;
   }
   
   .payment-option {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     gap: 8px;
+    width: 100%;
+    padding-left: 11px;
+    flex-direction: column;
   }
   
   .add-new-payment {
-    margin-bottom: 15px;
+    /* margin-bottom: 15px; */
+    width: 100%;
+    text-align: center;
   }
   
   .add-new-payment button {
@@ -158,6 +209,16 @@
   }
   
   .payment-icons img {
-    margin-right: 5px;
+    margin-right: 10px;
+  }
+  .payment-icons{
+    justify-self: center;
+    padding: 10px 0px;
   }
   
+  .payment-options input[type=radio]{
+    margin-bottom: 10px;
+  }
+  .header_width{
+    width: 132px;
+  }
