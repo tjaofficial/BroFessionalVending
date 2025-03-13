@@ -1,0 +1,50 @@
+{% extends "components/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>📊 Your Transactions</h1>
+    <p>Here are your latest transactions from your linked bank account.</p>
+
+    <table class="transaction-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.name }}</td>
+                <td>${{ transaction.amount }}</td>
+                <td>{{ transaction.category }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No transactions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .transaction-table th, .transaction-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+    .transaction-table th {
+        background-color: #007BFF;
+        color: white;
+    }
+</style>
+{% endblock %}

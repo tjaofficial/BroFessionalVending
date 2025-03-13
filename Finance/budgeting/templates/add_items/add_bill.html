@@ -1,0 +1,34 @@
+{% extends "components/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Add New Bill</h1>
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Bill Name:</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="id_amount">Amount:</label>
+                {{ form.amount }}
+            </div>
+            <div class="form-group">
+                <label for="id_due_date">Due Date:</label>
+                {{ form.due_date }}
+            </div>
+            <div class="form-group">
+                <label for="id_category">Category:</label>
+                {{ form.category }}
+            </div>
+            <div class="form-group">
+                <label for="id_is_recurring">Recurring Bill:</label>
+                {{ form.is_recurring }}
+            </div>
+            <button type="submit" class="button">Save Bill</button>
+            <a href="{% url 'budgeting_dashboard' %}" class="button button-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

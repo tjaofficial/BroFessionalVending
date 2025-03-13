@@ -1,0 +1,53 @@
+{% extends "components/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>🔗 Connect Your Bank Account</h1>
+    <p>Securely link your bank account using Plaid to automatically track transactions and balances.</p>
+
+    <button id="link-button" class="button">Connect Bank</button>
+
+    <div id="message-box" style="display: none; margin-top: 20px; padding: 10px; border-radius: 5px;"></div>
+
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <script>
+        document.getElementById('link-button').addEventListener('click', function() {
+            var handler = Plaid.create({
+                token: "{{ link_token }}",
+                onSuccess: function(public_token, metadata) {
+                    // ✅ Send `public_token` to Django to exchange for `access_token`
+                    fetch("{% url 'exchange_token' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: new URLSearchParams({ "public_token": public_token })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        let messageBox = document.getElementById('message-box');
+                        messageBox.style.display = "block";
+                        if (data.status === "success") {
+                            messageBox.style.backgroundColor = "#4CAF50";
+                            messageBox.style.color = "white";
+                            messageBox.innerText = "✅ " + data.message;
+                        } else {
+                            messageBox.style.backgroundColor = "#FF5733";
+                            messageBox.style.color = "white";
+                            messageBox.innerText = "❌ Error: " + data.message;
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                },
+                onExit: function(err, metadata) {
+                    if (err) {
+                        console.error("Plaid Error:", err);
+                    }
+                }
+            });
+            handler.open();
+        });
+    </script>
+</div>
+{% endblock %}

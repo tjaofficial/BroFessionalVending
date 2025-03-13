@@ -1,0 +1,305 @@
+{% extends "components/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Personal Budgeting Dashboard</h1>
+    <h3>📄 Generate Monthly Financial Report</h3>
+    <a href="{% url 'download_pdf_report' %}" class="button">📥 Download PDF Report</a>
+    <a href="{% url 'download_csv_report' %}" class="button">📥 Download CSV Report</a>
+
+    <!-- 🚨 Large Transaction Alerts -->
+    {% if large_transactions %}
+    <div class="alert-container">
+        <h3>🚨 Large Transactions Detected</h3>
+        {% for transaction in large_transactions %}
+            <div class="alert" id="alert-{{ transaction.id }}">
+                <p><strong>{{ transaction.date }}</strong>: {{ transaction.name }} - <span class="amount">${{ transaction.amount }}</span></p>
+                <button class="dismiss-btn" onclick="dismissAlert({{ transaction.id }})">Dismiss</button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 🔧 Set Alert Threshold -->
+    <div class="settings-container">
+        <h3>⚙️ Alert Settings</h3>
+
+        <!-- Global Threshold -->
+        <form method="POST" action="{% url 'update_alert_threshold' %}">
+            {% csrf_token %}
+            <label for="alert_threshold">Global Alert Threshold ($):</label>
+            <input type="number" name="alert_threshold" id="alert_threshold" step="0.01" value="{{ global_threshold }}">
+            <button type="submit">Update</button>
+        </form>
+
+        <!-- Category-Specific Thresholds -->
+        <h3>🔹 Category-Specific Thresholds</h3>
+        <form method="POST" action="{% url 'update_category_threshold' %}">
+            {% csrf_token %}
+            <label for="category">Category:</label>
+            <select name="category" id="category-select" required>
+                <option value="Groceries">Groceries</option>
+                <option value="Travel">Travel</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Dining">Dining</option>
+                <option value="Shopping">Shopping</option>
+            </select>
+            <label for="threshold">Threshold ($):</label>
+            <input type="number" name="threshold" id="category-threshold" step="0.01" required>
+            <button type="submit">Set Threshold</button>
+        </form>
+
+        <!-- Show Current Category Thresholds -->
+        {% if category_thresholds %}
+        <h4>Current Thresholds (Click to Edit)</h4>
+        <ul id="threshold-list">
+            {% for category, threshold in category_thresholds.items %}
+            <li>
+                <span class="category-name" onclick="editThreshold('{{ category }}', {{ threshold }})">{{ category }}</span>: 
+                <span id="threshold-value-{{ category }}">{{ threshold }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        function dismissAlert(transactionId) {
+            fetch(`/budgeting/dismiss-alert/${transactionId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    document.getElementById("alert-" + transactionId).style.opacity = "0";
+                    setTimeout(() => document.getElementById("alert-" + transactionId).style.display = "none", 300);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+        function editThreshold(category, currentThreshold) {
+            document.getElementById("category-select").value = category;
+            document.getElementById("category-threshold").value = currentThreshold;
+        }
+    </script>
+        
+        
+    <a href="{% url 'financial_reports' %}" class="button">Reports</a>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Total Income</h3>
+            <p class="highlight text-green">${{ total_income }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Expenses</h3>
+            <p class="highlight text-red">${{ total_expenses }}</p>
+        </div>
+        <div class="card">
+            <h3>Net Savings</h3>
+            <p class="highlight text-blue">${{ net_savings }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Expense Breakdown</h3>
+        <canvas id="expenseChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Budget Progress</h3>
+        <canvas id="budgetChart"></canvas>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Income</h3>
+            <ul class="list">
+                {% for income in incomes %}
+                <li>
+                    {{ income.source }} - ${{ income.amount }}
+                    <a href="{% url 'edit_income' income.id %}" class="button">Edit</a>
+                    <a href="{% url 'delete_income' income.id %}" class="delete-link" onclick="return confirm('Are you sure?');">Delete</a>
+                </li>
+                {% empty %}
+                <li>No income recorded.</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'add_income' %}" class="button">Add Income</a>
+        </div>
+
+        <div class="card">
+            <h3>📉 Expenses</h3>
+            <ul class="list">
+                {% for expense in expenses %}
+                <li>
+                    <span><strong>{{ expense.category }}</strong>: {{ expense.description }} - ${{ expense.amount }}</span>
+                    <a href="{% url 'edit_expense' expense.id %}" class="button">Edit</a>
+                    <a href="{% url 'delete_expense' expense.id %}" class="delete-link" onclick="return confirm('Are you sure?');">Delete</a>
+                </li>
+                {% empty %}
+                <li>No expenses recorded.</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'add_expense' %}" class="button">➕ Add Expense</a>
+
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Credit Cards</h3>
+            <ul class="list">
+                {% for card in credit_cards %}
+                <li>
+                    {{ card.card_name }} - Balance: ${{ card.balance }}
+                    <a href="{{ card.payment_link }}" class="button" target="_blank">Pay Now</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'add_credit_card' %}" class="button">Add Credit Card</a>
+        </div>
+
+        <div class="card">
+            <h3>Savings Goals</h3>
+            <ul class="list">
+                {% for saving in savings %}
+                <li>
+                    {{ saving.goal_name }}: ${{ saving.current_amount }} / ${{ saving.goal_amount }}
+                    <a href="{% url 'edit_savings' saving.id %}" class="button">Edit</a>
+                    <a href="{% url 'delete_savings' saving.id %}" class="delete-link" onclick="return confirm('Are you sure?');">Delete</a>
+                </li>
+                {% empty %}
+                <li>No savings goals set.</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'add_savings' %}" class="button">Add Savings Goal</a>
+        </div>
+
+        <div class="card">
+            <h3>📅 Upcoming Bills</h3>
+            <ul class="list">
+                {% for bill in bills %}
+                <li>
+                    <strong>{{ bill.name }}</strong> - Due: {{ bill.due_date }} - ${{ bill.amount }}
+                    <a href="{% url 'edit_bill' bill.id %}" class="button">Edit</a>
+                    <a href="{% url 'delete_bill' bill.id %}" class="delete-link" onclick="return confirm('Are you sure?');">Delete</a>
+                </li>
+                {% empty %}
+                <li>No upcoming bills.</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'add_bill' %}" class="button">➕ Add Bill</a>
+        </div>
+    </div>
+    <div>
+        <h1>📊 Budget Tracking & Spending Analysis</h1>
+
+        <!-- ✅ Category Spending Chart -->
+        <div class="chart-container">
+            <h3>💸 Spending by Category</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // ✅ Get category data from Django
+            var categoryLabels = JSON.parse('{{ category_labels|escapejs }}');
+            var categoryValues = JSON.parse('{{ category_values|escapejs }}');
+
+            // ✅ Create Chart.js Pie Chart
+            var ctx = document.getElementById('categoryChart').getContext('2d');
+            var categoryChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Category Spending',
+                        data: categoryValues,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800']
+                    }]
+                }
+            });
+        </script>
+    </div>
+    <div>
+        <!-- ✅ Monthly Spending Chart -->
+        <div class="chart-container">
+            <h3>📅 Monthly Spending Trend</h3>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <script>
+            // ✅ Get monthly data from Django
+            var monthLabels = JSON.parse('{{ month_labels|escapejs }}');
+            var monthValues = JSON.parse('{{ month_values|escapejs }}');
+
+            // ✅ Create Chart.js Line Chart
+            var ctx2 = document.getElementById('monthlyChart').getContext('2d');
+            var monthlyChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Total Monthly Spending',
+                        data: monthValues,
+                        borderColor: '#FF5733',
+                        backgroundColor: 'rgba(255, 87, 51, 0.2)',
+                        borderWidth: 2
+                    }]
+                }
+            });
+        </script>
+    </div>
+    <div>
+        <h3>📈 AI Model Accuracy: {{ ai_accuracy }}%</h3>
+
+        {% if transactions %}
+        <h3>📌 Transactions</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>AI Predicted Category</th>
+                <th>AI Confidence</th>
+                <th>Action</th>
+            </tr>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.name }}</td>
+                <td>${{ transaction.amount }}</td>
+                <td>
+                    {% if transaction.category %}
+                        {{ transaction.category }}
+                    {% else %}
+                        <span class="predicted-category">{{ transaction.ai_predicted_category }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ transaction.ai_accuracy }}%</td>
+                <td>
+                    {% if not transaction.ai_approved %}
+                        <form method="POST" action="{% url 'approve_ai_prediction' transaction.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="category" value="{{ transaction.ai_predicted_category }}">
+                            <button type="submit">✔ Accept</button>
+                        </form>
+                        <form method="POST" action="{% url 'correct_ai_prediction' transaction.id %}">
+                            {% csrf_token %}
+                            <input type="text" name="corrected_category" placeholder="Enter correct category">
+                            <button type="submit">✏ Correct</button>
+                        </form>
+                    {% else %}
+                        ✅ Approved
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

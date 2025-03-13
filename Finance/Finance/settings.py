@@ -12,16 +12,20 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+# Load environment variables from .env.prod
+env_path = BASE_DIR / ".env.prod"
+load_dotenv(env_path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*zyb7*k7cwg64b=c%81t!uy%3@4g!4sq4b69+hmw)uvwne&m1g'
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,6 +39,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'monthly_bills',
+    'budgeting',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Finance.wsgi.application'
+WSGI_APPLICATION = os.getenv('WSGI_APPLICATION')
 
 
 # Database
@@ -108,15 +113,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = os.getenv("LANGUAGE_CODE")
 
-TIME_ZONE = 'US/Eastern'
+TIME_ZONE = os.getenv("TIME_ZONE")
 
-USE_I18N = True
+USE_I18N = os.getenv("USE_I18N")
 
-USE_L10N = True
+USE_L10N = os.getenv("USE_L10N")
 
-USE_TZ = True
+USE_TZ = os.getenv("USE_TZ")
 
 
 # Static files (CSS, JavaScript, Images)
@@ -135,14 +140,29 @@ STATICFILES_DIR = (
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = os.getenv("DEFAULT_AUTO_FIELD")
 
-STRIPE_SECRET_KEY = 'sk_test_51QkiJCFYAt9hUnLy8h249l2766Ka939dfD0C8wVWd4ryakQeucN8XdPabE4JNG47UriZrnWSKx3qOEfgP9Uk9SdZ00sFicMyLq'
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51QkiJCFYAt9hUnLyyJEtsQMStjSgXhJJIRPaR3k7NBEg87S9glv91OftfT4MNSPAJwxwmIOUQg80deNqv29Revel00uxErFLM6'
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
 
 
 CRON_CLASSES = [
     "monthly_bills.cron.ProcessScheduledPayments",
     "monthly_bills.cron.ChargeMonthlyRentCronJob",
+    "budgeting.cron.FetchTransactionsCronJob",
 ]
+
+PLAID_CLIENT_ID = os.getenv("PLAID_CLIENT_ID")
+PLAID_SECRET = os.getenv("PLAID_SECRET")
+PLAID_ENV = os.getenv("PLAID_ENV", "sandbox")
+
+LARGE_TRANSACTION_THRESHOLD = 500.00  # Adjust this based on your preference
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 

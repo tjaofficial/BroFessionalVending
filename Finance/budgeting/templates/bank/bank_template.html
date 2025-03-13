@@ -1,0 +1,29 @@
+{% extends "components/layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>🔗 Connect Your Bank Account</h1>
+    <p>Securely link your bank account using Plaid to automatically track transactions and balances.</p>
+
+    <button id="link-button" class="button">Connect Bank</button>
+
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <script>
+        document.getElementById('link-button').addEventListener('click', function() {
+            var handler = Plaid.create({
+                token: "{{ link_token }}",
+                onSuccess: function(public_token, metadata) {
+                    alert("Bank account connected successfully!");
+                    // TODO: Send public_token to backend to exchange for access_token
+                },
+                onExit: function(err, metadata) {
+                    if (err) {
+                        console.error("Plaid Error:", err);
+                    }
+                }
+            });
+            handler.open();
+        });
+    </script>
+</div>
+{% endblock %}
