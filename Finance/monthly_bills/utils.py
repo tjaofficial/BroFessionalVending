@@ -1,5 +1,6 @@
 from .models import Transaction, machine_stock_model, item_data_model, machine_build_model
 from decimal import Decimal
+from datetime import date
 
 def productName(id_tag):
     stockModel = machine_stock_model.objects.filter(id_tag__id_tag__exact=id_tag, discontinued=False).order_by('itemID')
@@ -53,8 +54,16 @@ def payment_charges_totals(tenant):
     current_balance = total_payments - total_charges
     return current_balance
 
+def first_of_month(d):
+    return date(d.year, d.month, 1)
 
+def add_months(d, months):
+    year = d.year + (d.month - 1 + months) // 12
+    month = (d.month - 1 + months) % 12 + 1
+    return date(year, month, 1)
 
+def month_list_for_year(year: int):
+    return [date(year, m, 1) for m in range(1, 13)]
 
 
 

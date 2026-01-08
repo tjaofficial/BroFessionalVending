@@ -1,8 +1,7 @@
-from django.urls import path
-from . import views
-
-from django.conf import settings
-from django.contrib.auth import views as auth_views
+from django.urls import path #type: ignore
+from . import views #type: ignore
+from django.conf import settings #type: ignore
+from django.contrib.auth import views as auth_views #type: ignore
 
 
 
@@ -73,7 +72,10 @@ urlpatterns = [
     path("payment_cancel/", views.payment_cancel, name="payment_cancel"),
     path("save-payment-method/", views.save_payment_method, name="save_payment_method"),
     path("add-payment-success/", views.add_payment_success, name="add_payment_success"),
-
+    path("rent/", views.rent_overview, name="rent_overview"),
+    path("rent/backfill/", views.backfill_rent_charges, name="rent_backfill"),
+    path("dues/", views.dues_overview, name="dues_overview"),
+    path("dues/record/", views.record_dues_payment, name="record_dues_payment"),
     #`/tenant/review-payment/?amount=${selectedAmount}`
 
 

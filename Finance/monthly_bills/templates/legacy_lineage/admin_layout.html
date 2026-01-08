@@ -66,9 +66,16 @@
                         </ul>
                     </li>
                     <li>
-                        <button class="soft-btn">
-                            <a href="{% url 'expense_overview' %}">Tax Return</a>
+                        <button class="soft-btn" style="margin-bottom: 10px;">
+                            <span>Finances</span>
                         </button>
+                        <div style="margin-left: 30px;">
+                            <ul style="list-style: disc; color: black; font-size: 13px;">
+                                <li><a href="{% url 'expense_overview' %}">Tax Return</a></li>
+                                <li><a href="{% url 'rent_overview' %}">Rent</a></li>
+                                <li><a href="{% url 'dues_overview' %}">Dues</a></li>
+                            </ul>
+                        </div>
                     </li>
                     <li>
                         <button class="soft-btn">

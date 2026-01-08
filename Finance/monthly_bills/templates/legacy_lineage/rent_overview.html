@@ -1,0 +1,135 @@
+{% extends "legacy_lineage/admin_layout.html" %}{% load static %}
+{% block content %}
+	<link rel="stylesheet" href="{% static 'legacy_lineage/style/rent_overview.css' %}">
+	<script defer src="{% static 'legacy_lineage/script/rent_overview.js' %}"></script>
+
+	<div class="rent-container">
+		<h2 class="page-title">Rent Overview</h2>
+		<div class="top-grid">
+			<!-- Past Due Card -->
+			<div class="card">
+			<h3>Past Due</h3>
+			{% if past_due_list %}
+				<div class="past-due-list">
+				{% for t in past_due_list %}
+					<div class="past-due-item">
+					<div class="past-due-header">
+						<strong>{{ t.tenant_name }}</strong>
+						<span class="money">${{ t.total_due|floatformat:2 }}</span>
+					</div>
+					<div class="months">
+						{% for m in t.months %}
+						<span class="pill pill-red">{{ m }}</span>
+						{% endfor %}
+					</div>
+					</div>
+				{% endfor %}
+				</div>
+			{% else %}
+				<p class="muted">Nobody past due. Rare. Beautiful. 🥲</p>
+			{% endif %}
+			</div>
+
+			<!-- Tenants Quick Actions -->
+			<div class="card">
+				<h3>Tenants</h3>
+				<div class="tenant-list">
+					{% for t in tenants %}
+					<div class="tenant-row">
+						<div class="tenant-name">{{ t.userProf.user.first_name }} {{ t.userProf.user.last_name }}</div>
+
+						<button class="btn-action open-payment" data-tenant-id="{{ t.id }}" data-tenant-name="{{ t.userProf.user.first_name }} {{ t.userProf.user.last_name }}">
+							Record Payment
+						</button>
+						<form method="post" action="{% url 'rent_backfill' %}" style="display:inline;"
+							onsubmit="return confirm('Backfill missing rent charges for ALL active tenants through this month?');">
+							{% csrf_token %}
+							<button type="submit" class="btn-action">
+								Backfill Missing Rent Charges
+							</button>
+						</form>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+		<!-- Filters -->
+		<div class="filter-bar">
+			<input type="text" id="filter-tenant" placeholder="Filter tenant name...">
+			<input type="month" id="filter-month">
+			<select id="filter-status">
+				<option value="">All Status</option>
+				<option value="Unpaid">Unpaid</option>
+				<option value="Partial">Partial</option>
+				<option value="Paid">Paid</option>
+			</select>
+			<button id="clear-filters" class="btn-filter">Clear</button>
+		</div>
+
+		<!-- Ledger Table -->
+		<div class="card">
+			<h3>Rent Ledger</h3>
+			<table class="rent-table" id="rent-table">
+				<thead>
+					<tr>
+					<th>Tenant</th>
+					<th>Month</th>
+					<th>Due</th>
+					<th>Paid</th>
+					<th>Balance</th>
+					<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for r in ledger_rows %}
+						<tr
+							data-tenant="{{ r.tenant_name|lower }}"
+							data-month="{{ r.rent_month|date:'Y-m' }}"
+							data-status="{{ r.status }}"
+						>
+							<td>{{ r.tenant_name }}</td>
+							<td>{{ r.month_label }}</td>
+							<td>${{ r.due|floatformat:2 }}</td>
+							<td>${{ r.paid|floatformat:2 }}</td>
+							<td>${{ r.balance|floatformat:2 }}</td>
+							<td>
+							<span class="pill {% if r.status == 'Paid' %}pill-green{% elif r.status == 'Partial' %}pill-yellow{% else %}pill-red{% endif %}">
+								{{ r.status }}
+							</span>
+							</td>
+						</tr>
+					{% empty %}
+						<tr><td colspan="6">No rent records found.</td></tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Payment Modal -->
+	<div id="payment-modal" class="modal">
+		<div class="modal-content">
+			<span class="close-modal" id="close-payment">&times;</span>
+			<h3 id="payment-title">Record Payment</h3>
+
+			<form method="POST">
+				{% csrf_token %}
+				<input type="hidden" name="record_payment" value="1">
+				<input type="hidden" name="tenant_id" id="payment-tenant-id">
+
+				<label>Month</label>
+				<input type="date" name="rent_month" id="payment-rent-month" value="{{ current_month|date:'Y-m-d' }}">
+
+				<label>Amount</label>
+				<input type="number" step="0.01" name="amount" required>
+
+				<label>Note (optional)</label>
+				<input type="text" name="note" placeholder="Cash / check / partial, etc.">
+
+				<button class="btn-action" type="submit">Save Payment</button>
+			</form>
+		</div>
+	</div>
+
+{% endblock %}

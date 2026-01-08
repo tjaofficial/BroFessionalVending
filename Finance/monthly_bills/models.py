@@ -1,6 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
+from django.db import models #type: ignore
+from django.contrib.auth.models import User #type: ignore
+from django.utils import timezone #type: ignore
+from datetime import date
+
+def first_of_month(d):
+    return date(d.year, d.month, 1)
 
 
 # Create your models here.
@@ -54,6 +58,11 @@ billing_periods = (
     ('Bi-Monthly', 'Bi-Monthly'),
     ('Weekly', 'Weekly'),
 )
+status_choices = (
+    ("Paid", "Paid"),
+    ("Overdue", "Overdue")
+)
+
 class bill_items_model(models.Model):
     title = models.CharField(
         max_length=30
@@ -802,7 +811,8 @@ class WriteOff(models.Model):
         ('rent', 'Rent'),
         ('house_sold', 'House Sold'),
         ('deposit', 'Deposit'),
-        ('tax_return', 'Tax Return')
+        ('tax_return', 'Tax Return'),
+        ('dues', 'Dues')
     ]
 
     TRANSACTION_TYPE_CHOICES = [
@@ -897,6 +907,18 @@ class Transaction(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, blank=True, null=True)
     payment_method = models.ForeignKey('PaymentMethod', on_delete=models.CASCADE, blank=True, null=True)
     scheduled_date = models.DateTimeField(auto_now=False, auto_now_add=True, blank=True, null=True)
+    RENT_STATUS_CHOICES = [
+        ('Unpaid', 'Unpaid'),
+        ('Partial', 'Partial'),
+        ('Paid', 'Paid'),
+    ]
+
+    rent_month = models.DateField(blank=True, null=True, db_index=True)
+    # rent_month should always be the FIRST day of the month (e.g. 2026-01-01)
+
+    # Optional: only if you want to manually override computed status for weird cases
+    rent_status_override = models.CharField(max_length=10, choices=RENT_STATUS_CHOICES, blank=True, null=True)
+    paid_date = models.DateField(default=timezone.localdate, blank=True, null=True)
 
     def __str__(self):
         return f"{self.transaction_type} - ${self.amount} for {self.tenant.user.username} on {self.date.strftime('%Y-%m-%d')}"
@@ -996,9 +1018,63 @@ class PaymentMethod(models.Model):
     def __str__(self):
         return f"{self.brand} ending in {self.last4} for {self.tenantChoice}"
 
+class Rent(models.Model):
+    date = models.DateField(
+        auto_now=False,
+        auto_now_add=False
+    )
+    tenant = models.ForeignKey('Tenant', on_delete=models.CASCADE, related_name='payments')
+    status = models.CharField(
+        choices=status_choices,
+        max_length=20,
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+class LLCMember(models.Model):
+    """
+    Internal members (not tenants) who pay monthly dues to Legacy Lineage.
+    """
+    userProf = models.ForeignKey(
+        "UserProfile",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="llc_memberships"
+    )
+    display_name = models.CharField(max_length=120)  # what mom sees
+    monthly_dues = models.DecimalField(max_digits=10, decimal_places=2, default=100.00)
+    start_date = models.DateField(default=timezone.localdate)  # when dues start
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.display_name
+
+class MemberDuesPayment(models.Model):
+    """
+    Each payment made by a member.
+    We bucket payments into a month using dues_month (first day of month).
+    """
+    member = models.ForeignKey(LLCMember, on_delete=models.CASCADE, related_name="dues_payments")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid_date = models.DateField(default=timezone.localdate)
+    dues_month = models.DateField()  # always first-of-month for the bucket
+    note = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.dues_month:
+            self.dues_month = first_of_month(self.dues_month)
+        else:
+            self.dues_month = first_of_month(self.paid_date)
+        super().save(*args, **kwargs)
 
 
-
+    def __str__(self):
+        return f"{self.member.display_name} - ${self.amount} on {self.paid_date}"
 
 
 

@@ -1,21 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 #type: ignore
 from ..forms import TenantForm, PropertyForm, AddExpenseForm, MaintenanceRequestForm, AddIncomeForm
 from ..models import PaymentMethod, Property, Tenant, WriteOff, Revenue, MaintenanceRequest, Transaction, UserProfile
 from ..utils import payment_charges_totals
-from django.db.models import Sum
-from django.db.models.functions import ExtractYear, Upper
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib import messages
-from django.contrib.auth.models import User
-import stripe
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
+from django.db.models import Sum #type: ignore
+from django.db.models.functions import ExtractYear #type: ignore
+from django.http import JsonResponse #type: ignore
+from django.contrib.auth.decorators import login_required #type: ignore
+from django.contrib.auth.forms import UserCreationForm #type: ignore
+from django.contrib import messages #type: ignore
+import stripe #type: ignore
+from django.views.decorators.csrf import csrf_exempt #type: ignore
+from django.conf import settings #type: ignore
 import json
 from datetime import datetime, date
 from decimal import Decimal
-from django.urls import reverse
+from django.urls import reverse #type: ignore
 
 
 
@@ -103,11 +102,12 @@ def view_tenants(request):
 def expense_overview(request):
     # Calculate totals by category
     totals = {
-        'auto': WriteOff.objects.filter(category='auto').aggregate(Sum('amount'))['amount__sum'] or 0,
-        'business': WriteOff.objects.filter(category='business').aggregate(Sum('amount'))['amount__sum'] or 0,
-        'home_office': WriteOff.objects.filter(category='home_office').aggregate(Sum('amount'))['amount__sum'] or 0,
-        'meals': WriteOff.objects.filter(category='meals').aggregate(Sum('amount'))['amount__sum'] or 0,
-        'property': WriteOff.objects.filter(category='property').aggregate(Sum('amount'))['amount__sum'] or 0,
+        'auto': WriteOff.objects.filter(category='auto', transaction_type="Expense").aggregate(Sum('amount'))['amount__sum'] or 0,
+        'business': WriteOff.objects.filter(category='business', transaction_type="Expense").aggregate(Sum('amount'))['amount__sum'] or 0,
+        'home_office': WriteOff.objects.filter(category='home_office', transaction_type="Expense").aggregate(Sum('amount'))['amount__sum'] or 0,
+        'meals': WriteOff.objects.filter(category='meals', transaction_type="Expense").aggregate(Sum('amount'))['amount__sum'] or 0,
+        'property': WriteOff.objects.filter(category='property', transaction_type="Expense").aggregate(Sum('amount'))['amount__sum'] or 0,
+        'income': WriteOff.objects.filter(category__in=["rent", "dues"], transaction_type="Income").aggregate(Sum('amount'))['amount__sum'] or 0,
     }
 
     writeoffs = WriteOff.objects.all().order_by('-date')

@@ -1,4 +1,4 @@
-from django import forms
+from django import forms #type: ignore
 from .models import Income, Expense, Budget, Debt, Savings, CreditCard, Bill
 
 class IncomeForm(forms.ModelForm):

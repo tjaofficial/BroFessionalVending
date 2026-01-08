@@ -1,0 +1,160 @@
+{% extends "legacy_lineage/admin_layout.html" %}
+{% load static dues_extras %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/write_offs.css' %}">
+<link rel="stylesheet" href="{% static 'legacy_lineage/style/dues.css' %}">
+<script defer src="{% static 'legacy_lineage/script/dues.js' %}"></script>
+
+<div class="writeoff-container">
+  <h2 class="page-title">Member Dues – {{ year }}</h2>
+
+  <div class="filter-bar">
+    <form method="get" style="display:flex; gap:10px; align-items:center;">
+      <input type="number" name="year" value="{{ year }}" style="width:120px;" />
+      <button class="btn-filter" type="submit">Go</button>
+    </form>
+  </div>
+
+  <!-- Quick actions card -->
+  <div class="summary-bar" style="width:auto; flex-wrap:wrap;">
+    <div class="summary-item" style="min-width:280px;">
+      <h3>Quick Actions</h3>
+      <p style="font-size: 1rem; color:#555; margin:0;">
+        Pick a member, record payment (split payments supported).
+      </p>
+      <div style="margin-top:12px; display:flex; justify-content:center;">
+        <button class="btn-action open-dues-modal" type="button">Record Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid (spreadsheet-style) -->
+    <div class="writeoff-list">
+        <h3>Status Grid</h3>
+        <div class="grid-scroll">
+            <table class="dues-grid">
+                <thead>
+                <tr>
+                    <th class="sticky-col">Member</th>
+                    {% for m in months %}
+                    <th class="month-head">{{ m|date:"F" }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for member in members %}
+                    <tr>
+                    <td class="sticky-col member-col">
+                        <div class="member-cell">
+                        <div>
+                            <div class="member-name">{{ member.display_name }}</div>
+                            <div class="member-sub">${{ member.monthly_dues }}/mo</div>
+                        </div>
+
+                        <button
+                            class="btn-mini open-dues-modal"
+                            type="button"
+                            data-member-id="{{ member.id }}"
+                        >
+                            Record Payment
+                        </button>
+                        </div>
+                    </td>
+
+                    {% for m in months %}
+                        {% dues_cell grid member.id m as cell %}
+
+                        <td class="month-cell">
+                        <button
+                            type="button"
+                            class="pill {{ cell.status|status_class }} open-dues-modal"
+                            data-member-id="{{ member.id }}"
+                            data-month="{{ m|date:'Y-m-01' }}"
+                            data-total="{{ cell.total }}"
+                            data-dues="{{ member.monthly_dues }}"
+                            title="Paid so far: ${{ cell.total }}"
+                        >
+                            {{ cell.status }}
+                        </button>
+                        </td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+  <!-- Payments table -->
+  <div class="writeoff-list" style="margin-top:25px;">
+    <h3>Payments</h3>
+    <table class="writeoff-table">
+      <thead>
+        <tr>
+          <th style="width:220px;">Member</th>
+          <th style="width:120px;">Amount</th>
+          <th style="width:120px;">Date</th>
+          <th style="width:120px;">Month</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.member.display_name }}</td>
+            <td>${{ p.amount }}</td>
+            <td>{{ p.paid_date }}</td>
+            <td>{{ p.dues_month|date:"Y-m" }}</td>
+            <td>{{ p.note|default:"" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">No payments recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Record Payment Modal -->
+<div id="dues-payment-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3 style="margin-top:0;">Record Member Dues Payment</h3>
+
+    <form method="post" action="{% url 'record_dues_payment' %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label>Member</label>
+            {{ form.member }}
+        </div>
+
+        <div class="form-row">
+            <label>Apply to Month</label>
+            {{ form.apply_month }}
+            <small class="hint">This is the month that gets marked Paid/Partial.</small>
+        </div>
+
+        <div class="form-row">
+            <label>Payment Date</label>
+            {{ form.paid_date }}
+        </div>
+
+        <div class="form-row">
+            <label>Amount</label>
+            {{ form.amount }}
+        </div>
+
+        <div class="form-row">
+            <label>Note</label>
+            {{ form.note }}
+        </div>
+
+        <button class="btn-action" type="submit">Save Payment</button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

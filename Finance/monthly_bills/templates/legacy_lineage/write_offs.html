@@ -25,24 +25,28 @@
 
     <div class="summary-bar">
         <div class="summary-item">
+            <h3>Total Income</h3>
+            <p>${{ totals.income|floatformat:2 }}</p>
+        </div>
+        <div class="summary-item">
             <h3>Total Auto Expenses</h3>
-            <p>${{ totals.auto|floatformat:2 }}</p>
+            <p>-${{ totals.auto|floatformat:2 }}</p>
         </div>
         <div class="summary-item">
             <h3>Total Business Expenses</h3>
-            <p>${{ totals.business|floatformat:2 }}</p>
+            <p>-${{ totals.business|floatformat:2 }}</p>
         </div>
         <div class="summary-item">
             <h3>Total Home Office Expenses</h3>
-            <p>${{ totals.home_office|floatformat:2 }}</p>
+            <p>-${{ totals.home_office|floatformat:2 }}</p>
         </div>
         <div class="summary-item">
             <h3>Total Meal Expenses</h3>
-            <p>${{ totals.meals|floatformat:2 }}</p>
+            <p>-${{ totals.meals|floatformat:2 }}</p>
         </div>
         <div class="summary-item">
             <h3>Total Property Expenses</h3>
-            <p>${{ totals.property|floatformat:2 }}</p>
+            <p>-${{ totals.property|floatformat:2 }}</p>
         </div>
     </div>
 

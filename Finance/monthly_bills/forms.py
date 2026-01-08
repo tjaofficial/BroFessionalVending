@@ -1,8 +1,8 @@
 from .models import *
-from django import forms
-from django.forms import ModelForm, Textarea
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django import forms #type: ignore
+from django.forms import ModelForm, Textarea #type: ignore
+from django.contrib.auth.forms import UserCreationForm #type: ignore
+from django.contrib.auth.models import User #type: ignore
 from .utils import find_machines_with_item
 import datetime
 
@@ -416,6 +416,12 @@ class AddIncomeForm(forms.ModelForm):
         ]
 
 class MaintenanceRequestForm(forms.ModelForm):
+    apply_month = forms.CharField(
+        label="Apply to Month",
+        widget=forms.TextInput(attrs={"type": "month"}),
+        required=True,
+        help_text="Which month this payment counts toward."
+    )
     class Meta:
         model = MaintenanceRequest
         fields = ['category', 'description', 'status', 'property']
@@ -494,6 +500,43 @@ class LossStockForm(forms.ModelForm):
             "reported_by": forms.TextInput(attrs={"class": "form-control"}),
             "machine_id": forms.Select(attrs={"class": "form-control"}),  # Dropdown for machine_id
         }
+
+class MemberDuesPaymentForm(forms.ModelForm):
+    apply_month = forms.CharField(
+        label="Apply to Month",
+        widget=forms.TextInput(attrs={"type": "month"}),
+        required=True,
+        help_text="Which month this payment counts toward."
+    )
+
+    class Meta:
+        model = MemberDuesPayment
+        fields = ["member", "amount", "paid_date", "note", "apply_month"]  # keep dues_month OUT of fields
+        widgets = {
+            "paid_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def clean_apply_month(self):
+        raw = (self.cleaned_data.get("apply_month") or "").strip()
+        print(raw)
+        # Expect "YYYY-MM"
+        try:
+            year_str, month_str = raw.split("-")
+            y = int(year_str)
+            m = int(month_str)
+            return date(y, m, 1)
+        except Exception:
+            raise forms.ValidationError("Pick a valid month.")
+
+    def save(self, commit=True):
+        obj = super().save(commit=False)
+        obj.dues_month = self.cleaned_data["apply_month"]
+        if commit:
+            obj.save()
+        return obj
+    
+
+
 
 
 
